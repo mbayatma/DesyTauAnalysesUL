@@ -3,21 +3,14 @@ source /cvmfs/cms.cern.ch/cmsset_default.sh
 
 export SCRAM_ARCH=slc7_amd64_gcc700
 
-cmsrel CMSSW_10_6_26
-cd CMSSW_10_6_26/src
+cmsrel CMSSW_12_1_1
+cd CMSSW_12_1_1/src
 cmsenv
 
 git cms-init
 
 cd ${CMSSW_BASE}/src
 git clone https://github.com/CMS-HTT/HiggsCPinTauDecays.git
-
-cd ${CMSSW_BASE}/src
-git cms-addpkg RecoEgamma/EgammaTools
-git clone https://github.com/cms-egamma/EgammaPostRecoTools.git
-mv EgammaPostRecoTools/python/EgammaPostRecoTools.py RecoEgamma/EgammaTools/python/.
-git clone -b ULSSfiles_correctScaleSysMC https://github.com/jainshilpi/EgammaAnalysis-ElectronTools.git EgammaAnalysis/ElectronTools/data/
-git cms-addpkg EgammaAnalysis/ElectronTools
 
 scram b -j 8
 
@@ -58,7 +51,14 @@ cd ${CMSSW_BASE}/src
 
 cp -r /nfs/dust/cms/user/cardinia/public/DesyTau_data/data ${CMSSW_BASE}/src/DesyTauAnalyses/Common/.
 
+git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODTools
+cd PhysicsTools/NanoAODTools
+
+python3 -c 'import correctionlib._core; import correctionlib.schemav2'
+
+
 
 scram b -j 16
 scram b -j 16
+
 

@@ -187,7 +187,7 @@ int main(int argc, char * argv[]){
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
   if(ApplyBTagScaling){
-    calib = BTagCalibration(BTagAlgorithm, BtagSfFile);
+    calib = BTagCalibration(BTagAlgorithm, BtagSfFile,true);
     reader_B = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_C = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_Light = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
@@ -1541,9 +1541,9 @@ int main(int argc, char * argv[]){
       // mt TOT
       TLorentzVector metxLV = metLV;
       if (usePuppiMET) metxLV = puppimetLV;
-      float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(DeltaPhi(tau1LV,metxLV)));
-      mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(DeltaPhi(tau2LV,metxLV))); 
-      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(DeltaPhi(tau1LV,tau2LV))); 
+      float mtTOT = 2*(otree->pt_1)*metxLV.Pt()*(1-cos(deltaPhi(tau1LV,metxLV)));
+      mtTOT += 2*(otree->pt_2)*metxLV.Pt()*(1-cos(deltaPhi(tau2LV,metxLV))); 
+      mtTOT += 2*(otree->pt_1)*(otree->pt_2)*(1-cos(deltaPhi(tau1LV,tau2LV))); 
       otree->mt_tot = TMath::Sqrt(mtTOT);
         
       //extra lepton vetos

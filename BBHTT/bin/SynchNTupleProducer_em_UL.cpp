@@ -245,7 +245,7 @@ int main(int argc, char * argv[]){
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
   if(ApplyBTagScaling){
-    calib = BTagCalibration(BTagAlgorithm, BtagSfFile);
+    calib = BTagCalibration(BTagAlgorithm, BtagSfFile,true);
     reader_B = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_C = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_Light = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});

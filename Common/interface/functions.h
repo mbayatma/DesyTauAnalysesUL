@@ -233,7 +233,7 @@ double mT (TLorentzVector v1, TLorentzVector Metv){
 
 
 
-double DeltaPhi(TLorentzVector METV, TLorentzVector LeptonV){
+double deltaPhi(TLorentzVector METV, TLorentzVector LeptonV){
   TLorentzVector Ws = METV + LeptonV;
 
   //Delta phi between W and Lep

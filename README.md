@@ -3,7 +3,7 @@ DesyTauAnalyses FW for Run2 UL campaign
 
 ## BBHTT analysis
 
-For the bbH(tau tau) analysis the setup script is located in the (subdirectory BBHTT)[https://github.com/DesyTau/DesyTauAnalysesUL/tree/bbHTT/BBHTT#desytauanalysesul---bbhtt-analysis]
+For the bbH(tau tau) analysis the setup script is located in the [subdirectory BBHTT](https://github.com/DesyTau/DesyTauAnalysesUL/tree/bbHTT/BBHTT#desytauanalysesul---bbhtt-analysis)
 
 
 ### Install BBHTT version

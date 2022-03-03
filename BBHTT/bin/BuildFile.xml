@@ -12,6 +12,12 @@
  <lib name="stdc++fs" />
 </bin>
 
+<bin name="PlotDatacards" file="PlotDatacards.cpp">
+  <use name="root"/>
+  <use name="rootgraphics"/>
+  <use name="rootmath"/>
+</bin>
+
 <bin name="SynchNTupleProducer_bbH" file="SynchNTupleProducer_bbH.cpp">
  <use name="PhysicsTools/Utilities"/>
  <use name="rootgraphics"/>
@@ -75,4 +81,18 @@
  <use name="HTT-utilities/RecoilCorrections_KIT"/>
  <use name="HiggsCPinTauDecays/ImpactParameter"/>
  <use name="HiggsCPinTauDecays/IpCorrection"/>
+</bin>
+
+
+<bin name="CreateCards_emu" file="CreateCards_emu.cpp">
+  <use name="PhysicsTools/Utilities"/>
+  <use name="rootgraphics"/>
+  <use name="root"/>
+  <use name="rootmath"/>
+  <use name="roottmva"/>
+  <use name="boost" />
+  <use name="boost_program_options"/>
+  <use name="DesyTauAnalyses/BBHTT"/>
+  <use name="DesyTauAnalyses/Common"/>
+  <lib name="stdc++fs" />
 </bin>

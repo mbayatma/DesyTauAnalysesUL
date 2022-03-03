@@ -13,4 +13,4 @@ CreateCards_emu $1 $2 $3 0
 EOF1
 
 chmod u+x jobs/$1_$2_$3.sh
-nohup ./jobs/$1_$2_$3.sh > nohup_$1_$2_$3.out &
+nohup ./jobs/$1_$2_$3.sh > jobs/nohup_$1_$2_$3.out &

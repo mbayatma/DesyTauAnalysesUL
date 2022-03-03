@@ -72,7 +72,8 @@ if (argc!=4) {
   //TString output_dir = "";
   samples_map[channel + "-NOMINAL_ntuple_"+Sample     ] = map_sample.at(Sample);
   if(channel=="em")
-      input_dir = "/nfs/dust/cms/user/makou/Higgs_Tau_Tau/CMSSW_10_2_22/src/DesyTauAnalyses/NTupleMaker/test/emu_MSSM/2016";
+      input_dir = "/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/"; 
+    //"/nfs/dust/cms/user/makou/ULFW/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/"+ era;
     //input_dir= "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/" + era;
 //input_dir ="/nfs/dust/cms/user/rasp/storage/cardinia/SynchNTuples/mutau_June2-PAS/" + era ;
   else 
@@ -100,7 +101,7 @@ if (argc!=4) {
   //TF1 *hOS_SS_transfer_factors_njet1= NULL;
   //TF1 *hOS_SS_transfer_factors_njet0= NULL;
   
-  TString output_dir= "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/NTuples_" + era; 
+  TString output_dir= "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/NTuplesULneu_" + era; 
   //TString output_dir= "./NTuples_" + era; 
   gSystem -> Exec("mkdir " + output_dir);
 
@@ -380,6 +381,9 @@ if (era == "2018"){
       //int htxs_stage1p1cat;
       float dr_tt;
       int os;
+      float mbb;
+      float dRbb;
+      int nbtag;
       inTree->SetBranchAddress("gen_noutgoing",&gen_noutgoing);
       inTree->SetBranchAddress("iso_1",&iso_1);
       inTree->SetBranchAddress("iso_2",&iso_2);
@@ -408,6 +412,9 @@ if (era == "2018"){
       inTree->SetBranchAddress("os",&os);
       inTree->SetBranchAddress("weightEMu",&weightEMu);
       inTree->SetBranchAddress("qcdweight",&qcdweight);
+      inTree->SetBranchAddress("mbb", &mbb);
+      inTree->SetBranchAddress("dRbb",&dRbb);
+      inTree->SetBranchAddress("nbtag",&nbtag);
 
       outFile->cd();
       
@@ -586,17 +593,23 @@ if (era == "2018"){
 
   // Replace jet variables to have an effectie cut of jetpt > 30 GeV
 	if(njets < 2){
-	  // jdeta   = -10;
-	  // m_jj     = -10;
-	  // dijetpt = -10;
-	  // pt_ttjj = -10;
+	  jdeta   = -10;
+	  mjj     = -10;
+	  //dijetpt = -10;
+	  //pt_ttjj = -10;
 	  jpt_2   = -10;
 	  jeta_2  = -10;
+	 
 	  if(njets < 1){
 	    jpt_1 = -10;
 	    jeta_1= -10;
 	  }
 	}
+	if(nbtag < 2){
+	  mbb     = -10;
+	  dRbb    = -10;
+	  }
+	
 	
 	// Stitching only for wjets MC in n-jet binned samples in npartons
 	if( subsample.Contains("W") && subsample.Contains("JetsToLNu") ){

@@ -15,8 +15,8 @@ using namespace std;
 
 void Plot(TString filename,
 	  TString  era,
-	  TString category,
 	  TString channel,
+	  TString category,
 	  std::vector<float> bins={0.25,0.4,0.55,0.7,0.85,1.},
 	  TString xtitle="BDT score",
 	  float xmin_blind=0.7,
@@ -386,7 +386,11 @@ void Plot(TString filename,
   canv1->cd();
   canv1->SetSelected(canv1);
   canv1->Update();
-  canv1->Print(category+"_"+era+".png");
+    
+  string cmsswBase = (getenv("CMSSW_BASE"));
+  TString plotfile=(TString) cmsswBase + "/src/DesyTauAnalyses/BBHTT/test/datacards/plots/";
+
+  canv1->Print(plotfile+channel+"-"+category+"_"+era+".png");
   std::cout << std::endl; 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
   std::cout << std::endl;
@@ -420,23 +424,25 @@ int main(int argc, char * argv[]) {
 
   vector<float>bins={0.25,0.4,0.55,0.7,0.85,1.};
 
+  if(label!="")
+    label=(TString)"_"+label;
+
   vector<TString> categories = 
     {
-      channel+"_cat0",
-      channel+"_cat1",
-      channel+"_cat2",
-      channel+"_cat3"
+      channel+"_cat0"+label,
+      channel+"_cat1"+label,
+      channel+"_cat2"+label,
+      channel+"_cat3"+label
     };
-  if(label!="")
-    for(int i=0;i<4;i++)categories[i]+="_"+label;
 
   std::cout << "processing era " << era << std::endl;
   
   for (auto category : categories) {
-    if (category.Contains("Nbtag0")) 
-      blindData = false;
-    else
+    cout << "Run on category: " << category <<endl;
+    if (category.Contains("cat0")) 
       blindData = true;
+    else
+      blindData = false;
     Plot(filename,era,channel,category,bins,xtitle);	
   }
 }

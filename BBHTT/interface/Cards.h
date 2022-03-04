@@ -5,6 +5,7 @@
 #include "TH2.h"
 #include "TTree.h"
 #include "TFile.h"
+#include "TList.h"
 #include "TString.h"
 #include <vector>
 #include <map>
@@ -143,7 +144,14 @@ class Cards {
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
     {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02}    
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
+  {"BBHToTauTau_M125_13TeV",  0.0972},
+  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
+  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
+  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
+  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
+  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
+  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307},  
   };
 
   const map<TString, double> xsecs_2017 = {
@@ -201,7 +209,14 @@ class Cards {
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
     {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02}
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
+  {"BBHToTauTau_M125_13TeV",  0.0972},
+  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
+  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
+  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
+  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
+  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
+  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307}, 
   };
 
   const map<TString, double> xsecs_2018 = {
@@ -259,7 +274,14 @@ class Cards {
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
     {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02}
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
+  {"BBHToTauTau_M125_13TeV",  0.0972},
+  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
+  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
+  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
+  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
+  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
+  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307}, 
   };
 
   const double ggHbb_scale = 0.54;
@@ -479,7 +501,19 @@ class Cards {
     "WZTo2L2Q",
     "WZTo3LNu",
     "ZZTo2L2Q",
-    "ZZTo4L",
+    "ZZTo4L"
+  };
+
+  vector<TString> EWKToTT = {
+    "ST_t-channel_top_4fToTT",
+    "ST_t-channel_antitop_4fToTT",
+    "ST_tW_top_5fToTT",
+    "ST_tW_antitop_5fToTT",
+    "VVTo2L2NuToTT",
+    "WZTo2L2QToTT",
+    "WZTo3LNuToTT",
+    "ZZTo2L2QToTT",
+    "ZZTo4LToTT"
   };
 
   vector<TString> TT = {
@@ -488,12 +522,24 @@ class Cards {
     "TTToSemiLeptonic"
   };
 
+  vector<TString> TTToTT = {
+    "TTTo2L2NuToTT",
+    "TTToHadronicToTT",
+    "TTToSemiLeptonicToTT"
+  };
+
+  map<TString,TString> TTToTTFiles = {
+    {"TTTo2L2NuToTT","TTTo2L2Nu"},
+    {"TTToHadronicToTT","TTToHadronic"},
+    {"TTToSemiLeptonicToTT","TTToSemiLeptonic"}
+  };
+
   vector<TString> DYJets_Low = {
     "DYJetsToLL_M-10to50"
   };
   
   vector<TString> GluGluHToTauTau = {
-    "GluGluHToTauTau_M125" 
+    "GluGluHToTauTau_M125","GluGluToBBHToTauTau_M125_13TeV"
   };
   
   vector<TString> VBFHToTauTau = {
@@ -510,7 +556,11 @@ class Cards {
   };
 
   vector<TString> bbHToTauTau = {
-    "BBHToTauTau_M125_13TeV","BBHToTauTauYbYt_M125_13TeV","GluGluToBBHToTauTau_M125_13TeV"
+    "BBHToTauTau_M125_13TeV"
+  };
+
+  vector<TString> bbHybytToTauTau = {
+    "BBHToTauTauYbYt_M125_13TeV"
   };
 
   vector<TString> GluGluHToWW = {
@@ -534,7 +584,7 @@ class Cards {
   TString mcTauTau;
   const TString BaseTreeName = "TauCheck"; 
   TString baselineTT="trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5";
-  TString baselineEM="(trg_muhigh_elow && pt_2 > 24) || (trg_ehigh_mulow && pt_1 > 24)&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>10.&&pt_2>10.&&extraelec_veto < 0.5&&extramuon_veto<0.5&&TMath::Max(pt_1,pt_2)>20";
+  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>10.&&pt_2>10.&&extraelec_veto < 0.5&&extramuon_veto<0.5";
   TString category;
   const TString mcNotTauTau_TT = "&&!(gen_match_1==5&&gen_match_2==5)";
   const TString mcTauTau_TT = "&&(gen_match_1==5&&gen_match_2==5)";

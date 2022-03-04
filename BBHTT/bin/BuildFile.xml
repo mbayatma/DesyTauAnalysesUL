@@ -16,6 +16,7 @@
   <use name="root"/>
   <use name="rootgraphics"/>
   <use name="rootmath"/>
+  <use name="DesyTauAnalyses/Plotter"/>
 </bin>
 
 <bin name="SynchNTupleProducer_bbH" file="SynchNTupleProducer_bbH.cpp">

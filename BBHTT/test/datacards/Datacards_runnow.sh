@@ -2,7 +2,7 @@
 #for era in 2016 2017 2018
 for era in 2018
 do
-    for dataset in Data EMB DYJets TTbar EWK ggH qqH ggHbb bbH TTbarTT EWKTT
+    for dataset in Data EMB DYJets TTbar EWK ggH qqH ggHbb bbH TTbarToTT EWKToTT bbHybyt
 #    for dataset in ggHbb
     do
 #	for category in Nbtag0 Nbtag1 Nbtag2 NbtagGe1

@@ -98,8 +98,8 @@ Cards::Cards(TString Sample,
   if (sampleToProcess!="Data"&&
       sampleToProcess!="EWK"&&
       sampleToProcess!="TTbar"&&
-      sampleToProcess!="TTbarTT"&&
-      sampleToProcess!="EWKTT"&&
+      sampleToProcess!="TTbarToTT"&&
+      sampleToProcess!="EWKToTT"&&
       sampleToProcess!="WJets"&&
       sampleToProcess!="DYJets"&&
       sampleToProcess!="EMB"&&
@@ -107,6 +107,7 @@ Cards::Cards(TString Sample,
       sampleToProcess!="ggHbb"&&
       sampleToProcess!="qqH"&&
       sampleToProcess!="VH"&&
+      sampleToProcess!="bbHybyt"&&
       sampleToProcess!="bbH") {
     std::cout << "Unknown sample specified : " << sampleToProcess << std::endl;
     std::cout << "Nothing will be done" << std::endl;
@@ -201,7 +202,6 @@ Cards::Cards(TString Sample,
   regionWeight.push_back(globalWeight+QCDFFWeight);
   if(channel=="tt") regionWeight.push_back(globalWeight);
 
-  for(auto weight: regionWeight)cout<<weight<<endl;
 
   nameSampleMap["Data"] = Data; nameHistoMap["Data"] = "data_obs";
   nameSampleMap["DYJetsToLL"] = DYJetsToLL; nameHistoMap["DYJetsToLL"] = "ZL"; 
@@ -210,9 +210,9 @@ Cards::Cards(TString Sample,
   nameSampleMap["DYJetsLowToTT"] = DYJets_Low; nameHistoMap["DYJetsLowToTT"] = "ZTT";
   nameSampleMap["WJets"] = WJets; nameHistoMap["WJets"] = "W";
   nameSampleMap["TTbar"] = TT; nameHistoMap["TTbar"] = "TTL";
-  nameSampleMap["TTbarTT"] = TT; nameHistoMap["TTbarTT"] = "TTT";
+  nameSampleMap["TTbarToTT"] = TTToTT; nameHistoMap["TTbarToTT"] = "TTT";
   nameSampleMap["EWK"] = EWK; nameHistoMap["EWK"] = "VVL";
-  nameSampleMap["EWKTT"] = EWK; nameHistoMap["EWKTT"] = "VVT";
+  nameSampleMap["EWKToTT"] = EWKToTT; nameHistoMap["EWKToTT"] = "VVT";
   nameSampleMap["EMB"] = Embedded; nameHistoMap["EMB"] = "EMB";
   nameSampleMap["ggHWW125"] = GluGluHToWW; nameHistoMap["ggHWW125"] = "ggHWW125";
   nameSampleMap["qqHWW125"] = VBFHToWW; nameHistoMap["qqHWW125"] = "qqHWW125";
@@ -223,6 +223,7 @@ Cards::Cards(TString Sample,
   nameSampleMap["qqHTT125"] = VBFHToTauTau; nameHistoMap["qqHTT125"] = "qqH125";
   nameSampleMap["WHTT125"] = WHToTauTau; nameHistoMap["WHTT125"] = "WH125";
   nameSampleMap["ZHTT125"] = ZHToTauTau; nameHistoMap["ZHTT125"] = "ZH125";
+  nameSampleMap["bbHTTybyt125"] = bbHybytToTauTau; nameHistoMap["bbHybytTT125"] = "bbHybyt125";
   nameSampleMap["bbHTT125"] = bbHToTauTau; nameHistoMap["bbHTT125"] = "bbH125";
 
   samplesContainer.clear();
@@ -232,23 +233,24 @@ Cards::Cards(TString Sample,
       samplesContainer.push_back("EMB");
       samplesContainer.push_back("DYJetsToLL");
     }
-    else 
+    else{ 
+      samplesContainer.push_back("EWKToTT");
       samplesContainer.push_back("DYJetsToTT");
+      samplesContainer.push_back("TTbarToTT");
+    }
     samplesContainer.push_back("WJets");
-    samplesContainer.push_back("EWKTT");
-    samplesContainer.push_back("TTbarTT");
     samplesContainer.push_back("EWK");
     samplesContainer.push_back("TTbar");
   }
   if (sampleToProcess=="TTbar") {
     samplesContainer.push_back("TTbar");
   }
-  if (sampleToProcess=="TTbarTT") {
-    samplesContainer.push_back("TTbarTT");
+  if (sampleToProcess=="TTbarToTT") {
+    samplesContainer.push_back("TTbarToTT");
   }
   if (sampleToProcess=="EMB") {
     samplesContainer.push_back("EMB");
-    InitializeSample("TTbarTT");
+    InitializeSample("TTbarToTT");
   }
   if (sampleToProcess=="DYJets") {
     samplesContainer.push_back("DYJetsToLL");
@@ -258,8 +260,8 @@ Cards::Cards(TString Sample,
   if (sampleToProcess=="EWK") {
     samplesContainer.push_back("EWK");
   }
-  if (sampleToProcess=="EWKTT") {
-    samplesContainer.push_back("EWKTT");
+  if (sampleToProcess=="EWKToTT") {
+    samplesContainer.push_back("EWKToTT");
   }
   if (sampleToProcess=="WJets") {
     samplesContainer.push_back("WJets");    
@@ -279,6 +281,9 @@ Cards::Cards(TString Sample,
   }
   if (sampleToProcess=="bbH") {
     samplesContainer.push_back("bbHTT125");
+  }
+  if (sampleToProcess=="bbHybyt") {
+    samplesContainer.push_back("bbHTTybyt125");
   }
 
   InitializeSamples();
@@ -314,7 +319,7 @@ std::vector<TString> Cards::SampleSpecificCutTT(TString name, TString sampleName
     mcSB = mcSideBand;
     mcSF = mcSingleFake;
   }
-  if (name=="TTbarTT"||name=="EWKTT"||name=="DYJetsToTT") {
+  if (name=="TTbarToTT"||name=="EWKToTT"||name=="DYJetsToTT") {
     mcSR = mcTauTau;
     mcSB = mcSideBand;
     mcSF = mcSingleFake;
@@ -383,7 +388,7 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
     mcOS = mcNotTauTau;
     mcSS = mcNotTauTau;
   }
-  if (name=="TTbarTT"||name=="EWKTT"||name=="DYJetsToTT") {
+  if (name=="TTbarToTT"||name=="EWKToTT"||name=="DYJetsToTT") {
     mcOS = mcTauTau;
     mcSS = mcTauTau;
   }
@@ -434,6 +439,10 @@ void Cards::InitializeSample(TString name) {
       baseFileName = DYJetsLLFiles[sampleName];
     if (name=="DYJetsToTT") 
       baseFileName = DYJetsTTFiles[sampleName];
+    if (name=="EWKToTT") 
+      baseFileName.ReplaceAll("ToTT","");
+    if (name=="TTbarToTT") 
+      baseFileName.ReplaceAll("ToTT","");
     if (name=="WJets") 
       baseFileName = WJetsFiles[sampleName];
     TString fullPathName = input_dir + "/" + baseFileName + ".root";
@@ -580,6 +589,7 @@ void Cards::InitializeSample(TString name) {
 }
 void Cards::InitializeSamples() {
   for (auto sample : samplesContainer) {
+    cout << "Initialize " << sample << endl;
     InitializeSample(sample);
   }
 }
@@ -588,6 +598,9 @@ TH1D * Cards::ProcessSample(TString name,
 				  TString sysName,
 				  unsigned int region,
 				  bool weightSys) {
+
+  bool is2D = variable.Contains(":");
+
 
   std::cout << std::endl;
   std::cout << "processing " << name;
@@ -614,13 +627,10 @@ TH1D * Cards::ProcessSample(TString name,
   TString histName = name + suffix + "_" + sysName;
   if (sysName=="") histName = name + suffix;
   std::cout << "   creating histo " << histName << std::endl;
-  TH1D * hist = NULL;
-  TH2D * hist2D = NULL;
-  bool is2D = variable.Contains(":");
-  if (is2D)
-    hist2D = create2DHisto(histName+"_2d");
-  else 
-    hist = createHisto(histName);
+  
+
+  TList * list = new TList;
+
 
   TString treeName = BaseTreeName;
   if (sysName=="") {
@@ -645,8 +655,7 @@ TH1D * Cards::ProcessSample(TString name,
     if (tree==NULL) {
       std::cout << "Tree named " << treeName << " does not exist for sample " << sampleName << std::endl;
       std::cout << "returning null pointer" << std::endl;
-      if (is2D) delete hist2D;
-      else delete hist;
+
       return NULL;
     }
     std::cout << "      " << sampleName << "  :  entries in tree = " << tree->GetEntries() << std::endl;
@@ -654,32 +663,55 @@ TH1D * Cards::ProcessSample(TString name,
     //    tree->AddFriend(treeName,friendName);
     TString cut = regionCut[region] + sampleSpecificCutMap[sampleName].at(region);
     double norm = sampleNormMap[sampleName];
-    TH1D * histSample;
-    TH2D * hist2DSample; 
+    TString HistName = sampleName;
+    if(sysName!="")
+      HistName+=sysName;
+
+
+    TH1D * histSample=NULL;
+    TH2D * hist2DSample=NULL; 
     if (is2D) 
-      hist2DSample = create2DHisto("hist");
+      hist2DSample = create2DHisto(HistName);
     else
-      histSample = createHisto("hist");
-    TString Cuts = weight + "(" + cut + ")";
-    std::cout << "       cuts = " << Cuts << std::endl;
-    tree->Draw(variable+">>hist",Cuts);
+      histSample = createHisto(HistName);
+    TString Cuts = weight + norm+"*(" + cut + ")";
+    std::cout << HistName << "       cuts = " << Cuts << std::endl;
+    tree->Draw(variable+">>"+HistName,Cuts);
+    //cout<< histSample->GetEntries() << "  integral " << histSample->Integral() << endl;
     if (is2D)
-      hist2D->Add(hist2D,hist2DSample,1.,norm);
-    else
-      hist->Add(hist,histSample,1.,norm);
-    //    std::cout << "    ENTRIES = " << histSample->GetEntries() << std::endl;
-    if (is2D) 
-      delete hist2DSample;
-    else 
-      delete histSample;
+      list->Add((TH2D*)hist2DSample->Clone());
+    else    
+      list->Add((TH1D*)histSample->Clone());
+    std::cout << "    ENTRIES = " << histSample->GetEntries() << std::endl;
+
+    delete hist2DSample;
+    delete histSample;
   }
+
+  TH1D * hist= NULL;
+  TH2D * hist2D= NULL;
+
+  if(is2D){
+    hist2D = (TH2D*)(list->First())->Clone(histName+"_2d");
+    hist2D->Reset();
+    hist2D->Merge(list);
+  }else{
+    hist = (TH1D*)(list->First())->Clone(histName);
+    hist->Reset();
+    hist->Merge(list);
+  }
+  list->Clear();
+  delete list;
 
   if (is2D) {
     hist = unroll(hist2D,histName);
     delete hist2D;
   }
   //  zeroBins(hist);
+
+  cout << "Integral " << hist->Integral() << endl;
   return hist;
+
 
 }
 
@@ -960,11 +992,11 @@ int Cards::CreateWeightSystematicsMap() {
   }
 
   // MC ---->
-  if (sampleToProcess=="EWK"||sampleToProcess=="EWKTT"||sampleToProcess=="WJets")
+  if (sampleToProcess=="EWK"||sampleToProcess=="EWKToTT"||sampleToProcess=="WJets")
     return numberOfWeightSystematics;
   
   // TTbar ---->
-  if (sampleToProcess=="TTbar"||sampleToProcess=="TTbarTT") {
+  if (sampleToProcess=="TTbar"||sampleToProcess=="TTbarToTT") {
     for (auto mapIter : TopShapeSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
@@ -1002,6 +1034,7 @@ bool Cards::RunData() {
   TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
   TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
   for (auto name : samplesContainer) {
+    cout << ">>> processing sample " << name << endl;
     TH1D * hist = ProcessSample(name,"",1,false);
     QCD->Add(QCD,hist,1.,-1.);
     QCD_Up->Add(QCD_Up,hist,1.,-0.9);
@@ -1078,7 +1111,7 @@ bool Cards::RunModel() {
 
   // ttbar contamination --->
   if (sampleToProcess=="EMB") {
-    TH1D * hist = ProcessSample("TTbarTT","",0,false);
+    TH1D * hist = ProcessSample("TTbarToTT","",0,false);
     TH1D * emb = nameTH1DMap["EMB"];
     TString nameUp = sampleToProcess + "_CMS_htt_emb_ttbar_"+era+"Up";
     TString nameDown = sampleToProcess + "_CMS_htt_emb_ttbar_"+era+"Down";

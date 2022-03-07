@@ -189,7 +189,7 @@ Cards::Cards(TString Sample,
     regionCut.push_back(commonCuts+sameSignRegion); // same sign
   }
 
-  globalWeight = "weight*";
+  globalWeight = "weightEMu*";
   regionWeight.clear();
   regionWeight.push_back(globalWeight);
 
@@ -624,9 +624,6 @@ TH1D * Cards::ProcessSample(TString name,
   }
   std::cout << std::endl;
   TString weight = regionWeight[region];
-  TString histName = name + suffix + "_" + sysName;
-  if (sysName=="") histName = name + suffix;
-  std::cout << "   creating histo " << histName << std::endl;
   
 
   TList * list = new TList;
@@ -646,6 +643,11 @@ TH1D * Cards::ProcessSample(TString name,
     }
   }
 
+
+  TString histName = name + suffix + "_" + sysName;
+  if (sysName=="") histName = name + suffix;
+
+
   vector<TString> sampleNames = nameSampleMap[name];
   for (auto sampleName : sampleNames) {
     TFile * file = sampleFileMap[sampleName];
@@ -663,13 +665,16 @@ TH1D * Cards::ProcessSample(TString name,
     //    tree->AddFriend(treeName,friendName);
     TString cut = regionCut[region] + sampleSpecificCutMap[sampleName].at(region);
     double norm = sampleNormMap[sampleName];
-    TString HistName = sampleName;
+    TString HistName = sampleName+suffix;
     if(sysName!="")
-      HistName+=sysName;
+      HistName+="_"+sysName;
 
 
     TH1D * histSample=NULL;
     TH2D * hist2DSample=NULL; 
+
+    std::cout << "   creating histo " << HistName << std::endl; 
+    std::cout << "   creating histo " << histName << std::endl; 
     if (is2D) 
       hist2DSample = create2DHisto(HistName);
     else

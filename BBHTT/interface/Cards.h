@@ -226,6 +226,7 @@ class Cards {
     {"W3JetsToLNu" , 1132.5}, // NNLO (4)
     {"W4JetsToLNu" , 631.5 }, // NNLO (5)
     {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
+    {"DYJetsToTT_M-50"       , 6077.22},  // NNLO (20)
     {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
     {"DY1JetsToLL_M-50"      , 1007.6}, // NNLO (20a)
     {"DY2JetsToLL_M-50"      , 344.3}, // NNLO (20b)
@@ -247,6 +248,22 @@ class Cards {
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
+    {"TTTo2L2NuToTT"        , 88.29},  // NNLO (21)
+    {"TTToHadronicToTT"     , 377.96}, // NNLO (22)
+    {"TTToSemiLeptonicToTT" , 365.35}, // NNLO (23)
+    {"ST_t-channel_top_4fToTT"      , 136.02}, 
+    {"ST_t-channel_antitop_4fToTT"  , 80.95}, 
+    {"ST_tW_top_5fToTT"             , 35.85}, 
+    {"ST_tW_antitop_5fToTT"         , 35.85}, 
+    {"VVTo2L2NuToTT"                , 13.84},
+    {"WWToLNuQQToTT"                , 49.997},
+    {"WZTo2L2QToTT"                 , 5.52},
+    {"WZTo1L1Nu2QToTT"              , 10.71},
+    {"WZTo1L3NuToTT"                , 3.05},
+    {"WZJToLLLNuToTT"               , 4.708},
+    {"WZTo3LNuToTT"                 , 4.43},
+    {"ZZTo4LToTT"                   , 1.26},
+    {"ZZTo2L2QToTT"                 , 3.38},
     {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
     {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
@@ -410,6 +427,7 @@ class Cards {
   // ******** MC samples *************
 
   const vector<TString> WJets = {
+    "WJetsToLNu"/*
     "WJetsToLNu_0",
     "WJetsToLNu_1",
     "WJetsToLNu_2",
@@ -418,11 +436,12 @@ class Cards {
     "W1JetsToLNu",
     "W2JetsToLNu",
     "W3JetsToLNu",
-    "W4JetsToLNu"
+    "W4JetsToLNu"*/
   };
   
   vector<TString> DYJetsToLL = {
-    "DYJetsToLL_M-50_0",
+    "DYJetsToLL_M-50"
+    /*"DYJetsToLL_M-50_0",
     "DYJetsToLL_M-50_1",
     "DYJetsToLL_M-50_2",
     "DYJetsToLL_M-50_3",
@@ -430,11 +449,12 @@ class Cards {
     "DY1JetsToLL_M-50",
     "DY2JetsToLL_M-50",
     "DY3JetsToLL_M-50",
-    "DY4JetsToLL_M-50"  
+    "DY4JetsToLL_M-50"*/  
   };
 
   vector<TString> DYJetsToTT = {
-    "DYJetsToTT_M-50_0",
+    "DYJetsToTT_M-50",
+    /*"DYJetsToTT_M-50_0",
     "DYJetsToTT_M-50_1",
     "DYJetsToTT_M-50_2",
     "DYJetsToTT_M-50_3",
@@ -442,7 +462,7 @@ class Cards {
     "DY1JetsToTT_M-50",
     "DY2JetsToTT_M-50",
     "DY3JetsToTT_M-50",
-    "DY4JetsToTT_M-50"  
+    "DY4JetsToTT_M-50"  */
   };
   
   /*
@@ -457,6 +477,7 @@ class Cards {
   
   // needed for stitching 
   map<TString,TString> WJetsFiles = {
+    {"WJetsToLNu","WJetsToLNu"},
     {"WJetsToLNu_0","WJetsToLNu"},
     {"WJetsToLNu_1","WJetsToLNu"},
     {"WJetsToLNu_2","WJetsToLNu"},
@@ -469,6 +490,7 @@ class Cards {
   };
 
   map<TString,TString> DYJetsLLFiles = {
+    {"DYJetsToLL_M-50","DYJetsToLL_M-50"},
     {"DYJetsToLL_M-50_0","DYJetsToLL_M-50"},
     {"DYJetsToLL_M-50_1","DYJetsToLL_M-50"},
     {"DYJetsToLL_M-50_2","DYJetsToLL_M-50"},
@@ -481,6 +503,7 @@ class Cards {
   };
 
   map<TString,TString> DYJetsTTFiles = {
+    {"DYJetsToTT_M-50","DYJetsToLL_M-50"},
     {"DYJetsToTT_M-50_0","DYJetsToLL_M-50"},
     {"DYJetsToTT_M-50_1","DYJetsToLL_M-50"},
     {"DYJetsToTT_M-50_2","DYJetsToLL_M-50"},
@@ -819,6 +842,8 @@ class Cards {
   bool runWithSystematics;
   bool runWithShapeSystematics;
   bool runOnEmbedded;
+  bool _usefriend;
+
 
   TString variable;
   double lumi;

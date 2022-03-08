@@ -26,8 +26,10 @@ int main(int argc, char * argv[]) {
   int systematics = atoi(argv[4]);
   int triggerOption = 0;
 
-  TString inputDir("/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/");
-  TString predDir("/nfs/dust/cms/user/makou/predict_synchNTuples/");
+  //TString inputDir("/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/");
+  //TString predDir("/nfs/dust/cms/user/makou/predict_synchNTuples/");
+  TString inputDir("/nfs/dust/cms/user/makou/predict_synchTuples_nonfriend/");
+  TString predDir("");
   string cmsswBase = (getenv("CMSSW_BASE"));
 
   TString outputDir = (TString) cmsswBase + "/src/DesyTauAnalyses/BBHTT/test/datacards/datacardsEMu_"+era;

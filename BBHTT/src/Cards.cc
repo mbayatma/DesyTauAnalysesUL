@@ -36,6 +36,9 @@ Cards::Cards(TString Sample,
   runWithSystematics = RunWithSystematics;
   runOnEmbedded = RunOnEmbedded;
 
+  _usefriend=true;
+  if(PredDir=="")_usefriend=false;
+
   if(era=="2016"){
     lumi = 59740;
     sampleXSecMap = xsecs_2016;
@@ -61,8 +64,6 @@ Cards::Cards(TString Sample,
       Embedded=EmbeddedElMu_2018;
       Data = DataElMu_2018;
     }
-
-
   }else{
     commonCuts=baselineTT;
     mcNotTauTau=mcNotTauTau_TT;
@@ -231,7 +232,6 @@ Cards::Cards(TString Sample,
     InitializeSample("Data");
     if (runOnEmbedded) {
       samplesContainer.push_back("EMB");
-      samplesContainer.push_back("DYJetsToLL");
     }
     else{ 
       samplesContainer.push_back("EWKToTT");
@@ -241,6 +241,7 @@ Cards::Cards(TString Sample,
     samplesContainer.push_back("WJets");
     samplesContainer.push_back("EWK");
     samplesContainer.push_back("TTbar");
+    samplesContainer.push_back("DYJetsToLL");
   }
   if (sampleToProcess=="TTbar") {
     samplesContainer.push_back("TTbar");
@@ -435,43 +436,65 @@ void Cards::InitializeSample(TString name) {
   std::vector<TString> sampleNames = nameSampleMap[name];
   for (auto sampleName : sampleNames) {
     TString baseFileName = sampleName;
+    cout << name << " ----" << baseFileName << endl;
     if (name=="DYJetsToLL") 
-      baseFileName = DYJetsLLFiles[sampleName];
+      baseFileName = "DYJetsToLL_M-50";
+      //baseFileName = DYJetsLLFiles[sampleName];
     if (name=="DYJetsToTT") 
-      baseFileName = DYJetsTTFiles[sampleName];
+      baseFileName = "DYJetsToLL_M-50";
+      //baseFileName = DYJetsTTFiles[sampleName];
     if (name=="EWKToTT") 
       baseFileName.ReplaceAll("ToTT","");
     if (name=="TTbarToTT") 
       baseFileName.ReplaceAll("ToTT","");
     if (name=="WJets") 
       baseFileName = WJetsFiles[sampleName];
-    TString fullPathName = input_dir + "/" + baseFileName + ".root";
+    TString fullPathName = input_dir + "/" + baseFileName + "_"+era+".root";
+    std::cout << "file " << fullPathName << std::endl;
     TFile * file = new TFile(fullPathName);
-    TTree * tree = (TTree*)file->Get("TauCheck");
-    TString friendName = "";
-    if(channel=="tt")
-      friendName=input_friend_dir+baseFileName+"_pred.root";
-    else
-      friendName=input_friend_dir+channel+"-"+baseFileName+"_"+era+".root";
-    
 
-    tree->AddFriend("TauCheck",friendName);
     if (file->IsZombie()) {
       std::cout << "cannot open file " << fullPathName << std::endl;
       std::cout << "nothing will be done " << std::endl;
       block = true;
       return;
     }
+
+    TTree * tree = (TTree*)file->Get("TauCheck");
+    TString friendName = "";
+    if(_usefriend){
+      if(channel=="tt")
+	friendName=input_friend_dir+baseFileName+"_pred.root";
+      else
+	friendName=input_friend_dir+channel+"-"+baseFileName+".root";
+      tree->AddFriend("TauCheck",friendName);
+    }
+
     sampleFileMap[sampleName] = file;
     TH1D * histEvents = (TH1D*)file->Get("nWeightedEvents");
     sampleNeventsMap[sampleName] = histEvents->GetSumOfWeights();
     if(channel=="em")sampleSpecificCutMap[sampleName] = SampleSpecificCutEM(name,sampleName);
     else sampleSpecificCutMap[sampleName] = SampleSpecificCutTT(name,sampleName);
+
+
+    if(!(name.Contains("DYJets")||name.Contains("WJets"))){
+ 
+       if (name=="Data"||name=="EMB")
+	 sampleNormMap[sampleName] = 1.0;
+       else {
+	 cout << "lumi-" << lumi << "    sampleXSecMap[sampleName]-" << sampleXSecMap[sampleName]  << "    sampleNeventsMap[sampleName]-" << sampleNeventsMap[sampleName] << endl;
+	 sampleNormMap[sampleName] = lumi*sampleXSecMap[baseFileName]/sampleNeventsMap[sampleName];
+	 if(sampleToProcess=="ggHbb") sampleNormMap[sampleName] *= ggHbb_scale;
+       }
+    }
   }
+
+
   
   if (name.Contains("DYJetsToLL")) {
 
-    float nIncl = sampleNeventsMap["DYJetsToLL_M-50_0"];
+    // float nIncl = sampleNeventsMap["DYJetsToLL_M-50_0"];
+    float nIncl = sampleNeventsMap["DYJetsToLL_M-50"];
     float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
 
     float n1Jet = sampleNeventsMap["DY1JetsToLL_M-50"];
@@ -486,6 +509,7 @@ void Cards::InitializeSample(TString name) {
     float n4Jet = sampleNeventsMap["DY4JetsToLL_M-50"];
     float xsec4Jet = sampleXSecMap["DY4JetsToLL_M-50"];
 
+    sampleNormMap["DYJetsToLL_M-50"] = lumi*xsecIncl/nIncl;
     sampleNormMap["DYJetsToLL_M-50_0"] = lumi*xsecIncl/nIncl;
     sampleNormMap["DYJetsToLL_M-50_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
     sampleNormMap["DYJetsToLL_M-50_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
@@ -500,7 +524,8 @@ void Cards::InitializeSample(TString name) {
   }
   else if (name.Contains("DYJetsToTT")) {
 
-    float nIncl = sampleNeventsMap["DYJetsToTT_M-50_0"];
+    //float nIncl = sampleNeventsMap["DYJetsToTT_M-50_0"];
+    float nIncl = sampleNeventsMap["DYJetsToTT_M-50"];
     float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
 
     float n1Jet = sampleNeventsMap["DY1JetsToTT_M-50"];
@@ -525,6 +550,7 @@ void Cards::InitializeSample(TString name) {
     std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
     std::cout << std::endl;
 
+    sampleNormMap["DYJetsToTT_M-50"] = lumi*xsecIncl/nIncl;
     sampleNormMap["DYJetsToTT_M-50_0"] = lumi*xsecIncl/nIncl;
     sampleNormMap["DYJetsToTT_M-50_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
     sampleNormMap["DYJetsToTT_M-50_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
@@ -539,7 +565,8 @@ void Cards::InitializeSample(TString name) {
   }
   else if (name.Contains("WJets")) {
 
-    float nIncl = sampleNeventsMap["WJetsToLNu_0"];
+    //float nIncl = sampleNeventsMap["WJetsToLNu_0"];
+    float nIncl = sampleNeventsMap["WJetsToLNu"];
     float xsecIncl = sampleXSecMap["WJetsToLNu"];
 
     float n1Jet = sampleNeventsMap["W1JetsToLNu"];
@@ -563,6 +590,7 @@ void Cards::InitializeSample(TString name) {
     std::cout << "n4Jet = " << n4Jet << "   xsec4Jet = " << xsec4Jet << std::endl;
     std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
 
+    sampleNormMap["WJetsToLNu"] = lumi*xsecIncl/nIncl;
     sampleNormMap["WJetsToLNu_0"] = lumi*xsecIncl/nIncl;
     sampleNormMap["WJetsToLNu_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
     sampleNormMap["WJetsToLNu_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
@@ -574,16 +602,6 @@ void Cards::InitializeSample(TString name) {
     sampleNormMap["W3JetsToLNu"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
     sampleNormMap["W4JetsToLNu"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
 
-  }
-  else {
-    for (auto sampleName : sampleNames) {
-      if (name=="Data"||name=="EMB")
-	sampleNormMap[sampleName] = 1.0;
-      else {
-	sampleNormMap[sampleName] = lumi*sampleXSecMap[sampleName]/sampleNeventsMap[sampleName];
-	if(sampleToProcess=="ggHbb") sampleNormMap[sampleName] *= ggHbb_scale;
-      }
-    }
   }
 
 }

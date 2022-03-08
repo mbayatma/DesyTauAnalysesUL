@@ -64,8 +64,10 @@ void Plot(TString filename,
   }
   TH1D * histData = (TH1D*)TH1DtoTH1D(histData_,nbins,xbins,true,"_rebinned");
 
+  TH1D * EWKTT_  = (TH1D*)file->Get(category+"/VVT");
   TH1D * TT_  = (TH1D*)file->Get(category+"/TTL");
-  TH1D * ZTT_ = (TH1D*)file->Get(category+"/EMB");
+  TH1D * TTT_  = (TH1D*)file->Get(category+"/TTT");
+  TH1D * ZTT_ = (TH1D*)file->Get(category+"/ZTT");
   TH1D * ZLL_ = (TH1D*)file->Get(category+"/ZL");
   TH1D * EWK_ = (TH1D*)file->Get(category+"/VVL"); 
   TH1D * QCD_ = NULL;
@@ -84,6 +86,8 @@ void Plot(TString filename,
   TH1D * bbH_ = (TH1D*)file->Get(category+"/bbH125");
   std::cout << ggH_ << " " << bbH_ << std::endl;
 
+  TH1D * TTT = (TH1D*)TH1DtoTH1D(TTT_,nbins,xbins,true,"_rebinned");
+  TH1D * EWKTT = (TH1D*)TH1DtoTH1D(EWKTT_,nbins,xbins,true,"_rebinned");
   TH1D * TT = (TH1D*)TH1DtoTH1D(TT_,nbins,xbins,true,"_rebinned");
   TH1D * ZTT = (TH1D*)TH1DtoTH1D(ZTT_,nbins,xbins,true,"_rebinned");
   TH1D * ZLL = (TH1D*)TH1DtoTH1D(ZLL_,nbins,xbins,true,"_rebinned");
@@ -95,7 +99,8 @@ void Plot(TString filename,
   TH1D * ggH = (TH1D*)TH1DtoTH1D(ggH_,nbins,xbins,true,"_rebinned");
   TH1D * bbH = (TH1D*)TH1DtoTH1D(bbH_,nbins,xbins,true,"_rebinned");
   bbH->Add(bbH,ggH);
-
+  TT->Add(TT,TTT);
+  EWK->Add(EWK,EWKTT);
   std::cout << std::endl;
 
   int nBins = histData->GetNbinsX();

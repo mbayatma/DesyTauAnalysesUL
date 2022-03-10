@@ -427,7 +427,7 @@ class Cards {
   // ******** MC samples *************
 
   const vector<TString> WJets = {
-    "WJetsToLNu"/*
+    //"WJetsToLNu"/*
     "WJetsToLNu_0",
     "WJetsToLNu_1",
     "WJetsToLNu_2",
@@ -436,12 +436,12 @@ class Cards {
     "W1JetsToLNu",
     "W2JetsToLNu",
     "W3JetsToLNu",
-    "W4JetsToLNu"*/
+    "W4JetsToLNu"
   };
   
   vector<TString> DYJetsToLL = {
-    "DYJetsToLL_M-50"
-    /*"DYJetsToLL_M-50_0",
+    //"DYJetsToLL_M-50"
+    "DYJetsToLL_M-50_0",
     "DYJetsToLL_M-50_1",
     "DYJetsToLL_M-50_2",
     "DYJetsToLL_M-50_3",
@@ -449,12 +449,12 @@ class Cards {
     "DY1JetsToLL_M-50",
     "DY2JetsToLL_M-50",
     "DY3JetsToLL_M-50",
-    "DY4JetsToLL_M-50"*/  
+    "DY4JetsToLL_M-50" 
   };
 
   vector<TString> DYJetsToTT = {
-    "DYJetsToTT_M-50",
-    /*"DYJetsToTT_M-50_0",
+    //"DYJetsToTT_M-50",
+    "DYJetsToTT_M-50_0",
     "DYJetsToTT_M-50_1",
     "DYJetsToTT_M-50_2",
     "DYJetsToTT_M-50_3",
@@ -462,7 +462,7 @@ class Cards {
     "DY1JetsToTT_M-50",
     "DY2JetsToTT_M-50",
     "DY3JetsToTT_M-50",
-    "DY4JetsToTT_M-50"  */
+    "DY4JetsToTT_M-50"  
   };
   
   /*
@@ -562,7 +562,9 @@ class Cards {
   };
   
   vector<TString> GluGluHToTauTau = {
-    "GluGluHToTauTau_M125","GluGluToBBHToTauTau_M125_13TeV"
+    "GluGluHToTauTau_M125",
+    "bbHToTauTau_yt2_M125_MiniAODv2",
+    //"GluGluToBBHToTauTau_M125_13TeV"
   };
   
   vector<TString> VBFHToTauTau = {
@@ -579,7 +581,8 @@ class Cards {
   };
 
   vector<TString> bbHToTauTau = {
-    "BBHToTauTau_M125_13TeV"
+    //    "BBHToTauTau_M125_13TeV"
+"bbHToTauTau_yb2_M125_MiniAODv2"
   };
 
   vector<TString> bbHybytToTauTau = {

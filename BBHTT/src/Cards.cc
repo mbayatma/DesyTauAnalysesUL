@@ -438,18 +438,18 @@ void Cards::InitializeSample(TString name) {
     TString baseFileName = sampleName;
     cout << name << " ----" << baseFileName << endl;
     if (name=="DYJetsToLL") 
-      baseFileName = "DYJetsToLL_M-50";
-      //baseFileName = DYJetsLLFiles[sampleName];
+      baseFileName = DYJetsLLFiles[sampleName];
+      //baseFileName = "DYJetsToLL_M-50";
     if (name=="DYJetsToTT") 
-      baseFileName = "DYJetsToLL_M-50";
-      //baseFileName = DYJetsTTFiles[sampleName];
+      baseFileName = DYJetsTTFiles[sampleName];
+    //baseFileName = "DYJetsToLL_M-50";
     if (name=="EWKToTT") 
       baseFileName.ReplaceAll("ToTT","");
     if (name=="TTbarToTT") 
       baseFileName.ReplaceAll("ToTT","");
     if (name=="WJets") 
       baseFileName = WJetsFiles[sampleName];
-    TString fullPathName = input_dir + "/" + baseFileName + "_"+era+".root";
+    TString fullPathName = input_dir + "/" + baseFileName +".root";//+ "_"+era+".root";
     std::cout << "file " << fullPathName << std::endl;
     TFile * file = new TFile(fullPathName);
 
@@ -461,13 +461,19 @@ void Cards::InitializeSample(TString name) {
     }
 
     TTree * tree = (TTree*)file->Get("TauCheck");
+    TFile * filePred=NULL;
+    TTree * treeF=NULL;
     TString friendName = "";
     if(_usefriend){
       if(channel=="tt")
 	friendName=input_friend_dir+baseFileName+"_pred.root";
       else
-	friendName=input_friend_dir+channel+"-"+baseFileName+".root";
-      tree->AddFriend("TauCheck",friendName);
+	friendName=input_friend_dir+baseFileName+"_pred.root";
+      //friendName=input_friend_dir+channel+"-"+baseFileName+".root";
+      filePred = new TFile(friendName);
+      treeF=(TTree*)filePred->Get("TauCheck");
+      treeF->SetTreeIndex(0);
+      tree->AddFriend(treeF);
     }
 
     sampleFileMap[sampleName] = file;
@@ -493,8 +499,8 @@ void Cards::InitializeSample(TString name) {
   
   if (name.Contains("DYJetsToLL")) {
 
-    // float nIncl = sampleNeventsMap["DYJetsToLL_M-50_0"];
-    float nIncl = sampleNeventsMap["DYJetsToLL_M-50"];
+    float nIncl = sampleNeventsMap["DYJetsToLL_M-50_0"];
+    //float nIncl = sampleNeventsMap["DYJetsToLL_M-50"];
     float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
 
     float n1Jet = sampleNeventsMap["DY1JetsToLL_M-50"];
@@ -524,8 +530,8 @@ void Cards::InitializeSample(TString name) {
   }
   else if (name.Contains("DYJetsToTT")) {
 
-    //float nIncl = sampleNeventsMap["DYJetsToTT_M-50_0"];
-    float nIncl = sampleNeventsMap["DYJetsToTT_M-50"];
+    float nIncl = sampleNeventsMap["DYJetsToTT_M-50_0"];
+    //float nIncl = sampleNeventsMap["DYJetsToTT_M-50"];
     float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
 
     float n1Jet = sampleNeventsMap["DY1JetsToTT_M-50"];
@@ -565,8 +571,8 @@ void Cards::InitializeSample(TString name) {
   }
   else if (name.Contains("WJets")) {
 
-    //float nIncl = sampleNeventsMap["WJetsToLNu_0"];
-    float nIncl = sampleNeventsMap["WJetsToLNu"];
+    float nIncl = sampleNeventsMap["WJetsToLNu_0"];
+    //float nIncl = sampleNeventsMap["WJetsToLNu"];
     float xsecIncl = sampleXSecMap["WJetsToLNu"];
 
     float n1Jet = sampleNeventsMap["W1JetsToLNu"];

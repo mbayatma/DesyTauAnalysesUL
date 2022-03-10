@@ -26,10 +26,11 @@ int main(int argc, char * argv[]) {
   int systematics = atoi(argv[4]);
   int triggerOption = 0;
 
-  //TString inputDir("/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/");
+  TString inputDir("/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/");
   //TString predDir("/nfs/dust/cms/user/makou/predict_synchNTuples/");
-  TString inputDir("/nfs/dust/cms/user/makou/predict_synchTuples_nonfriend/");
-  TString predDir("");
+  TString predDir("/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/4/2e465ee969674198839ed7c981ecf8fd/artifacts/pred/");
+  //TString inputDir("/nfs/dust/cms/user/makou/predict_synchTuples_nonfriend/");
+  //TString predDir("");
   string cmsswBase = (getenv("CMSSW_BASE"));
 
   TString outputDir = (TString) cmsswBase + "/src/DesyTauAnalyses/BBHTT/test/datacards/datacardsEMu_"+era;
@@ -37,7 +38,7 @@ int main(int argc, char * argv[]) {
 
   //  TString variable("m_sv");
   //  TString variable("m_vis");
-  TString variable("pred_proba");
+  TString variable("pred_class_proba");
   //  TString variable("pt_tt:m_sv");
   int nbins   =   15;
   double xmin = 0.25;

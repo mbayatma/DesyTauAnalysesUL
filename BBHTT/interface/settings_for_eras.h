@@ -41,8 +41,12 @@ const vector<TString> Diboson_2018         = { "WZTo2L2Q" ,
                                                "ZZTo4L" ,
                                                "VVTo2L2Nu" };
 const vector<TString> GluGluHToTauTau_2018 = {"GluGluHToTauTau_M125" };
-const vector<TString> BBH_2018 =  {"BBHToTauTau_M125_13TeV","BBHToTauTauYbYt_M125_13TeV","GluGluToBBHToTauTau_M125_13TeV","bbHToTauTau_yb2_M125_MiniAOD",
-"bbHToTauTau_yb2_M125_MiniAODv2","bbHToTauTau_yt2_M125_MiniAOD", "bbHToTauTau_yt2_M125_MiniAODv2" };
+const vector<TString> BBH_2018 =  {
+  "BBHToTauTau_M125_13TeV",
+  "BBHToTauTauYbYt_M125_13TeV","GluGluToBBHToTauTau_M125_13TeV"//,"bbHToTauTau_yb2_M125_MiniAOD",,"bbHToTauTau_yt2_M125_MiniAOD"
+  //"bbHToTauTau_yb2_M125_MiniAODv2", "bbHToTauTau_yt2_M125_MiniAODv2" 
+};
+
 const vector<TString> VBFHToTauTau_2018    = { "VBFHToTauTau_M125"};
 const vector<TString> ZHToTauTau_2018      = { "ZHToTauTau_M125_13TeV", 
                                               /*"ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8",

@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <map>
 #include "TString.h"
@@ -17,6 +16,8 @@ bool applyPreselection = true;
 
 int main(int argc, char * argv[]) {
 
+
+  bool useFriend=true;
   bool TEST = false;
 
   TString process(argv[1]);
@@ -60,6 +61,7 @@ if (argc!=4) {
   float embedded_trigger_weight = 1.0;
   float embedded_tracking_weight = 1.0;
   TString input_dir;
+  TString friend_dir;
   bool IsEra2016 = 0;
   bool IsEra2017 = 0;
   bool IsEra2018 = 0;
@@ -72,13 +74,17 @@ if (argc!=4) {
   //TString output_dir = "";
   samples_map[channel + "-NOMINAL_ntuple_"+Sample     ] = map_sample.at(Sample);
   if(channel=="em")
-      input_dir = "/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/"; 
+      input_dir = "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/synch_NTuples_2018/"; 
+  //      input_dir = "/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/"; 
     //"/nfs/dust/cms/user/makou/ULFW/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/"+ era;
     //input_dir= "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/" + era;
 //input_dir ="/nfs/dust/cms/user/rasp/storage/cardinia/SynchNTuples/mutau_June2-PAS/" + era ;
   else 
     input_dir ="/nfs/dust/cms/user/rasp/storage/cardinia/SynchNTuples/etau_Aug27/" + era ;
  
+
+  friend_dir="/nfs/dust/cms/user/makou/predict_BDT_friendtrees/";
+  //  friend_dir="/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/4/2e465ee969674198839ed7c981ecf8fd/artifacts/pred/";
  
 
   // Mapping of subsamples to output root-file
@@ -101,7 +107,7 @@ if (argc!=4) {
   //TF1 *hOS_SS_transfer_factors_njet1= NULL;
   //TF1 *hOS_SS_transfer_factors_njet0= NULL;
   
-  TString output_dir= "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/NTuplesULneu_" + era; 
+  TString output_dir= "/nfs/dust/cms/user/cardinia/Maryam/NTuplesULfriend_" + era; 
   //TString output_dir= "./NTuples_" + era; 
   gSystem -> Exec("mkdir " + output_dir);
 
@@ -338,7 +344,19 @@ if (era == "2018"){
       cout << "  - " << subsample << " : ";
 
       TFile *inFile  = new TFile( input_dir + "/" + subsample + ".root" ,"READ");
+      TFile *friendFile =NULL;
       TTree *inTree  = (TTree*) inFile -> Get("TauCheck");
+      TTree *friendTree= NULL;
+
+      if(useFriend){
+	friendFile= new TFile(friend_dir + "/" + subsample + "_" + era+ ".root","READ" );
+	//	friendFile= new TFile(friend_dir + "/" + subsample + "_pred.root","READ" );
+	friendTree=(TTree *)friendFile->Get("TauCheck");
+	friendTree->SetTreeIndex(0);
+	inTree->AddFriend(friendTree);
+      }
+
+
       double nevents=0.;
       /*
 	for (auto const& sample_evt : n_events_per_sample){
@@ -384,6 +402,13 @@ if (era == "2018"){
       float mbb;
       float dRbb;
       int nbtag;
+      //double pred_class_0_proba,pred_class_1_proba,pred_class_2_proba,pred_class_3_proba;
+      //float pred_class_proba;
+      int pred_class;
+      float prob_0,prob_1,prob_2,prob_3;
+      float pred_proba;
+
+
       inTree->SetBranchAddress("gen_noutgoing",&gen_noutgoing);
       inTree->SetBranchAddress("iso_1",&iso_1);
       inTree->SetBranchAddress("iso_2",&iso_2);
@@ -416,6 +441,17 @@ if (era == "2018"){
       inTree->SetBranchAddress("dRbb",&dRbb);
       inTree->SetBranchAddress("nbtag",&nbtag);
 
+      if(useFriend){
+	inTree->SetBranchAddress("pred_class",&pred_class);
+	inTree->SetBranchAddress("pred_proba",&pred_proba);
+	inTree->SetBranchAddress("prob_0",&prob_0);
+	inTree->SetBranchAddress("prob_1",&prob_1);
+	inTree->SetBranchAddress("prob_2",&prob_2);
+	inTree->SetBranchAddress("prob_3",&prob_3);
+      }
+
+
+
       outFile->cd();
       
       TTree *currentTree = new TTree(subsample,"temporary tree");
@@ -445,13 +481,22 @@ if (era == "2018"){
 	outTree->Branch("embedded_rate_weight", &embedded_rate_weight, "embedded_rate_weight/F");
 	outTree->Branch("htxs_reco_flag_ggh", &htxs_reco_flag_ggh, "htxs_reco_flag_ggh/I");
 	outTree->Branch("htxs_reco_flag_qqh", &htxs_reco_flag_qqh, "htxs_reco_flag_qqh/I");
-  outTree->Branch("era2016", &era2016, "era2016/O");
-  outTree->Branch("era2017", &era2017, "era2017/O");
-  outTree->Branch("era2018", &era2018, "era2018/O");
-  outTree->Branch("qcdweightml", &qcdweightml, "qcdweightml/F");
-  outTree->Branch("qcdweightml_1", &qcdweightml_1, "qcdweightml_1/F");
-  outTree->Branch("qcdweightml_2", &qcdweightml_2, "qcdweightml_2/F");
-  outTree->Branch("qcdweightml_3", &qcdweightml_3, "qcdweightml_3/F");
+	outTree->Branch("era2016", &era2016, "era2016/O");
+	outTree->Branch("era2017", &era2017, "era2017/O");
+	outTree->Branch("era2018", &era2018, "era2018/O");
+	outTree->Branch("qcdweightml", &qcdweightml, "qcdweightml/F");
+	outTree->Branch("qcdweightml_1", &qcdweightml_1, "qcdweightml_1/F");
+	outTree->Branch("qcdweightml_2", &qcdweightml_2, "qcdweightml_2/F");
+	outTree->Branch("qcdweightml_3", &qcdweightml_3, "qcdweightml_3/F");
+	
+	if(useFriend){
+	  outTree->Branch("pred_class",&pred_class,"pred_class/I");
+	  outTree->Branch("pred_class_proba",&pred_proba,"pred_class_proba/F");
+	  outTree->Branch("pred_class_0_proba",&prob_0,"pred_class_0_proba/F");
+	  outTree->Branch("pred_class_1_proba",&prob_1,"pred_class_1_proba/F");
+	  outTree->Branch("pred_class_2_proba",&prob_2,"pred_class_2_proba/F");
+	  outTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
+	}
 	firstTree  = false;
       }
       currentTree = inTree->CloneTree(0);
@@ -469,6 +514,15 @@ if (era == "2018"){
       currentTree->Branch("qcdweightml_1", &qcdweightml_1, "qcdweightml_1/F");
       currentTree->Branch("qcdweightml_2", &qcdweightml_2, "qcdweightml_2/F");
       currentTree->Branch("qcdweightml_3", &qcdweightml_3, "qcdweightml_3/F");
+
+	if(useFriend){
+	  currentTree->Branch("pred_class",&pred_class,"pred_class/I");
+	  currentTree->Branch("pred_class_proba",&pred_proba,"pred_class_proba/F");
+	  currentTree->Branch("pred_class_0_proba",&prob_0,"pred_class_0_proba/F");
+	  currentTree->Branch("pred_class_1_proba",&prob_1,"pred_class_1_proba/F");
+	  currentTree->Branch("pred_class_2_proba",&prob_2,"pred_class_2_proba/F");
+	  currentTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
+	}
       // lumi-xsec-weight added
       if( xsec_map->find(subsample) == xsec_map->end() && !sample.first.Contains("MuonEG")  && !sample.first.Contains("Embedded")){
 	cout << endl << endl << "Sample " << subsample << " is missing in xsec_map. Exit code." << endl << endl ;

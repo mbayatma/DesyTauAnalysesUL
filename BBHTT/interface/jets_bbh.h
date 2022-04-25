@@ -687,6 +687,8 @@ namespace jets{
      otree->mjj =  -10;
      otree->jdeta =  -10;
      otree->dijetpt =  -10;
+     otree->dijetphi =  -10;
+     otree->dijeteta =  -10;
      otree->jdphi =  -10;
      otree->njetingap = -10;
    }

@@ -366,6 +366,8 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("prefiringweight", &prefiringweight, &b_prefiringweight);
    fChain->SetBranchAddress("prefiringweightUp", &prefiringweightUp, &b_prefiringweightUp);
    fChain->SetBranchAddress("prefiringweightDown", &prefiringweightDown, &b_prefiringweightDown);
+   fChain->SetBranchAddress("btagweight", &btagweight, &b_btagweight);
+
 
    if (ch == "em") {
      fChain->SetBranchAddress("weightSingle", &weightSingle, &b_weightSingle);
@@ -1225,6 +1227,7 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("zptweight", &zptweight, "zptweight/D");
   fChain->Branch("zptembweight", &zptembweight, "zptembweight/D");
   fChain->Branch("effweight", &effweight, "effweight/F"); 
+  fChain->Branch("btagweight",&btagweight, "btagweight/F");
 
   if (ch == "em") {
     fChain->Branch("weightSingle", &weightSingle, "weightSingle/F");

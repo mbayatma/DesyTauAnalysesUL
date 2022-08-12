@@ -10,6 +10,7 @@
 #include "DesyTauAnalyses/BBHTT/interface/JESUncertainties.h"
 #include "DesyTauAnalyses/Common/interface/Jets.h"
 #include "JetMETCorrections/Modules/interface/JetResolution.h"
+#include "DesyTauAnalyses/BBHTT/interface/BTagReshape.h"
 
 struct btag_scaling_inputs{
   BTagCalibrationReader reader_B;
@@ -21,6 +22,7 @@ struct btag_scaling_inputs{
   TH2F *tagEff_B_nonCP5;
   TH2F *tagEff_C_nonCP5;
   TH2F *tagEff_Light_nonCP5;
+  BTagReshape btagShape;
   TRandom3 *rand;
 };
 
@@ -335,6 +337,8 @@ namespace jets{
    
    TLorentzVector uncorrectedJets; uncorrectedJets.SetXYZT(0,0,0,0);
    TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
+
+   double bweight_event = 1.0;
    
    for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
      
@@ -389,18 +393,35 @@ namespace jets{
 
        // check if meets working point cut <=> tagged      
        bool tagged = false;
-       if (BTagAlgorithm == "pfCombinedInclusiveSecondaryVertexV2BJetTags")
-	 tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut; 
-       else if (BTagAlgorithm == "DeepCSV")
+       double bdiscriminant = 0.;
+       if (BTagAlgorithm == "pfCombinedInclusiveSecondaryVertexV2BJetTags") {
+	 tagged = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] > btagCut;
+	 bdiscriminant = analysisTree->pfjet_btag[jet][nBTagDiscriminant1];
+       } 
+       else if (BTagAlgorithm == "DeepCSV") {
 	 tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2]) > btagCut;
-       else if (BTagAlgorithm == "DeepFlavour")
+	 bdiscriminant = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2];
+       }
+       else if (BTagAlgorithm == "DeepFlavour") {
 	 tagged = (analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3]) > btagCut;
+	 bdiscriminant = analysisTree->pfjet_btag[jet][nBTagDiscriminant1] + analysisTree->pfjet_btag[jet][nBTagDiscriminant2] + analysisTree->pfjet_btag[jet][nBTagDiscriminant3];
+       }
        else
 	 {
 	   std::cout << "tagger in the cfg is neither pfCombinedInclusiveSecondaryVertexV2BJetTags, nor DeepFlavour, nor DeepCSV, exiting" << '\n';
 	   exit(-1);
 	 }
        bool taggedRaw = tagged;
+
+       if(!isData) {
+	 int flavor = abs(analysisTree->pfjet_flavour[jet]);
+	 double bweight_jet = inputs_btag_scaling->btagShape.getWeight(
+								       double(jetPt),
+								       double(absJetEta),
+								       double(bdiscriminant),
+								       flavor);
+	 bweight_event *= bweight_jet;
+       }
        
        if(!isData && ApplyBTagScaling) {
 	 int flavor = abs(analysisTree->pfjet_flavour[jet]);
@@ -411,6 +432,7 @@ namespace jets{
 
 	 if (JetPtForBTag > MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	 if (JetPtForBTag < MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
+
 	 
 	 // getting SFs and efficiencies
 	 if (flavor == 5) {
@@ -517,7 +539,9 @@ namespace jets{
    otree->njets = jets.size();
    otree->njetspt20 = jetspt20.size();
    otree->nbtag = bjets.size();
-   
+   otree->btagweight = bweight_event;
+   std::cout << "bweight_event : " << bweight_event << std::endl;
+
    if (!otree->apply_recoil) {
 
      //     std::cout << "changing met " << std::endl;

@@ -1,9 +1,9 @@
 #include "DesyTauAnalyses/BBHTT/interface/SynchNTupleProducer_all_Defs_Alexeis.h"
+#include "DesyTauAnalyses/BBHTT/interface/BTagReshape.h"
 
 #define pi   3.14159265358979312
 #define d2r  1.74532925199432955e-02
 #define r2d  57.2957795130823229
-
 #define electronMass 	 0.000511
 #define muonMass 	 0.105658
 #define tauMass 	 1.77682
@@ -155,6 +155,7 @@ int main(int argc, char * argv[]){
   //b-tag scale factors
   const string BTagAlgorithm = cfg.get<string>("BTagAlgorithm");
   const string BtagSfFile = cmsswBase + "/src/" + cfg.get<string>("BtagSfFile");
+  const string btagReshapeFileName = cmsswBase + "/src/" + cfg.get<string>("BTagReshapeFileName");
   if( ApplyBTagScaling && gSystem->AccessPathName( (TString) BtagSfFile) ){
     cout<<BtagSfFile<<" not found. Please check."<<endl;
     exit(-1);
@@ -227,7 +228,11 @@ int main(int argc, char * argv[]){
       tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
     }
   }  
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, rand};
+
+  BTagReshape reshape(btagReshapeFileName);
+  //exit(-1);
+
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, reshape, rand};
 
   TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/Common/data/fakefactors_ws_tt_lite_"+TString(year_label)+"_dR_corr.root");
   if (ff_file->IsZombie()) {

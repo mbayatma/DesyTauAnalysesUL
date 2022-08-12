@@ -55,6 +55,7 @@ git clone https://github.com/cms-nanoAOD/nanoAOD-tools.git PhysicsTools/NanoAODT
 cd PhysicsTools/NanoAODTools
 
 python3 -c 'import correctionlib._core; import correctionlib.schemav2'
+cd ${CMSSW_BASE}/src
 
 
 

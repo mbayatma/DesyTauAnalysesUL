@@ -200,6 +200,7 @@ int main(int argc, char * argv[]){
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
   const string pileUpforMC = cfg.get<string>("pileUpforMC");
 
+
   std::string year_label;
   if (era == 2016) year_label = "2016Legacy";
   else if (era == 2017) year_label = "2017ReReco";
@@ -328,13 +329,11 @@ int main(int argc, char * argv[]){
   // kinematic cuts on electrons
   const float ptElectronLowCut    = cfg.get<float>("ptElectronLowCut");
   const float ptElectronHighCut   = cfg.get<float>("ptElectronHighCut");
-  const float ptElectronSingleCut = cfg.get<float>("ptElectronSingleCut");
   const float etaElectronCut      = cfg.get<float>("etaElectronCut");
   const float dxyElectronCut      = cfg.get<float>("dxyElectronCut");
   const float dzElectronCut       = cfg.get<float>("dzElectronCut");
   const string lowPtLegElectron   = cfg.get<string>("LowPtLegElectron");
   const string highPtLegElectron  = cfg.get<string>("HighPtLegElectron");
-  const vector<string> singleLegElectron = cfg.get<vector<string> >("SingleLegElectron");
   
   // veto electrons
   const float ptVetoElectronCut   = cfg.get<float>("ptVetoElectronCut");
@@ -346,13 +345,11 @@ int main(int argc, char * argv[]){
   // kinematic cuts on muons
   const float ptMuonLowCut    = cfg.get<float>("ptMuonLowCut");
   const float ptMuonHighCut   = cfg.get<float>("ptMuonHighCut");
-  const float ptMuonSingleCut = cfg.get<float>("ptMuonSingleCut");
   const float etaMuonCut      = cfg.get<float>("etaMuonCut");
   const float dxyMuonCut      = cfg.get<float>("dxyMuonCut");
   const float dzMuonCut       = cfg.get<float>("dzMuonCut");
   const string lowPtLegMuon   = cfg.get<string>("LowPtLegMuon");
   const string highPtLegMuon  = cfg.get<string>("HighPtLegMuon");
-  const vector<string> singleLegMuon = cfg.get<vector<string> >("SingleLegMuon");
    
   // veto muons
   const float ptVetoMuonCut   = cfg.get<float>("ptVetoMuonCut");
@@ -381,12 +378,6 @@ int main(int argc, char * argv[]){
   TString LowPtLegElectron(lowPtLegElectron);
   TString HighPtLegMuon(highPtLegMuon);
   TString HighPtLegElectron(highPtLegElectron);
-  vector<TString> SingleLegMuon;
-  vector<TString> SingleLegElectron;
-  for (unsigned int i=0; i<singleLegMuon.size(); ++i) 
-    SingleLegMuon.push_back(TString(singleLegMuon.at(i)));
-  for (unsigned int i=0; i<singleLegElectron.size(); ++i) 
-    SingleLegElectron.push_back(TString(singleLegElectron.at(i)));
   TString Mu23Ele12DzFilter(mu23ele12DzFilter);
   TString Mu8Ele23DzFilter(mu8ele23DzFilter);
 
@@ -400,7 +391,7 @@ int main(int argc, char * argv[]){
 
   // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
-  const string CorrectionWorkspaceFileNameKIT = cfg.get<string>("CorrectionWorkspaceFileNameKIT");
+  const string CorrectionWorkspaceFileNameEmb = cfg.get<string>("CorrectionWorkspaceFileNameEmb");
 
   // Met correction in embedded sample
   double genMetScale = 1;
@@ -497,7 +488,7 @@ int main(int argc, char * argv[]){
 
   // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
-  TString workspace_filename_kit = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileNameKIT;
+  TString workspace_filename_emb = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileNameEmb;
   cout << "Taking correction workspace (IC) from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
@@ -505,15 +496,15 @@ int main(int argc, char * argv[]){
      exit(-1);
    }
 
-  cout << "Taking correction workspace (KIT) from " << workspace_filename_kit << endl;
-  TFile *f_workspace_kit = new TFile(workspace_filename_kit, "read");
-  if (f_workspace_kit->IsZombie()) {
-    std::cout << " workspace file " << workspace_filename_kit << " not found. Please check. " << std::endl;
+  cout << "Taking correction workspace (KIT) from " << workspace_filename_emb << endl;
+  TFile *f_workspace_emb = new TFile(workspace_filename_emb, "read");
+  if (f_workspace_emb->IsZombie()) {
+    std::cout << " workspace file " << workspace_filename_emb << " not found. Please check. " << std::endl;
      exit(-1);
    }
 
-  RooWorkspace *w = (RooWorkspace*)f_workspace->Get("w");
-  RooWorkspace *correctionWS = (RooWorkspace*)f_workspace_kit->Get("w");
+  RooWorkspace *wSF  = (RooWorkspace*)f_workspace->Get("w");
+  RooWorkspace *wEmb = (RooWorkspace*)f_workspace_emb->Get("w");
 
   //  TString ggHWeightsFile("higgs_pt_v0.root");
   TString ggHWeightsFile("higgs_pt_v2.root");
@@ -580,7 +571,7 @@ int main(int argc, char * argv[]){
   TH2F *hIsolationCorrection = (TH2F*)fQCD->Get("IsolationCorrection");
 
   // scale factor class
-  ScaleFactors * scaleFactors = new ScaleFactors(correctionWS,era,isEmbedded);
+  ScaleFactors * scaleFactors = new ScaleFactors(wSF,era,isEmbedded);
 
   // output fileName with histograms
   rootFileName += "_";
@@ -818,10 +809,6 @@ int main(int argc, char * argv[]){
       otree->passedAllMetFilters = passed_all_met_filters;
       
       // accessing trigger info ====
-      vector<bool> isSingleLegMuon; isSingleLegMuon.clear();
-      vector<bool> isSingleLegElectron; isSingleLegElectron.clear();
-      vector<unsigned int> nSingleLegMuon; nSingleLegMuon.clear();
-      vector<unsigned int> nSingleLegElectron; nSingleLegElectron.clear();
 
       bool isMu23Ele12DzFilter = false;
       bool isMu8Ele23DzFilter = false;
@@ -836,18 +823,6 @@ int main(int argc, char * argv[]){
       bool isHighPtLegElectron = accessTriggerInfo(&analysisTree,HighPtLegElectron,nHighPtLegElectron);
       bool isLowPtLegMuon = accessTriggerInfo(&analysisTree,LowPtLegMuon,nLowPtLegMuon);
       bool isHighPtLegMuon = accessTriggerInfo(&analysisTree,HighPtLegMuon,nHighPtLegMuon);
-      for (unsigned int i=0; i<SingleLegMuon.size(); ++i) {
-	unsigned int nfilter = 0;
-	bool isfilter = accessTriggerInfo(&analysisTree,SingleLegMuon.at(i),nfilter);
-	isSingleLegMuon.push_back(isfilter);
-	nSingleLegMuon.push_back(nfilter);
-      }
-      for (unsigned int i=0; i<SingleLegElectron.size(); ++i) {
-	unsigned int nfilter = 0;
-	bool isfilter = accessTriggerInfo(&analysisTree,SingleLegElectron.at(i),nfilter);
-	isSingleLegElectron.push_back(isfilter);
-	nSingleLegElectron.push_back(nfilter);
-      }
       if (applyDzFilterMatch){
 	isMu23Ele12DzFilter = accessTriggerInfo(&analysisTree,Mu23Ele12DzFilter,nMu23Ele12DzFilter);
 	isMu8Ele23DzFilter = accessTriggerInfo(&analysisTree,Mu8Ele23DzFilter,nMu8Ele23DzFilter);
@@ -924,32 +899,12 @@ int main(int argc, char * argv[]){
       /////////////////////////////
       // Trigger matching
       /////////////////////////////
-      vector<bool> isSingleMuonMatch(isSingleLegMuon.size(), false);
-      vector<bool> isSingleElectronMatch(isSingleLegElectron.size(), false);
       bool isHighPtMuonMatch = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isHighPtLegMuon,nHighPtLegMuon,dRTrigMatch);
       bool isLowPtMuonMatch  = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isLowPtLegMuon,nLowPtLegMuon,dRTrigMatch);
 
       bool isHighPtElectronMatch = triggerMatching(&analysisTree,otree->eta_1,otree->phi_1,isHighPtLegElectron,nHighPtLegElectron,dRTrigMatch);;
       bool isLowPtElectronMatch  = triggerMatching(&analysisTree,otree->eta_1,otree->phi_1,isLowPtLegElectron,nLowPtLegElectron,dRTrigMatch);
 
-      for ( unsigned int i=0; i<isSingleLegMuon.size(); ++i) {
-	isSingleMuonMatch.at(i) = triggerMatching(&analysisTree,otree->eta_2,otree->phi_2,isSingleLegMuon.at(i),nSingleLegMuon.at(i),dRTrigMatch);
-      }
-      for ( unsigned int i=0; i<isSingleLegElectron.size(); ++i) {
-	isSingleElectronMatch.at(i) = triggerMatching(&analysisTree,otree->eta_1,otree->phi_1,isSingleLegElectron.at(i),nSingleLegElectron.at(i),dRTrigMatch);
-      }
-      if (era == 2017) {
-        int id_SingleEGO = -1;
-        int id_Single32 = -1;    
-        for(unsigned int i_trig = 0; i_trig < SingleLegElectron.size(); i_trig++){
-          if(SingleLegElectron.at(i_trig) == "hltEGL1SingleEGOrFilter")
-            id_SingleEGO = i_trig;
-          if(SingleLegElectron.at(i_trig) == "hltEle32L1DoubleEGWPTightGsfTrackIsoFilter")
-            id_Single32 = i_trig;
-        }
-        isSingleElectronMatch[id_SingleEGO] = isSingleElectronMatch[id_SingleEGO] && isSingleElectronMatch[id_Single32];
-        isSingleElectronMatch[id_Single32] =  isSingleElectronMatch[id_SingleEGO] && isSingleElectronMatch[id_Single32];
-      }
       bool isHighPtMuonDZMatch = true;
       bool isLowPtMuonDZMatch = true;
       bool isHighPtElectronDZMatch = true;
@@ -983,18 +938,7 @@ int main(int argc, char * argv[]){
       otree->trg_muhigh_elow = isHighPtMuonMatch && isLowPtElectronMatch && isHighPtMuonDZMatch && isLowPtElectronDZMatch;
       otree->trg_ehigh_mulow = isHighPtElectronMatch && isLowPtMuonMatch && isLowPtMuonDZMatch && isHighPtElectronDZMatch;
 
-      for(unsigned int i_trig = 0; i_trig < SingleLegElectron.size(); i_trig++)
-        otree->trg_singleelectron = otree->trg_singleelectron || isSingleElectronMatch.at(i_trig);
-      for(unsigned int i_trig = 0; i_trig < SingleLegMuon.size(); i_trig++)
-        otree->trg_singlemuon = otree->trg_singlemuon || isSingleMuonMatch.at(i_trig);
-      if (triggerEmbed2017) {
-	if (otree->pt_1<ptTriggerEmbed2017&&fabs(otree->eta_1)>etaTriggerEmbed2017) {
-	  otree->trg_singleelectron = true;
-	}
-      }    
-      otree->singleLepTrigger = otree->trg_singleelectron || otree->trg_singlemuon;
-    
-      bool trigger_fired = otree->trg_singleelectron || otree->trg_singlemuon || otree->trg_ehigh_mulow || otree->trg_muhigh_elow;
+      bool trigger_fired = otree->trg_ehigh_mulow || otree->trg_muhigh_elow;
 
       //extra lepton veto
       TString chE("et");
@@ -1084,32 +1028,8 @@ int main(int argc, char * argv[]){
       if ((!isData || isEmbedded) && ApplyLepSF) {
       	TString suffix = "mc";
       	TString suffixRatio = "ratio";
-      	if (isEmbedded) {suffix = "embed"; suffixRatio = "embed_ratio";}
 
-	// single-muon trigger weights
-	w->var("m_pt")->setVal(otree->pt_2);
-	w->var("m_eta")->setVal(otree->eta_2);
-	w->var("m_iso")->setVal(otree->iso_2);
-	eff_data_trig_m = w->function("m_trg_ic_data")->getVal();
-	eff_mc_trig_m = w->function("m_trg_ic_" + suffix)->getVal();
-	sf_trig_m = w->function("m_trg_ic_" + suffixRatio)->getVal();
-
-	// single-electron trigger weights
-	w->var("e_pt")->setVal(otree->pt_1);
-	w->var("e_eta")->setVal(otree->eta_1);
-	w->var("e_iso")->setVal(otree->iso_1);
-	eff_data_trig_e = w->function("e_trg_ic_data")->getVal();
-	eff_mc_trig_e = w->function("e_trg_ic_" + suffix)->getVal();
-	sf_trig_e = w->function("e_trg_ic_" + suffixRatio)->getVal();
-
-	if (triggerEmbed2017) {
-	  if (otree->pt_1<ptTriggerEmbed2017&&fabs(otree->eta_1)>etaTriggerEmbed2017) {
-	    eff_mc_trig_e = 1.0;
-	    sf_trig_e = eff_data_trig_e;
-	  }
-	}
-
-	// KIT scale factors --->
+	// IC scale factors --->
 	scaleFactors->setLeptons(otree->pt_1,otree->eta_1,otree->iso_1,
 				 otree->pt_2,otree->eta_2,otree->iso_2);
 
@@ -1159,7 +1079,7 @@ int main(int argc, char * argv[]){
       // embedded weight
       otree->embweight = 1.0;
       if (isEmbedded) {
-	otree->embweight = getEmbeddedWeight(&analysisTree, w);
+	otree->embweight = getEmbeddedWeight(&analysisTree, wEmb);
 	//	otree->embweight = getEmbeddedWeightKIT(&analysisTree, correctionWS, era);
 	if (otree->embweight>10.0)
 	  cout << "warning : embedding weight = " << otree->embweight << endl;

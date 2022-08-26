@@ -54,39 +54,25 @@ void ScaleFactors::computeSFs() {
   trkeffweight_2 = 1.0;
   trig_emu = 1.0;
 
-  // id/iso/trk scale factors (from KIT)
-  if (era==2016){
-    if (isEmbedded) {
+  // id/iso/trk scale factors (UL)
+  if (isEmbedded) { // obsolete pre-legacy 
+    if (era==2016){
       isoweight_1 = correctionWS->function("e_idiso_ratio_emb")->getVal();
       isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
     }
-    else {
-      isoweight_1 = correctionWS->function("e_idiso_ratio")->getVal();
-      isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
-    }
-  }
-  else{
-    if (isEmbedded) {
-      if (era==2017) {
-	isoweight_1 = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal()*correctionWS->function("e_id90_embed_kit_ratio")->getVal();
-	isoweight_2 = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
-      }
-      else {
-	isoweight_1 = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal() * correctionWS->function("e_id90_embed_kit_ratio")->getVal();
-	isoweight_2 = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
-      }
+    else if (era==2017){
+      isoweight_1 = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal()*correctionWS->function("e_id90_embed_kit_ratio")->getVal();
+      isoweight_2 = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
     }
     else {
-      isoweight_1 = correctionWS->function("e_id90_kit_ratio")->getVal() * correctionWS->function("e_iso_kit_ratio")->getVal();
-      isoweight_2 = correctionWS->function("m_looseiso_ic_ratio")->getVal()*correctionWS->function("m_id_kit_ratio")->getVal();
+      isoweight_1 = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal() * correctionWS->function("e_id90_embed_kit_ratio")->getVal();
+      isoweight_2 = correctionWS->function("m_looseiso_binned_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
     }
   }
-  if (!isEmbedded){
-    if (era == 2018) trkeffweight_1 = correctionWS->function("e_trk_ratio")->getVal();
-    if (era==2016 || era==2018) 
-      trkeffweight_2 = correctionWS->function("m_trk_ratio")->getVal();
+  else {
+    isoweight_1 = correctionWS->function("e_idiso_binned_ratio")->getVal();
+    isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
   }
-  if (era == 2017) trkeffweight_1 = correctionWS->function("e_trk_ratio")->getVal();
 
   double eff_data_trig_mhigh = correctionWS->function("m_trg_23_ic_data")->getVal();
   double eff_data_trig_mlow = correctionWS->function("m_trg_8_ic_data")->getVal();

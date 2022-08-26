@@ -2,29 +2,54 @@
 
 ### the script is to be run with "./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
 
+YEARS="16_pre 16_post 17 18"
 YEAR=$1
 CHANNEL=$2
 DATA_TYPE=$3
-if [ $YEAR -lt 16 ] || [ $YEAR -gt 18 ]; then
+
+
+
+if [[ $YEAR = "16_pre" ]]; then
+    NOT_YEAR=(16_post 17 18)
+elif [[ $YEAR = "16_post" ]]; then
+    NOT_YEAR=(16_pre 17 18)
+elif [[ $YEAR = "17" ]]; then
+    NOT_YEAR=(16_pre 16_post 18)
+elif [[ $YEAR = "18" ]]; then
+    NOT_YEAR=(16_pre 16_post 17)
+else 
     echo
     echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
     echo
-    echo "  ./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}> <channel={mt,et,em}>"
+    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
     echo
-    echo "year is not 16, 17 or 18 - exiting"
+    echo "year is not 16_pre,16_post, 17 or 18 - exiting"
     exit
 fi
 
-if [ $DATA_TYPE != 'data' ] && [ $DATA_TYPE != 'MC' ] && [ $DATA_TYPE != 'embedded' ]; then
+
+if [[ $DATA_TYPE == "data" ]]; then
+    VALUE_LIST=("${VALUE_LIST_DATA[@]}")
+    NOT_DATA_TYPE=("MC" "embedded")
+elif [[ $DATA_TYPE == "MC" ]]; then
+    VALUE_LIST=("${VALUE_LIST_MC[@]}")
+    NOT_DATA_TYPE=("data" "embedded")
+elif [[ $DATA_TYPE == "embedded" ]]; then          
+    VALUE_LIST=("${VALUE_LIST_EMBEDDED[@]}")
+    NOT_DATA_TYPE=("MC" "data")
+else
     echo
     echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
     echo
-    echo "  ./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
+    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
     echo
-    echo "data_type is not {data, MC, embedded} - exiting"
+    echo "data_type is neither data nor MC - exiting"
     exit
+fi  
 
-fi
+
+
+
 
 if [[ $CHANNEL == "em" ]]; then
     OUTDIR=./emu/20$YEAR
@@ -35,26 +60,6 @@ fi
 
 if [ ! -d "$OUTDIR" ]; then
   mkdir $OUTDIR
-fi
-
-if [[ $YEAR -eq 16 ]]; then
-  NOT_YEAR=(17 18)
-else 
-  if [[ $YEAR -eq 17 ]]; then
-    NOT_YEAR=(16 18)
-  else 
-    if [[ $YEAR -eq 18 ]]; then
-      NOT_YEAR=(16 17)
-    else 
-      echo
-      echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
-      echo
-      echo "  ./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
-      echo
-      echo "year is not 16, 17 or 18 - exiting"
-      exit
-    fi
-  fi
 fi
 
 TEMPLATE_CFG_PREFIX="analysisMacroSynch"
@@ -75,29 +80,6 @@ KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyRecoilCorrections ApplyBTagScalin
 VALUE_LIST_MC=(false true true true true)
 VALUE_LIST_DATA=(true false false false false)
 VALUE_LIST_EMBEDDED=(true false true false false)
-
-if [[ $DATA_TYPE == "data" ]]; then
-  VALUE_LIST=("${VALUE_LIST_DATA[@]}")
-  NOT_DATA_TYPE=("MC" "embedded")
-else
-  if [[ $DATA_TYPE == "MC" ]]; then
-    VALUE_LIST=("${VALUE_LIST_MC[@]}")
-    NOT_DATA_TYPE=("data" "embedded")
-  else    
-    if [[ $DATA_TYPE == "embedded" ]]; then          
-      VALUE_LIST=("${VALUE_LIST_EMBEDDED[@]}")
-      NOT_DATA_TYPE=("MC" "data")
-    else
-      echo
-      echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
-      echo
-      echo "  ./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
-      echo
-      echo "data_type is neither data nor MC - exiting"
-      exit
-    fi  
-  fi
-fi
 
 # these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
 # also redefine list of the parameters according to the input data type
@@ -130,25 +112,18 @@ MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_1
 MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
 
 if [[ $DATA_TYPE == "MC" ]]; then
-  if [[ $YEAR -eq 17 ]]; then # for 17 the path in the root file to PU histograms is sample-dependent, pick it from the list
-    for (( i = 0; i < $MC_SAMPLES_LEN; i++ )); do
-        PU_STR=${MC_SAMPLES_LIST[i]}_pileup
-        sed "s/pileUpforMC =/pileUpforMC = ${PU_STR}/" ${TEMPLATE_CFG_NAME}_tmp.conf > $OUTDIR/${TEMPLATE_CFG_NAME}_${MC_SAMPLES_LIST[i]}.conf
-    done
-    sed "s/pileUpforMC =/pileUpforMC = MC_PU2017_pileup/" ${TEMPLATE_CFG_NAME}_tmp.conf > $OUTDIR/${TEMPLATE_CFG_NAME}.conf
-  else
     sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_tmp.conf > $OUTDIR/${TEMPLATE_CFG_NAME}.conf
-  fi # path in the root file to PU histograms for 16 and 18 data; 
+    # path in the root file to PU histograms for 16 and 18 data; 
 else
-  cp  ${TEMPLATE_CFG_NAME}_tmp.conf $OUTDIR/${TEMPLATE_CFG_NAME}.conf
+    cp  ${TEMPLATE_CFG_NAME}_tmp.conf $OUTDIR/${TEMPLATE_CFG_NAME}.conf
 fi
 rm ${TEMPLATE_CFG_NAME}_tmp.conf
 
 if [[ $DATA_TYPE == "data" ]]; then
-    if [[ $YEAR -eq 16 ]]; then
+    if [[ $YEAR = "16_pre" ] || [ $YEAR = "16_post" ]]; then
 	sed "s/ApplyDzFilterMatch = false/ApplyDzFilterMatch = true/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}GH.conf
     fi
-    if [[ $YEAR -eq 17 ]]; then
+    if [[ $YEAR = "17" ]]; then
 	sed "s/LowPtLegMuon =  hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8/LowPtLegMuon =  hltL3fL1sMu7EG23f0Filtered8/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}B.conf
     fi	
 fi

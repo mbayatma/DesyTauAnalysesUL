@@ -8,7 +8,7 @@ else
     if [[ $CHANNEL == "tt" ]]; then
 	OUTDIR=./tautau/$YEAR
     else
-	echo "ERROR: please run the script with ./gridcontrol_setup_mt_Run2.sh <year={16,17,18}> <channel={tt,em}>"
+	echo "ERROR: please run the script with ./gridcontrol_setup_mt_Run2.sh <year={16_pre,16_post,17,18}> <channel={tt,em}>"
 	exit
     fi
 fi

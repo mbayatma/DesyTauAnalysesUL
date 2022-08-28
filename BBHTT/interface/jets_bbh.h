@@ -290,11 +290,13 @@ namespace jets{
    bool ApplyBTagScaling = cfg->get<bool>("ApplyBTagScaling");
    
    bool is2017 = false;
-   int era = cfg->get<int>("era");
-   if(era == 2017) 
+   string era = cfg->get<string>("era");
+   TString Era(era);
+   int era_int = 2016;
+   if (Era=="2017") era_int = 2017;
+   if (Era=="2018") era_int = 2018;
+   if(era_int == 2017) 
      is2017 = true;
-   else if(era != 2016 && era != 2018) 
-     {cout<<"no proper era found in cfg file, exiting"<<endl; exit(-1);}
    
    const bool applyJetPUID = cfg->get<bool>("ApplyJetPUID");
    
@@ -373,7 +375,7 @@ namespace jets{
      if (jetPt <= JetPtLowCut) continue;
      
      // see definition in Jets.h
-     bool isPFJetId = tightJetID((*analysisTree), int(jet), era);
+     bool isPFJetId = tightJetID((*analysisTree), int(jet), era_int);
      if (!isPFJetId) continue;
      bool passedPUID = jetPUID((*analysisTree), int(jet),"Loose");
      if(applyJetPUID&&!passedPUID) continue;
@@ -428,7 +430,6 @@ namespace jets{
 
 	 if (JetPtForBTag > MaxBJetPt) JetPtForBTag = MaxBJetPt - 0.1;
 	 if (JetPtForBTag < MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
-
 	 
 	 // getting SFs and efficiencies
 	 if (flavor == 5) {
@@ -521,7 +522,7 @@ namespace jets{
    otree->njetspt20 = jetspt20.size();
    otree->nbtag = bjets.size();
    otree->btagweight = bweight_event;
-   std::cout << "bweight_event : " << bweight_event << std::endl;
+   //   std::cout << "bweight_event : " << bweight_event << std::endl;
 
    if (!otree->apply_recoil) {
 

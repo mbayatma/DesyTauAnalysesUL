@@ -214,12 +214,14 @@ int main(int argc, char * argv[]){
     cout << "Quitting... " << endl;
     exit(-1);
   }
-
+  /*
   std::shared_ptr<RooWorkspace> ff_ws_;
   std::map<std::string, std::shared_ptr<RooFunctor>> fns_;
   ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
   fns_["ff_tt_medium_dmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_dmbins")->functor(ff_ws_->argSet("pt,dm,njets,os,met_var_qcd,dR")));
   fns_["ff_tt_medium_mvadmbins_nosig"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_mvadmbins_nosig")->functor(ff_ws_->argSet("pt,mvadm,njets,os,met_var_qcd,dR")));
+  */
+  RooWorkspace * w_fakefactors = (RooWorkspace*)ff_file->Get("w");
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
@@ -488,6 +490,7 @@ int main(int argc, char * argv[]){
   //  SynchGenTree *gentreeForGoodRecoEvtsOnly = new SynchGenTree(tree);
 
   // systematics
+  /*
   for (auto sysname : otree->ff_sysnames) {
     TString SysName(sysname);
     if (SysName!="qcd_pt2") {
@@ -495,7 +498,7 @@ int main(int argc, char * argv[]){
       std::cout << sysname << ":" << fns_[sysname] << std::endl;
     }
   }
-    
+  */
   int nTotalFiles = 0;
   int nEvents = 0;
   int selEvents = 0;
@@ -1378,7 +1381,6 @@ int main(int argc, char * argv[]){
       }
       otree->weight *= otree->zptweight;
       
-      cout << "6" << endl;
       ////////////////////////////////////////////////////////////
       // Top pt weight
       ////////////////////////////////////////////////////////////
@@ -1392,7 +1394,6 @@ int main(int argc, char * argv[]){
         // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       }
       otree->weight *= otree->topptweight;
-      cout << "7" << endl;
 
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections
@@ -1445,8 +1446,6 @@ int main(int argc, char * argv[]){
 	}
       }
 
-      cout << "8" << endl;
-      
       //ditau sytem
       TLorentzVector tau1LV; tau1LV.SetPtEtaPhiM(otree->pt_1,
 						 otree->eta_1,
@@ -1554,10 +1553,9 @@ int main(int argc, char * argv[]){
       //
       // Fake Factors    
       // 
-      cout << "9" << endl;
       double dphi_met_tau  = dPhiFrom2P(tau1LV.Px(),tau1LV.Py(),puppimetLV.Px(),puppimetLV.Py());
       double met_var_qcd_1 = puppimetLV.Pt()*TMath::Cos(dphi_met_tau)/tau1LV.Pt();
-      double pt_fake = TMath::Min(TMath::Max(otree->pt_1,40.1),169.9);
+      /*
       auto args = std::vector<double>{
 	static_cast<double>(pt_fake),
 	static_cast<double>(otree->tau_decay_mode_1),
@@ -1566,7 +1564,16 @@ int main(int argc, char * argv[]){
 	static_cast<double>(met_var_qcd_1),
 	static_cast<double>(otree->dr_tt)
       };
-      otree->ff_nom = fns_["ff_tt_medium_dmbins"]->eval(args.data());
+      */
+      //      otree->ff_nom = fns_["ff_tt_medium_dmbins"]->eval(args.data());
+      w_fakefactors->var("pt")->setVal(otree->pt_1);
+      w_fakefactors->var("dm")->setVal(otree->tau_decay_mode_1);
+      w_fakefactors->var("njets")->setVal(otree->njets);
+      w_fakefactors->var("os")->setVal(otree->os);
+      w_fakefactors->var("met_var_qcd")->setVal(met_var_qcd_1);
+      w_fakefactors->var("dR")->setVal(otree->dr_tt);
+      otree->ff_nom = w_fakefactors->function("ff_tt_medium_dmbins")->getVal();
+
       double PT2 = otree->pt_2;
       if (PT2<40.) PT2 = 40.5;
       if (PT2>150.) PT2 = 149.5;
@@ -1574,17 +1581,19 @@ int main(int argc, char * argv[]){
       otree->ff_nom *= ff_closure;
       
       //      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
-      for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {
-	std::string sysname = otree->ff_sysnames.at(i);
-	TString SysName(sysname);
-	if (SysName!="qcd_pt2")
-	  otree->ff_sys[i] = fns_[sysname]->eval(args.data())*ff_closure/otree->ff_nom;
-	else
-	  otree->ff_sys[i] = ff_closure;
+      //      for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {
+      //	std::string sysname = otree->ff_sysnames.at(i);
+      //	TString SysName(sysname);
+	//	if (SysName!="qcd_pt2")
+	  //	  otree->ff_sys[i] = fns_[sysname]->eval(args.data())*ff_closure/otree->ff_nom;
+	  //	  otree->ff_sys[i] = w_fakefactors->function(sysname.c_str())->getVal()*ff_closure/otree->ff_nom;
+	//	else
+	//	  otree->ff_sys[i] = ff_closure;
 	//	std::cout << sysname << " : " << otree->ff_sys[i] << std::endl;
-      }
+	//      }
       otree->ff_nom_sys = 0.15;
-
+      
+      /*
       auto args_mva = std::vector<double>{
 	static_cast<double>(pt_fake),
 	static_cast<double>(otree->dmMVA_1),
@@ -1595,8 +1604,8 @@ int main(int argc, char * argv[]){
       };
       otree->ff_mva = fns_["ff_tt_medium_mvadmbins_nosig"]->eval(args_mva.data());
       otree->ff_mva_sys = 0.15;
-
-      /*
+      */
+      
       cout << "Trigger weight = " << otree->trigweight << endl;
       cout << "mc weight      = " << otree->mcweight << endl;
       cout << "pu weight      = " << otree->puweight << endl;
@@ -1611,7 +1620,7 @@ int main(int argc, char * argv[]){
 	cout << "gen_match_1 = " << otree->gen_match_1 << "   id/Iso1 weight = " << otree->idisoweight_1 << endl;
       if (otree->gen_match_2!=5)
 	cout << "gen_match_2 = " << otree->gen_match_2 << "   id/Iso2 weight = " << otree->idisoweight_2 << endl;
-      */
+      
 
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
       if(!Synch){

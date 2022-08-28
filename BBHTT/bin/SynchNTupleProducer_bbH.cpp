@@ -184,10 +184,10 @@ int main(int argc, char * argv[]){
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyFastMTT     = cfg.get<bool>("ApplyFastMTT");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
+  const bool ApplyBTagReshape = cfg.get<bool>("ApplyBTagReshape");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
-  const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
   const bool ApplyMetCorrection = cfg.get<bool>("ApplyMetCorrection");
   const bool smearMET = cfg.get<bool>("SmearMET");
 
@@ -264,32 +264,19 @@ int main(int argc, char * argv[]){
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
-  TH2F  *tagEff_B_nonCP5     = 0;
-  TH2F  *tagEff_C_nonCP5     = 0;
-  TH2F  *tagEff_Light_nonCP5 = 0;
   TRandom3 *rand = new TRandom3();
 
   if(ApplyBTagScaling){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
-    if (ApplyBTagCP5Correction) {
-      TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
-      if (gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)) {
-        cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
-        exit(-1);
-      } 
-      TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
-      tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
-      tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
-      tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
-    }
   }  
 
-  BTagReshape reshape(btagReshapeFileName);
+  BTagReshape * reshape = NULL;
+  if (ApplyBTagReshape) reshape = new BTagReshape(btagReshapeFileName);
   //exit(-1);
 
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, reshape, rand};
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, reshape, rand};
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY

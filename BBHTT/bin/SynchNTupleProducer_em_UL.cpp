@@ -179,33 +179,27 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase) + "/src/" + TString(json_name)).Data(), json);
   }
 
-  const int era = cfg.get<int>("era");
+  const string era_string = cfg.get<string>("era");
+  TString Era(era_string);
+  int era = 2016;
+  if (Era.Contains("2017")) era = 2017;
+  if (Era.Contains("2018")) era = 2018;
+
   const bool synch            = cfg.get<bool>("Synch");
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyFastMTT     = cfg.get<bool>("ApplyFastMTT");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
+  const bool ApplyBTagReshape = cfg.get<bool>("ApplyBTagReshape");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
-  const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
-
-  // JER
-  //  const string jer_resolution = cfg.get<string>("JER_Resolution");
-  //  const string jer_scalefactor = cfg.get<string>("JER_ScaleFactor");
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
   const string pileUpInMCFile = cfg.get<string>("pileUpInMCFile");
   const string pileUpforMC = cfg.get<string>("pileUpforMC");
-
-
-  std::string year_label;
-  if (era == 2016) year_label = "2016Legacy";
-  else if (era == 2017) year_label = "2017ReReco";
-  else if (era == 2018) year_label = "2018ReReco";	
-  else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -224,24 +218,21 @@ int main(int argc, char * argv[]){
   }
   
   // JER
+  const string m_resolution_filename = cfg.get<string>("JERResolutionFileName");
+  const string m_resolution_sf_filename = cfg.get<string>("JERSFFileName");
   std::unique_ptr<JME::JetResolution> m_resolution_from_file;
   std::unique_ptr<JME::JetResolutionScaleFactor> m_scale_factor_from_file;
-  if (era==2016) {
-    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt"));
-    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Summer16_25nsV1_MC_SF_AK4PFchs.txt"));
-  }
-  else if (era==2017) {
-    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
-    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Fall17_V3_MC_SF_AK4PFchs.txt"));
-  }
-  else {
-    m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Autumn18_V7b_MC_PtResolution_AK4PFchs.txt"));
-    m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Autumn18_V7b_MC_SF_AK4PFchs.txt"));    
-  }
+  m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/"+m_resolution_filename));
+  m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/"+m_resolution_sf_filename));
 
   JME::JetResolution resolution = *m_resolution_from_file;
   JME::JetResolutionScaleFactor resolution_sf = *m_scale_factor_from_file;
 
+  // JES uncertainties
+  const string jes_unc_filename = cfg.get<string>("JESUncertaintyFileName");
+  string JESUncertaintyFileName = cmsswBase + "/src/" + jes_unc_filename;
+
+  // BTag calibration
   BTagCalibration calib;
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
@@ -266,31 +257,18 @@ int main(int argc, char * argv[]){
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
-  TH2F  *tagEff_B_nonCP5     = 0;
-  TH2F  *tagEff_C_nonCP5     = 0;
-  TH2F  *tagEff_Light_nonCP5 = 0;
   TRandom3 *rand = new TRandom3();
 
   if(ApplyBTagScaling){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
-    if (ApplyBTagCP5Correction) {
-      TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
-      if (gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)) {
-        cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
-        exit(-1);
-      } 
-      TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
-      tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
-      tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
-      tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
-    }
   }  
-  BTagReshape reshape(btagReshapeFileName);
+  BTagReshape * reshape = NULL;
+  if (ApplyBTagReshape) reshape = new BTagReshape(btagReshapeFileName);
   //exit(-1);
 
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, reshape, rand};
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, reshape, rand};
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
@@ -526,11 +504,10 @@ int main(int argc, char * argv[]){
   // Zpt reweighting for embedded
   TFile * f_zptweight_emb = new TFile(TString(cmsswBase) + "/src/" + ZptEmbweightFile, "read");
 
-  TString Era("2016");
-  if (era==2017) Era = "2017";
-  if (era==2018) Era = "2018";
-
-  TH2D * h_zptweight_emb = (TH2D*)f_zptweight_emb->Get("shifts_"+Era);
+  TString era_shift("2016");
+  if (era==2017) era_shift = "2017";
+  if (era==2018) era_shift = "2018";
+  TH2D * h_zptweight_emb = (TH2D*)f_zptweight_emb->Get("shifts_"+era_shift);
   if (h_zptweight_emb==NULL) {
     std::cout << "Problem opening file with embedded zpt weights" << std::endl;
     exit(-1);
@@ -673,12 +650,7 @@ int main(int argc, char * argv[]){
       }
       if (cfg.get<bool>("splitJES")){
 	JESUncertainties *jecUncertainties;
-	if (era==2016) 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
-	else if (era==2017)
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
-	else 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+	jecUncertainties = new JESUncertainties(JESUncertaintyFileName);
 	std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
 	for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
 	for (unsigned int i = 0; i < JESnames.size(); i++){

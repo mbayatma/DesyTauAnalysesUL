@@ -1,21 +1,19 @@
 #!/bin/bash
 
-### the script is to be run with "./make_config_Run2.sh <year={16,17,18}> <data_type={data, MC, embedded}>"
+### the script is to be run with "./make_config_Run2.sh <year={16_pre,16_post,17,18}> <type={data, MC, embedded}> <channel={em,tt}> "
 
 YEARS="16_pre 16_post 17 18"
 YEAR=$1
-CHANNEL=$2
-DATA_TYPE=$3
+DATA_TYPE=$2
+CHANNEL=$3
 
-
-
-if [[ $YEAR = "16_pre" ]]; then
+if [[ $YEAR == "16_pre" ]]; then
     NOT_YEAR=(16_post 17 18)
-elif [[ $YEAR = "16_post" ]]; then
+elif [[ $YEAR == "16_post" ]]; then
     NOT_YEAR=(16_pre 17 18)
-elif [[ $YEAR = "17" ]]; then
+elif [[ $YEAR == "17" ]]; then
     NOT_YEAR=(16_pre 16_post 18)
-elif [[ $YEAR = "18" ]]; then
+elif [[ $YEAR == "18" ]]; then
     NOT_YEAR=(16_pre 16_post 17)
 else 
     echo
@@ -27,6 +25,11 @@ else
     exit
 fi
 
+# define parameters which are different between MC and data configs
+KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyBTagScaling ApplyBTagReshape)
+VALUE_LIST_MC=(false true true true true)
+VALUE_LIST_DATA=(true false false false false)
+VALUE_LIST_EMBEDDED=(true false true false false)
 
 if [[ $DATA_TYPE == "data" ]]; then
     VALUE_LIST=("${VALUE_LIST_DATA[@]}")
@@ -48,13 +51,10 @@ else
 fi  
 
 
-
-
-
 if [[ $CHANNEL == "em" ]]; then
-    OUTDIR=./emu/20$YEAR
+    OUTDIR=./20$YEAR
 elif [[ $CHANNEL == "tt" ]]; then
-    OUTDIR=./tautau/20$YEAR
+    OUTDIR=./20$YEAR
 fi
 
 
@@ -74,12 +74,6 @@ done
 
 # remove just the strings "YEAR: " leaving the rest of the line intact 
 sed -i "s/${YEAR}: //" ${TEMPLATE_CFG_NAME}_tmp.conf
-
-# define parameters which are different between MC and data configs
-KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyRecoilCorrections ApplyBTagScaling)
-VALUE_LIST_MC=(false true true true true)
-VALUE_LIST_DATA=(true false false false false)
-VALUE_LIST_EMBEDDED=(true false true false false)
 
 # these parameters are year dependant for MC, so leave them as they are in the config and set to 0 only if it is data config
 # also redefine list of the parameters according to the input data type
@@ -102,15 +96,6 @@ done
 # remove just the strings "DATA_TYPE: " leaving the rest of the line intact 
 sed -i "s/${DATA_TYPE}: //" ${TEMPLATE_CFG_NAME}_tmp.conf
 
-# lists with the MC samples' names
-MC_SAMPLES_LIST=(DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DYJetsToLL_M-10to50_13TeV-12Apr2018)
-MC_SAMPLES_LIST+=(DY3JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8 DY4JetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8)
-MC_SAMPLES_LIST+=(W3JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8 W4JetsToLNu_TuneCP5_13TeV-madgraphMLM-pythia8)
-MC_SAMPLES_LIST+=(TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8 TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8)
-MC_SAMPLES_LIST+=(WW_TuneCP5_13TeV-pythia8 WZ_TuneCP5_13TeV-pythia8 ZZ_TuneCP5_13TeV-pythia8)
-
-MC_SAMPLES_LEN=${#MC_SAMPLES_LIST[@]}
-
 if [[ $DATA_TYPE == "MC" ]]; then
     sed "s/pileUpforMC =/pileUpforMC = pileup/" ${TEMPLATE_CFG_NAME}_tmp.conf > $OUTDIR/${TEMPLATE_CFG_NAME}.conf
     # path in the root file to PU histograms for 16 and 18 data; 
@@ -120,10 +105,12 @@ fi
 rm ${TEMPLATE_CFG_NAME}_tmp.conf
 
 if [[ $DATA_TYPE == "data" ]]; then
-    if [[ $YEAR = "16_pre" ] || [ $YEAR = "16_post" ]]; then
-	sed "s/ApplyDzFilterMatch = false/ApplyDzFilterMatch = true/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}GH.conf
+    if [[ $CHANNEL == "em" ]]; then
+	if [[ $YEAR == "16_post" ]]; then
+	    sed "s/ApplyDzFilterMatch = false/ApplyDzFilterMatch = true/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}GH.conf
+	fi
+	if [[ $YEAR = "17" ]]; then
+	    sed "s/LowPtLegMuon =  hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8/LowPtLegMuon =  hltL3fL1sMu7EG23f0Filtered8/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}B.conf
+	fi
     fi
-    if [[ $YEAR = "17" ]]; then
-	sed "s/LowPtLegMuon =  hltMu8TrkIsoVVLEle23CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered8/LowPtLegMuon =  hltL3fL1sMu7EG23f0Filtered8/" $OUTDIR/${TEMPLATE_CFG_NAME}.conf > $OUTDIR/${TEMPLATE_CFG_NAME}B.conf
-    fi	
 fi

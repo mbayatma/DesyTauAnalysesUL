@@ -96,38 +96,40 @@ int main(int argc, char * argv[]){
     read_json(TString(TString(cmsswBase) + "/src/" + TString(json_name)).Data(), json);
   }
 
-  const int era = cfg.get<int>("era");
+  const string era = cfg.get<string>("era");
   const bool Synch = cfg.get<bool>("Synch"); 
   const bool ApplyPUweight    = cfg.get<bool>("ApplyPUweight"); 
   const bool ApplyLepSF       = cfg.get<bool>("ApplyLepSF"); 
   const bool ApplySVFit       = cfg.get<bool>("ApplySVFit");
   const bool ApplyFastMTT     = cfg.get<bool>("ApplyFastMTT");
   const bool ApplyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
+  const bool ApplyBTagReshape = cfg.get<bool>("ApplyBTagReshape");
   const bool ApplySystShift   = cfg.get<bool>("ApplySystShift");
   const bool ApplyMetFilters  = cfg.get<bool>("ApplyMetFilters");
   const bool usePuppiMET      = cfg.get<bool>("UsePuppiMET");
-  const bool ApplyBTagCP5Correction = cfg.get<bool>("ApplyBTagCP5Correction");
   const bool ApplyMetCorrection = cfg.get<bool>("ApplyMetCorrection");
   
+  TString Era(era);
+
   // Met correction in embedded sample
   double genMetScale = 0.;
   double genMetResolution = 1;
-  if (era==2016) {
+  int era_int = 2016;
+  if (Era.Contains("2016")) {
     genMetScale = 0.005;
     genMetResolution = 0.929;
+    era_int = 2016;
   }
-  if (era==2017) {
+  if (Era=="2017") {
     genMetScale = -0.002;
     genMetResolution = 0.935;
-
+    era_int = 2017;
   }
-  if (era==2018) {
+  if (Era=="2018") {
     genMetScale = -0.004;
     genMetResolution = 0.885;
+    era_int = 2018;
   }
-  // JER
-  //  const string jer_resolution = cfg.get<string>("JER_Resolution");
-  //  const string jer_scalefactor = cfg.get<string>("JER_ScaleFactor");
 
   //pileup distrib
   const string pileUpInDataFile = cfg.get<string>("pileUpInDataFile");
@@ -139,12 +141,6 @@ int main(int argc, char * argv[]){
   if (ch == "mt") channel = "mutau"; 
   if (ch == "et") channel = "etau";
   if (ch == "tt") channel = "tautau";
-
-  std::string year_label;
-  if (era == 2016) year_label = "2016";
-  else if (era == 2017) year_label = "2017";
-  else if (era == 2018) year_label = "2018";	
-  else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
 
   //svfit
   const string svFitPtResFile = TString(TString(cmsswBase) + "/src/" + TString(cfg.get<string>("svFitPtResFile"))).Data();
@@ -162,23 +158,12 @@ int main(int argc, char * argv[]){
   }
   
   // JER
+  const string m_resolution_filename = cfg.get<string>("JERResolutionFileName");
+  const string m_resolution_sf_filename = cfg.get<string>("JERSFFileName");
   std::unique_ptr<JME::JetResolution> m_resolution_from_file;
   std::unique_ptr<JME::JetResolutionScaleFactor> m_scale_factor_from_file;
-  if (ApplySystShift) {
-    if (era==2016) {
-      m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Summer16_25nsV1_MC_PtResolution_AK4PFchs.txt"));
-      m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Summer16_25nsV1_MC_SF_AK4PFchs.txt"));
-    }
-    else if (era==2017) {
-      m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Fall17_V3_MC_PtResolution_AK4PFchs.txt"));
-      m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Fall17_V3_MC_SF_AK4PFchs.txt"));
-    }
-    else {
-      m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Autumn18_V7b_MC_PtResolution_AK4PFchs.txt"));
-      m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/DesyTauAnalyses/Common/data/JER/Autumn18_V7b_MC_SF_AK4PFchs.txt"));    
-    }
-  }
-  
+  m_resolution_from_file.reset(new JME::JetResolution(cmsswBase+"/src/"+m_resolution_filename));
+  m_scale_factor_from_file.reset(new JME::JetResolutionScaleFactor(cmsswBase+"/src/"+m_resolution_sf_filename)); 
   JME::JetResolution resolution = *m_resolution_from_file;
   JME::JetResolutionScaleFactor resolution_sf = *m_scale_factor_from_file;
 
@@ -207,36 +192,25 @@ int main(int argc, char * argv[]){
   TH2F  *tagEff_B     = 0;
   TH2F  *tagEff_C     = 0;
   TH2F  *tagEff_Light = 0;
-  TH2F  *tagEff_B_nonCP5     = 0;
-  TH2F  *tagEff_C_nonCP5     = 0;
-  TH2F  *tagEff_Light_nonCP5 = 0;
   TRandom3 *rand = new TRandom3();
 
   if(ApplyBTagScaling){
     tagEff_B     = (TH2F*)fileTagging->Get("btag_eff_b");
     tagEff_C     = (TH2F*)fileTagging->Get("btag_eff_c");
     tagEff_Light = (TH2F*)fileTagging->Get("btag_eff_oth");
-    if (ApplyBTagCP5Correction) {
-      TString pathToTaggingEfficiencies_nonCP5 = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile_nonCP5");
-      if (gSystem->AccessPathName(pathToTaggingEfficiencies_nonCP5)) {
-        cout<<pathToTaggingEfficiencies_nonCP5<<" not found. Please check."<<endl;
-        exit(-1);
-      } 
-      TFile *fileTagging_nonCP5  = new TFile(pathToTaggingEfficiencies_nonCP5);
-      tagEff_B_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_b");
-      tagEff_C_nonCP5     = (TH2F*)fileTagging_nonCP5->Get("btag_eff_c");
-      tagEff_Light_nonCP5 = (TH2F*)fileTagging_nonCP5->Get("btag_eff_oth");
-    }
   }  
 
-  BTagReshape reshape(btagReshapeFileName);
-  //exit(-1);
+  BTagReshape * reshape = NULL;
+  if (ApplyBTagReshape) reshape = new BTagReshape(btagReshapeFileName);
 
-  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, tagEff_B_nonCP5, tagEff_C_nonCP5, tagEff_Light_nonCP5, reshape, rand};
+  const struct btag_scaling_inputs inputs_btag_scaling_medium = {reader_B, reader_C, reader_Light, tagEff_B, tagEff_C, tagEff_Light, reshape, rand};
 
-  TFile * ff_file = TFile::Open(TString(cmsswBase)+"/src/DesyTauAnalyses/Common/data/fakefactors_ws_tt_lite_"+TString(year_label)+"_dR_corr.root");
+  const string ff_filename = cfg.get<string>("FakeFactorFileName");
+
+  TString FF_fileName = TString(cmsswBase) + "/src/" + TString(ff_filename);
+  TFile * ff_file = TFile::Open(FF_fileName);
   if (ff_file->IsZombie()) {
-    cout << "File " << TString(cmsswBase) << "/src/DesyTauAnalyses/Common/data/fakefactors_ws_tt_lite_" << TString(year_label) << "_dR_corr.root not found" << endl;
+    cout << "File " << FF_fileName << endl;
     cout << "Quitting... " << endl;
     exit(-1);
   }
@@ -246,7 +220,6 @@ int main(int argc, char * argv[]){
   ff_ws_ = std::shared_ptr<RooWorkspace>((RooWorkspace*)gDirectory->Get("w"));
   fns_["ff_tt_medium_dmbins"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_dmbins")->functor(ff_ws_->argSet("pt,dm,njets,os,met_var_qcd,dR")));
   fns_["ff_tt_medium_mvadmbins_nosig"] = std::shared_ptr<RooFunctor>(ff_ws_->function("ff_tt_medium_mvadmbins_nosig")->functor(ff_ws_->argSet("pt,mvadm,njets,os,met_var_qcd,dR")));
-
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
@@ -265,7 +238,6 @@ int main(int argc, char * argv[]){
   const bool ApplyRecoilCorrections = cfg.get<bool>("ApplyRecoilCorrections") && !isEmbedded && !isData && (isDY || isWJets || isHiggs || isMSSMsignal);
   kit::RecoilCorrector recoilCorrector(cfg.get<string>("RecoilFilePath"));
   kit::MEtSys MetSys(cfg.get<string>("RecoilSysFilePath"));
-
   
   // tau cuts
   const float ptTauCut    = cfg.get<float>("ptTauCut");
@@ -283,22 +255,20 @@ int main(int argc, char * argv[]){
   const float shift_tes_3prong_e = cfg.get<float>("TauEnergyScaleShift_ThreeProng_Error");
   const float shift_tes_3prong1p0_e = cfg.get<float>("TauEnergyScaleShift_ThreeProngOnePi0_Error");
   
-  std::string year_label_fes;
-  if (era == 2016) year_label_fes = "2016Legacy";
-  else if (era == 2017) year_label_fes = "2017ReReco";
-  else if (era == 2018) year_label_fes = "2018ReReco";	
-  else {std::cout << "year is not 2016, 2017, 2018 - exiting" << '\n'; exit(-1);}
-
   // lep->tau FES correction and uncertainties
-  TFile TauFES_file(TString(cmsswBase)+"/src/DesyTauAnalyses/Common/data/TauFES_eta-dm_DeepTau2017v2p1VSe_"+year_label_fes+".root"); 
+  
+  const string taufes_filename = cfg.get<string>("TauESFile");
+  TString TauFES_filename = TString(cmsswBase)+"/src/"+TString(taufes_filename);
+  
+  TFile TauFES_file(TauFES_filename); 
   if (TauFES_file.IsZombie()) {
-    std::cout << "file " << TString(cmsswBase) << "/src/DesyTauAnalyses/Common/data/TauFES_eta-dm_DeepTau2017v2p1VSe_" << year_label_fes << ".root not found" << std::endl;
+    std::cout << "file " << TauFES_filename << " not found... quitting" << std::endl;
     exit(-1);
   }
   TGraphAsymmErrors* FES_graph = (TGraphAsymmErrors*) TauFES_file.Get("fes");
   if (FES_graph==NULL) {
     std::cout << "TGraphAsymmErrors object 'fes' is not found in file " << std::endl;
-    std::cout << TString(cmsswBase) << "/src/DesyTauAnalyses/Common/data/TauFES_eta-dm_DeepTau2017v2p1VSe_" << year_label_fes << ".root not found"<< std::endl;
+    std::cout << taufes_filename << std::endl;
     exit(-1);
   }
 
@@ -368,7 +338,7 @@ int main(int argc, char * argv[]){
   vector<string> filterDiTau;
   vector<string> filterDiTau_before_HPS = cfg.get<vector<string>>("filterDiTau_before_HPS");
   vector<string> filterDiTau_HPS = cfg.get<vector<string>>("filterDiTau_HPS"); 
- 
+
     // correction workspace
   const string CorrectionWorkspaceFileName = cfg.get<string>("CorrectionWorkspaceFileName");
 
@@ -449,11 +419,35 @@ int main(int argc, char * argv[]){
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
   TH2D *h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
 
+  const string mutau_fr_filename = cfg.get<string>("MuTauFRFileName");
+  const string etau_fr_filename = cfg.get<string>("ETauFRFileName");
+
+  TString MuTau_fr_filename = TString(cmsswBase) + "/src/" + TString(mutau_fr_filename);
+  TString ETau_fr_filename = TString(cmsswBase) + "/src/" + TString(etau_fr_filename);
+
   // lepton to tau fake init
-  TFile muTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSmu_"+year_label_fes+".root"); 
+  TFile muTauFRfile(MuTau_fr_filename);
+  if (muTauFRfile.IsZombie()) {
+    std::cout << "file " << MuTau_fr_filename << " not found... quitting" << std::endl;
+    exit(-1);
+  }
   TH1F * SF_muTau_hist = (TH1F*) muTauFRfile.Get(LeptauFake_wpVsMu);
-  TFile eTauFRfile(TString(cmsswBase)+"/src/TauPOG/TauIDSFs/data/TauID_SF_eta_DeepTau2017v2p1VSe_"+year_label_fes+".root"); 
+  if (SF_muTau_hist==NULL) {
+    std::cout << "histogram " << LeptauFake_wpVsMu << " not found in file" << std::endl;
+    std::cout << MuTau_fr_filename << std::endl;
+    exit(-1);
+  }
+  TFile eTauFRfile(ETau_fr_filename);
+  if (eTauFRfile.IsZombie()) {
+    std::cout << "file " << ETau_fr_filename << " not found... quitting" << std::endl;
+    exit(-1);
+  }
   TH1F * SF_eTau_hist = (TH1F*) eTauFRfile.Get(LeptauFake_wpVsEle);
+  if (SF_eTau_hist==NULL) {
+    std::cout << "histogram " << LeptauFake_wpVsEle << " not found in file" << std::endl;
+    std::cout << ETau_fr_filename << std::endl;
+    exit(-1);
+  }
 
   // Fake factor pt_2 closure 
   TFile fileFF_Closure(TString(cmsswBase)+"/src/DesyTauAnalyses/Common/data/FF_closure.root");
@@ -462,13 +456,17 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
   TH1F * histFF_Closure;
-  if (era==2016) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2016");
-  if (era==2017) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2017");
-  if (era==2018) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2018");
+  if (Era.Contains("2016")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2016");
+  if (Era.Contains("2017")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2017");
+  if (Era.Contains("2018")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2018");
   if (histFF_Closure==NULL) {
     std::cout << "histogram pt2_closure_[era] is absent " << std::endl;
     exit(-1);
   }
+
+  // JES uncertainties
+  const string jes_unc_filename = cfg.get<string>("JESUncertaintyFileName");
+  string JESUncertaintyFileName = cmsswBase + "/src/" + jes_unc_filename;
 
   // output fileName with histograms
   rootFileName += "_";
@@ -497,8 +495,6 @@ int main(int argc, char * argv[]){
       std::cout << sysname << ":" << fns_[sysname] << std::endl;
     }
   }
-  //  exit(-1);
-
     
   int nTotalFiles = 0;
   int nEvents = 0;
@@ -622,12 +618,7 @@ int main(int argc, char * argv[]){
       }
       if (cfg.get<bool>("splitJES")){
 	JESUncertainties *jecUncertainties;
-	if (era==2016) 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Summer16_07Aug2017_V11_MC_UncertaintySources_AK4PFchs.txt");
-	else if (era==2017)
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Fall17_17Nov2017_V32_MC_UncertaintySources_AK4PFchs.txt");
-	else 
-	  jecUncertainties = new JESUncertainties("DesyTauAnalyses/Common/data/RegroupedV2_Autumn18_V19_MC_UncertaintySources_AK4PFchs.txt");
+	jecUncertainties = new JESUncertainties(JESUncertaintyFileName);
 	std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
 	for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
 	for (unsigned int i = 0; i < JESnames.size(); i++){
@@ -739,7 +730,7 @@ int main(int argc, char * argv[]){
       //      std::cout << "nbjets = " << nbjets << std::endl;
 
       filterDiTau = filterDiTau_before_HPS;
-      if (era == 2018) {
+      if (Era.Contains("2018")) {
       	if(isData && !isEmbedded) {
 	  //	  std::cout << "event run : " << analysisTree.event_run << std::endl;
 	  if (analysisTree.event_run < 317509)
@@ -976,6 +967,8 @@ int main(int argc, char * argv[]){
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
   
+      std::cout << " Jets = " << std::endl;
+
       // setting weights to 1
       otree->trkeffweight = 1;
       otree->trigweight_1 = 1;
@@ -1064,8 +1057,7 @@ int main(int argc, char * argv[]){
       if (ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
       otree->puweight = 1.0;
-      //      std::cout << "pu weight = " << otree->puweight << std::endl;
-      //      std::cout << "pu weight = " << otree->puweight << std::endl;
+      std::cout << "pu weight = " << otree->puweight << std::endl;
       if(!isData || isEmbedded){
         otree->mcweight = analysisTree.genweight;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
@@ -1074,15 +1066,18 @@ int main(int argc, char * argv[]){
       }
       otree->weight = otree->puweight * otree->mcweight;
 
+      std::cout << "here we are..." << std::endl;
       // applying trigger/ID SFs       
       if ((!isData || isEmbedded) && ApplyLepSF) {
 
 	// first tau
 	w->var("t_pt")->setVal(otree->pt_1);
 	w->var("t_eta")->setVal(otree->eta_1);
-	w->var("t_phi")->setVal(otree->phi_1);
+	//	w->var("t_phi")->setVal(otree->phi_1);
 	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tau1Index]);
 	
+	std::cout << "1" << std::endl;
+
 	otree->idisoweight_1 = w->function("t_deeptauid_dm_medium")->getVal();
 	id_1Up = w->function("t_deeptauid_dm_medium_up")->getVal();
 	id_1Down = w->function("t_deeptauid_dm_medium_down")->getVal();
@@ -1091,18 +1086,21 @@ int main(int argc, char * argv[]){
 	  id_1Up = w->function("t_deeptauid_dm_embed_medium_up")->getVal();
 	  id_1Down = w->function("t_deeptauid_dm_embed_medium_down")->getVal();
 	}
-	otree->trigweight_1 = w->function("t_trg_pog_deeptau_medium_mutau_ratio")->getVal();
-	trig_1Up = w->function("t_trg_pog_deeptau_medium_mutau_ratio_up")->getVal();
-	trig_1Down = w->function("t_trg_pog_deeptau_medium_mutau_ratio_down")->getVal();
+	otree->trigweight_1 = w->function("t_trg_pog_deeptau_medium_ditau_ratio")->getVal();
+	trig_1Up = w->function("t_trg_pog_deeptau_medium_ditau_ratio_up")->getVal();
+	trig_1Down = w->function("t_trg_pog_deeptau_medium_ditau_ratio_down")->getVal();
 	if (isEmbedded) {
 	  otree->trigweight_1 = w->function("t_trg_mediumDeepTau_ditau_embed_ratio")->getVal();
 	  trig_1Up =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_up")->getVal();
 	  trig_1Down =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_down")->getVal();
 	}
+
+	std::cout << "2" << std::endl;
+
 	// second tau
 	w->var("t_pt")->setVal(otree->pt_2);
 	w->var("t_eta")->setVal(otree->eta_2);
-	w->var("t_phi")->setVal(otree->phi_2);
+	//	w->var("t_phi")->setVal(otree->phi_2);
 	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tau2Index]);
 	
 	otree->idisoweight_2 = w->function("t_deeptauid_dm_medium")->getVal();
@@ -1113,14 +1111,16 @@ int main(int argc, char * argv[]){
 	  id_2Up = w->function("t_deeptauid_dm_embed_medium_up")->getVal();
 	  id_2Down = w->function("t_deeptauid_dm_embed_medium_down")->getVal();
 	}
-	otree->trigweight_2 = w->function("t_trg_pog_deeptau_medium_mutau_ratio")->getVal();
-	trig_2Up = w->function("t_trg_pog_deeptau_medium_mutau_ratio_up")->getVal();
-	trig_2Down = w->function("t_trg_pog_deeptau_medium_mutau_ratio_down")->getVal();
+	otree->trigweight_2 = w->function("t_trg_pog_deeptau_medium_ditau_ratio")->getVal();
+	trig_2Up = w->function("t_trg_pog_deeptau_medium_ditau_ratio_up")->getVal();
+	trig_2Down = w->function("t_trg_pog_deeptau_medium_ditau_ratio_down")->getVal();
 	if (isEmbedded) {
 	  otree->trigweight_2 = w->function("t_trg_mediumDeepTau_ditau_embed_ratio")->getVal();
 	  trig_2Up =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_up")->getVal();
           trig_2Down =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_down")->getVal();
 	}
+
+	std::cout << "3" << std::endl;
 
 	// *****************************
 	// variations of tauID weight   
@@ -1304,6 +1304,8 @@ int main(int argc, char * argv[]){
 
       }
 
+      std::cout << "4 " << std::endl;
+
       otree->trigweight = otree->trigweight_1 * otree->trigweight_2;
 
       otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight;
@@ -1335,7 +1337,7 @@ int main(int argc, char * argv[]){
       otree->prefiringweight = 1.0;
       otree->prefiringweightUp = 1.0;
       otree->prefiringweightDown = 1.0;
-      if (era<2018) {
+      if (Era.Contains("2016")||Era.Contains("2017")) {
 	if (!isData) {
 	  otree->prefiringweight     = analysisTree.prefiringweight;
 	  otree->prefiringweightUp   = analysisTree.prefiringweight;
@@ -1364,6 +1366,7 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
+      std::cout << "5 " << std::endl;
       otree->zptweight = 1.;
       if (!isData && isDY){
         genV = genTools::genV(analysisTree); // gen Z boson ?
@@ -1391,6 +1394,7 @@ int main(int argc, char * argv[]){
       }
       otree->weight *= otree->zptweight;
       
+      cout << "6" << endl;
       ////////////////////////////////////////////////////////////
       // Top pt weight
       ////////////////////////////////////////////////////////////
@@ -1404,6 +1408,7 @@ int main(int argc, char * argv[]){
         // otree->topptweight = genTools::topPtWeight(analysisTree, 1); // 1 is for Run1 - use this reweighting as recommended by HTT 17
       }
       otree->weight *= otree->topptweight;
+      cout << "7" << endl;
 
       ////////////////////////////////////////////////////////////
       // MET and Recoil Corrections
@@ -1455,6 +1460,8 @@ int main(int argc, char * argv[]){
           otree->metphi = otree->metphi_rcmr;
 	}
       }
+
+      cout << "8" << endl;
       
       //ditau sytem
       TLorentzVector tau1LV; tau1LV.SetPtEtaPhiM(otree->pt_1,
@@ -1552,7 +1559,7 @@ int main(int argc, char * argv[]){
       otree->mt_tot = TMath::Sqrt(mtTOT);
         
       //extra lepton vetos
-      otree->extraelec_veto = extra_electron_veto_tt(&cfg, &analysisTree, otree, era, isEmbedded);
+      otree->extraelec_veto = extra_electron_veto_tt(&cfg, &analysisTree, otree, era_int, isEmbedded);
       otree->extramuon_veto = extra_muon_veto_tt(&cfg, &analysisTree, otree, isData);
     
       otree->mt_1 = mT(tau1LV, metLV);
@@ -1563,10 +1570,12 @@ int main(int argc, char * argv[]){
       //
       // Fake Factors    
       // 
+      cout << "9" << endl;
       double dphi_met_tau  = dPhiFrom2P(tau1LV.Px(),tau1LV.Py(),puppimetLV.Px(),puppimetLV.Py());
       double met_var_qcd_1 = puppimetLV.Pt()*TMath::Cos(dphi_met_tau)/tau1LV.Pt();
+      double pt_fake = TMath::Min(TMath::Max(otree->pt_1,40.1),169.9);
       auto args = std::vector<double>{
-	static_cast<double>(otree->pt_1),
+	static_cast<double>(pt_fake),
 	static_cast<double>(otree->tau_decay_mode_1),
 	static_cast<double>(otree->njets),
 	static_cast<double>(otree->os),
@@ -1580,7 +1589,7 @@ int main(int argc, char * argv[]){
       double ff_closure = histFF_Closure->GetBinContent(histFF_Closure->FindBin(PT2));
       otree->ff_nom *= ff_closure;
       
-      //      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
+      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
       for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {
 	std::string sysname = otree->ff_sysnames.at(i);
 	TString SysName(sysname);
@@ -1593,7 +1602,7 @@ int main(int argc, char * argv[]){
       otree->ff_nom_sys = 0.15;
 
       auto args_mva = std::vector<double>{
-	static_cast<double>(otree->pt_1),
+	static_cast<double>(pt_fake),
 	static_cast<double>(otree->dmMVA_1),
 	static_cast<double>(otree->njets),
 	static_cast<double>(otree->os),

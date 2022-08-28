@@ -54,13 +54,12 @@ void ScaleFactors::computeSFs() {
   trkeffweight_2 = 1.0;
   trig_emu = 1.0;
 
-  // id/iso/trk scale factors (UL)
-  if (isEmbedded) { // obsolete pre-legacy 
-    if (era==2016){
+  if (isEmbedded) {
+    if (era==2016) {
       isoweight_1 = correctionWS->function("e_idiso_ratio_emb")->getVal();
       isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_embed_ratio")->getVal();
     }
-    else if (era==2017){
+    else if (era==2017) {
       isoweight_1 = correctionWS->function("e_iso_binned_embed_kit_ratio")->getVal()*correctionWS->function("e_id90_embed_kit_ratio")->getVal();
       isoweight_2 = correctionWS->function("m_looseiso_binned_ic_embed_ratio")->getVal()*correctionWS->function("m_id_embed_kit_ratio")->getVal();
     }
@@ -70,7 +69,8 @@ void ScaleFactors::computeSFs() {
     }
   }
   else {
-    isoweight_1 = correctionWS->function("e_idiso_binned_ratio")->getVal();
+    // id/iso/trk scale factors (UL)
+    isoweight_1 = correctionWS->function("e_idiso_binned_ic_ratio")->getVal();
     isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
   }
 

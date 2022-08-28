@@ -43,7 +43,8 @@ fi
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W4JetsToLNu 20
 
 # Exclusive VV
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VVTo2L2Nu 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WWTo2L2Nu 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo2L2Nu 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo2L2Q 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WZTo3LNu 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZZTo2L2Q 10
@@ -60,13 +61,14 @@ fi
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ST_tW_antitop_5f 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ST_tW_top_5f 10
 
+if [[ $CHANNEL = "em" ]]; then
 # H->WW
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToWWTo2L2Nu_M125 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VBFHToWWTo2L2Nu_M125 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf HWminusJ_HToWW_M125 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf HWplusJ_HToWW_M125 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHJ_HToWW_M125 10
-
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToWWTo2L2Nu_M125 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VBFHToWWTo2L2Nu_M125 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WplusHToWWTo2L2Nu_M125 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WminusHToWWTo2L2Nu_M125 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHToWWTo2L2Nu_M125 10
+fi
 # H->tautau
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToTauTau_M125 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf VBFHToTauTau_M125 10
@@ -76,17 +78,14 @@ fi
 
 
 # BBH
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf BBHToTauTau_M125_13TeV 5
-
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToTauTau_yb2_M125 5
 
 # GGH+bb
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluToBBHToTauTau_M125_13TeV 5
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToTauTau_yt2_M125 5
 
 # Interference
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf BBHToTauTauYbYt_M125_13TeV 5
-
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToTauTau_ybyt_M125 5
 
 # BBHToWW
-
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf BBHToWW_M125_13TeV 5
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf BBHToWWYbYt_M125_13TeV 5
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_yb2_M125 5
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_ybyt_M125 5

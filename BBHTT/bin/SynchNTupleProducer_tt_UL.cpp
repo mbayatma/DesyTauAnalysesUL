@@ -967,8 +967,6 @@ int main(int argc, char * argv[]){
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
   
-      std::cout << " Jets = " << std::endl;
-
       // setting weights to 1
       otree->trkeffweight = 1;
       otree->trigweight_1 = 1;
@@ -1054,10 +1052,8 @@ int main(int argc, char * argv[]){
       double fake_1Down = 1;
       double fake_2Down = 1;
 
-      if (ApplyPUweight) 
+      if ((!isData || isEmbedded) && ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
-      otree->puweight = 1.0;
-      std::cout << "pu weight = " << otree->puweight << std::endl;
       if(!isData || isEmbedded){
         otree->mcweight = analysisTree.genweight;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
@@ -1066,7 +1062,6 @@ int main(int argc, char * argv[]){
       }
       otree->weight = otree->puweight * otree->mcweight;
 
-      std::cout << "here we are..." << std::endl;
       // applying trigger/ID SFs       
       if ((!isData || isEmbedded) && ApplyLepSF) {
 
@@ -1076,8 +1071,6 @@ int main(int argc, char * argv[]){
 	//	w->var("t_phi")->setVal(otree->phi_1);
 	w->var("t_dm")->setVal(analysisTree.tau_decayMode[tau1Index]);
 	
-	std::cout << "1" << std::endl;
-
 	otree->idisoweight_1 = w->function("t_deeptauid_dm_medium")->getVal();
 	id_1Up = w->function("t_deeptauid_dm_medium_up")->getVal();
 	id_1Down = w->function("t_deeptauid_dm_medium_down")->getVal();
@@ -1094,8 +1087,6 @@ int main(int argc, char * argv[]){
 	  trig_1Up =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_up")->getVal();
 	  trig_1Down =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_down")->getVal();
 	}
-
-	std::cout << "2" << std::endl;
 
 	// second tau
 	w->var("t_pt")->setVal(otree->pt_2);
@@ -1119,8 +1110,6 @@ int main(int argc, char * argv[]){
 	  trig_2Up =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_up")->getVal();
           trig_2Down =  w->function("t_trg_mediumDeepTau_ditau_embed_ratio_down")->getVal();
 	}
-
-	std::cout << "3" << std::endl;
 
 	// *****************************
 	// variations of tauID weight   
@@ -1304,12 +1293,8 @@ int main(int argc, char * argv[]){
 
       }
 
-      std::cout << "4 " << std::endl;
-
       otree->trigweight = otree->trigweight_1 * otree->trigweight_2;
-
       otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight;
-
       otree->weight *= otree->effweight;
       
       //Theory uncertainties 
@@ -1366,7 +1351,6 @@ int main(int argc, char * argv[]){
       ////////////////////////////////////////////////////////////      
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
-      std::cout << "5 " << std::endl;
       otree->zptweight = 1.;
       if (!isData && isDY){
         genV = genTools::genV(analysisTree); // gen Z boson ?
@@ -1589,7 +1573,7 @@ int main(int argc, char * argv[]){
       double ff_closure = histFF_Closure->GetBinContent(histFF_Closure->FindBin(PT2));
       otree->ff_nom *= ff_closure;
       
-      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
+      //      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
       for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {
 	std::string sysname = otree->ff_sysnames.at(i);
 	TString SysName(sysname);
@@ -1634,7 +1618,7 @@ int main(int argc, char * argv[]){
 	//	std::cout << "trigger = " << otree->trg_doubletau << " : " 
 	//		  << "VVVL_1 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_1 
 	//		  << "VVVL_2 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_2 << std::endl;
-	isSRevent = (otree->trg_doubletau>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_1>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5 && otree->os>0.5 && otree->dr_tt>0.5);
+	isSRevent = (otree->trg_doubletau>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_1>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5 && otree->dr_tt>0.5);
       }
 
       /*

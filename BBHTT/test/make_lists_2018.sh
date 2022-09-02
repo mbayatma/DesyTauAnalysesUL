@@ -64,9 +64,7 @@ ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OU
 ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/WminusHToWWTo2L2Nu_M125
 ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > $OUTDIR/ZHToWWTo2L2Nu_M125
 
-#ls $dirSignal_UL/bbHToTauTau_yb2_M125_MiniAOD/*.root > $OUTDIR/bbHToTauTau_yb2_M125_MiniAOD
 ls $dirSignal_UL/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
-#ls $dirSignal_UL/bbHToTauTau_yt2_M125_MiniAOD/*.root > $OUTDIR/bbHToTauTau_yt2_M125_MiniAOD
 ls $dirSignal_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
 ls $dirSignal_UL/bbHToTauTau_M125_ybyt_UL18MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
 

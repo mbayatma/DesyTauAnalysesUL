@@ -263,6 +263,7 @@ namespace jets{
    
    vector<unsigned int> jets; jets.clear();
    vector<unsigned int> jetspt20; jetspt20.clear();
+   vector<unsigned int> jetspt20_central; jetspt20_central.clear();
    vector<unsigned int> bjets; bjets.clear();
    vector<unsigned int> bjetsRaw; bjetsRaw.clear();
 
@@ -383,6 +384,7 @@ namespace jets{
      jetspt20.push_back(jet);
      
      if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
+       jetspt20_central.push_back(jet);
        
        //       std::cout << "Discriminant1 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant1] << std::endl;
        //       std::cout << "Discriminant2 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant2] << std::endl;
@@ -520,6 +522,7 @@ namespace jets{
    
    otree->njets = jets.size();
    otree->njetspt20 = jetspt20.size();
+   otree->njetspt20_central = jetspt20_central.size();
    otree->nbtag = bjets.size();
    otree->btagweight = bweight_event;
    //   std::cout << "bweight_event : " << bweight_event << std::endl;

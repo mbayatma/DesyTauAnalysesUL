@@ -694,6 +694,7 @@ public :
   Int_t           njets;
   Int_t           njetshad;
   Int_t           njetspt20;
+  Int_t           njetspt20_central;
   Float_t         jpt_1;
   Float_t         jpt_1_unsmeared;
   Float_t         jeta_1;

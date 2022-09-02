@@ -259,7 +259,7 @@ int main(int argc, char * argv[]){
   
   // lep->tau FES correction and uncertainties
   
-  const string taufes_filename = cfg.get<string>("TauESFile");
+  const string taufes_filename = cfg.get<string>("TauFESFile");
   TString TauFES_filename = TString(cmsswBase)+"/src/"+TString(taufes_filename);
   
   TFile TauFES_file(TauFES_filename); 
@@ -1567,12 +1567,14 @@ int main(int argc, char * argv[]){
       */
       //      otree->ff_nom = fns_["ff_tt_medium_dmbins"]->eval(args.data());
       w_fakefactors->var("pt")->setVal(otree->pt_1);
-      w_fakefactors->var("dm")->setVal(otree->tau_decay_mode_1);
-      w_fakefactors->var("njets")->setVal(otree->njets);
+      //      w_fakefactors->var("dm")->setVal(otree->tau_decay_mode_1);
+      w_fakefactors->var("njets")->setVal(otree->njetspt20_central);
+      w_fakefactors->var("nbjets")->setVal(otree->nbtag);
       w_fakefactors->var("os")->setVal(otree->os);
-      w_fakefactors->var("met_var_qcd")->setVal(met_var_qcd_1);
       w_fakefactors->var("dR")->setVal(otree->dr_tt);
-      otree->ff_nom = w_fakefactors->function("ff_tt_medium_dmbins")->getVal();
+      w_fakefactors->var("pt_2")->setVal(otree->pt_2);
+      w_fakefactors->var("met")->setVal(otree->puppimet);
+      otree->ff_nom = w_fakefactors->function("ff_total")->getVal();
 
       double PT2 = otree->pt_2;
       if (PT2<40.) PT2 = 40.5;

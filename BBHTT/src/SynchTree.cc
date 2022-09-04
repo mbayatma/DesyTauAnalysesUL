@@ -547,12 +547,10 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
    //   fChain->SetBranchAddress("puppimet_rcmr", &puppimet_rcmr, &b_puppimet_rcmr);
    //   fChain->SetBranchAddress("puppimetphi_rcmr", &puppimetphi_rcmr, &b_puppimetphi_rcmr);
-   if (ch != "em") {
-     fChain->SetBranchAddress("puppimetcov00", &puppimetcov00, &b_puppimetcov00);
-     fChain->SetBranchAddress("puppimetcov01", &puppimetcov01, &b_puppimetcov01);
-     fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
-     fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
-   }
+   fChain->SetBranchAddress("puppimetcov00", &puppimetcov00, &b_puppimetcov00);
+   fChain->SetBranchAddress("puppimetcov01", &puppimetcov01, &b_puppimetcov01);
+   fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
+   fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
 
    //di tau system
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
@@ -1304,12 +1302,10 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");
   //   fChain->Branch("puppimet_rcmr", &puppimet_rcmr, "puppimet_rcmr/F");
   //   fChain->Branch("puppimetphi_rcmr", &puppimetphi_rcmr, "puppimetphi_rcmr/F");
-  if (ch != "em") {
-    fChain->Branch("puppimetcov00", &puppimetcov00, "puppimetcov00/F");
-    fChain->Branch("puppimetcov01", &puppimetcov01, "puppimetcov01/F");
-    fChain->Branch("puppimetcov10", &puppimetcov10, "puppimetcov10/F");
-    fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
-  }
+  fChain->Branch("puppimetcov00", &puppimetcov00, "puppimetcov00/F");
+  fChain->Branch("puppimetcov01", &puppimetcov01, "puppimetcov01/F");
+  fChain->Branch("puppimetcov10", &puppimetcov10, "puppimetcov10/F");
+  fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
 
   //di tau system
   fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");

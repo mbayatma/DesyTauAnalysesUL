@@ -9,12 +9,10 @@ using namespace std;
 
   const map<TString, double> xsecs_2016 = {
     {"WJetsToLNu"  , 61526.7}, // NNLO (1)
-    {"W1JetsToLNu" , 11805.6}, // NNLO (2)
-    {"W2JetsToLNu" , 3891.0}, // NNLO (3)
-    {"W3JetsToLNu" , 1153.2}, // NNLO (4)
-    {"W4JetsToLNu" , 629.3 }, // NNLO (5)
-    {"WGToLNuG"    , 464.4 }, // LO
-    {"DYJetsToLL_M-10to50"   , 21658.0}, // LO
+    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
+    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
+    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
+    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
     {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
     {"DY1JetsToLL_M-50"      , 1253.1}, // NNLO (20a)
     {"DY2JetsToLL_M-50"      , 409.4}, // NNLO (20b)
@@ -36,9 +34,6 @@ using namespace std;
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
-    {"WWToLNuQQ"                , 43.53},
-    {"WZTo1L1Nu2Q"              , 11.66},
-    {"WZTo1L3Nu"                , 3.3},
     {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
     {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
@@ -65,7 +60,8 @@ using namespace std;
     {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163}
+    {"ZHJ_HToWW_M125"           , 0.163},
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
   };
 
   const map<TString, double> xsecs_2017 = {
@@ -74,8 +70,6 @@ using namespace std;
     {"W2JetsToLNu" , 3170.9}, // NNLO (3)
     {"W3JetsToLNu" , 1132.5}, // NNLO (4)
     {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-    {"WGToLNuG"    , 464.4 }, // LO
-    {"DYJetsToLL_M-10to50"   , 21658.0}, // LO
     {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
     {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
     {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
@@ -123,7 +117,8 @@ using namespace std;
     {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163}
+    {"ZHJ_HToWW_M125"           , 0.163},
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
   };
 
   const map<TString, double> xsecs_2018 = {
@@ -132,13 +127,13 @@ using namespace std;
     {"W2JetsToLNu" , 3170.9}, // NNLO (3)
     {"W3JetsToLNu" , 1132.5}, // NNLO (4)
     {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-    {"WGToLNuG"    , 464.4 }, // LO
-    {"DYJetsToLL_M-10to50"   , 21658.0}, // LO
+      
     {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
     {"DY1JetsToLL_M-50"      , 1007.6}, // NNLO (20a)
     {"DY2JetsToLL_M-50"      , 344.3}, // NNLO (20b)
     {"DY3JetsToLL_M-50"      , 125.3}, // NNLO (20c)
     {"DY4JetsToLL_M-50"      , 71.20}, // NNLO (20d)
+
     {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
     {"TTToHadronic"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
@@ -181,16 +176,10 @@ using namespace std;
     {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
     {"HWminusJ_HToWW_M125"      , 0.114},
     {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163}
+    {"ZHJ_HToWW_M125"           , 0.163},
+    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
   };
 
-std::vector<TString> H125 = {
-  "GluGluHToTauTau_M125",
-  "VBFHToTauTau_M125",
-  "WplusHToTauTau_M125",
-  "WminusHToTauTau_M125",
-  "ZHToTauTau_M125_13TeV",
-};
 
 std::vector<TString> SingleMuon_2018 = {
   "SingleMuon_Run2018A",
@@ -213,11 +202,25 @@ std::vector<TString> MuonEG_2018 = {
   "MuonEG_Run2018D"
 };
 
+std::vector<TString> Tau_2018 = {
+  "Tau_Run2018A",
+  "Tau_Run2018B",
+  "Tau_Run2018C",
+  "Tau_Run2018D"
+};
+
 std::vector<TString> EmbeddedElMu_2018 = {
   "EmbeddedElMu_Run2018A",
   "EmbeddedElMu_Run2018B",
   "EmbeddedElMu_Run2018C",
   "EmbeddedElMu_Run2018D"
+};
+
+std::vector<TString> EmbeddedTauTau_2018 = {
+  "EmbeddedTauTau_Run2018A",
+  "EmbeddedTauTau_Run2018B",
+  "EmbeddedTauTau_Run2018C",
+  "EmbeddedTauTau_Run2018D"
 };
 
 // ****** 2017 ********
@@ -246,12 +249,28 @@ std::vector<TString> MuonEG_2017 = {
   "MuonEG_Run2017F"
 };
 
+std::vector<TString> Tau_2017 = {
+  "Tau_Run2017B",
+  "Tau_Run2017C",
+  "Tau_Run2017D",
+  "Tau_Run2017E",
+  "Tau_Run2017F"
+};
+
 std::vector<TString> EmbeddedElMu_2017 = {
   "EmbeddedElMu_Run2017B",
   "EmbeddedElMu_Run2017C",
   "EmbeddedElMu_Run2017D",
   "EmbeddedElMu_Run2017E",
   "EmbeddedElMu_Run2017F",
+};
+
+std::vector<TString> EmbeddedTauTau_2017 = {
+  "EmbeddedTauTau_Run2017B",
+  "EmbeddedTauTau_Run2017C",
+  "EmbeddedTauTau_Run2017D",
+  "EmbeddedTauTau_Run2017E",
+  "EmbeddedTauTau_Run2017F",
 };
 
 // ******* 2016 ******
@@ -286,6 +305,16 @@ std::vector<TString> MuonEG_2016 = {
   "MuonEG_Run2016H"
 };
 
+std::vector<TString> Tau_2016 = {
+  "Tau_Run2016B",
+  "Tau_Run2016C",
+  "Tau_Run2016D",
+  "Tau_Run2016E",
+  "Tau_Run2016F",
+  "Tau_Run2016G",
+  "Tau_Run2016H"
+};
+
 std::vector<TString> EmbeddedElMu_2016 = {
   "EmbeddedElMu_Run2016B",
   "EmbeddedElMu_Run2016C",
@@ -296,15 +325,22 @@ std::vector<TString> EmbeddedElMu_2016 = {
   "EmbeddedElMu_Run2016H"
 };
 
+std::vector<TString> EmbeddedTauTau_2016 = {
+  "EmbeddedTauTau_Run2016B",
+  "EmbeddedTauTau_Run2016C",
+  "EmbeddedTauTau_Run2016D",
+  "EmbeddedTauTau_Run2016E",
+  "EmbeddedTauTau_Run2016F",
+  "EmbeddedTauTau_Run2016G",
+  "EmbeddedTauTau_Run2016H"
+};
+
 std::vector<TString> WJets = {
   "WJetsToLNu",
   "W1JetsToLNu",
   "W2JetsToLNu",
   "W3JetsToLNu",
-  "W4JetsToLNu",
-};
-std::vector<TString> WGamma = {
-  "WGToLNuG"
+  "W4JetsToLNu"
 };
  
 std::vector<TString> DYJets = {
@@ -313,10 +349,6 @@ std::vector<TString> DYJets = {
   "DY2JetsToLL_M-50",
   "DY3JetsToLL_M-50",
   "DY4JetsToLL_M-50"  
-};
-
-std::vector<TString> DYJets_M10to50 = {
-  "DYJetsToLL_M-10to50",
 };
 
 std::vector<TString> EWK = {
@@ -331,13 +363,6 @@ std::vector<TString> EWK = {
   "ZZTo4L",
 };
 
-std::vector<TString> VVTo1L = {
-  "WWToLNuQQ",
-  "WZTo1L1Nu2Q",
-  "WZTo1L3Nu",
-};
-
-
 std::vector<TString> TT_EXCL = {
   "TTTo2L2Nu",
   "TTToHadronic",
@@ -348,35 +373,28 @@ std::vector<TString> TT_INCL = {
   "TT_INCL"
 };
 
-TString baseNameBBH = "SUSYGluGluToBBHToTauTau_M-";
-TString baseNameGGH = "SUSYGluGluToHToTauTau_M-"; 
+std::vector<TString> bbH125 = {
+  "SUSYGluGluToBBHToTauTau_powheg_M125"
+};
 
-std::vector<TString> masses = {
-  "80",
-  "90",
-  "100",
-  "120",
-  "140",
-  "160",
-  "180",
-  "200",
-  "250",
-  "350",
-  "400",
-  "450",
-  "600",
-  "700",
-  "800",
-  "900",
-  "1200",
-  "1400",
-  "1600",
-  "1800",
-  "2000",
-  "2300",
-  "2600",
-  "2900",
-  "3200"
+std::vector<TString> ggH125bb = {
+  "GluGluHToTauTau_M125"
+};
+
+std::vector<TString> ggH125 = {
+  "GluGluHToTauTau_M125",
+};
+
+std::vector<TString> H125 = {
+  "GluGluHToTauTau_M125",
+  "VBFHToTauTau_M125"
+};
+
+std::vector<TString> qqH125 = {
+  "VBFHToTauTau_M125",
+  //  "WplusHToTauTau_M125",
+  //  "WminusHToTauTau_M125",
+  //  "ZHToTauTau_M125_13TeV"
 };
 
 const TString BaseTreeName = "TauCheck"; 

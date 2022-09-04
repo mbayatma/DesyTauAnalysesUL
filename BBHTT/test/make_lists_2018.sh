@@ -1,11 +1,9 @@
 #!/bin/sh
+dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc
 dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
-dirData_AB=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/data
-dirData_CD=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples/UL/2018/data/Tau_Run2018D
+dirData=/pnfs/desy.de/cms/tier2/store/user/cardini/ntuples/Oktoberfest21/2018/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/emb
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/mc
-dirSignal_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/mc
-dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc
 
 CHANNEL=$1
 
@@ -64,9 +62,9 @@ ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OU
 ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_jhugen724_pythia8_TuneCP5/*root > $OUTDIR/WminusHToWWTo2L2Nu_M125
 ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_jhugen714_pythia8_TuneCP5/*root > $OUTDIR/ZHToWWTo2L2Nu_M125
 
-ls $dirSignal_UL/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
-ls $dirSignal_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
-ls $dirSignal_UL/bbHToTauTau_M125_ybyt_UL18MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
+ls $dirMC_UL/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
+ls $dirMC_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
+ls $dirMC_UL/bbHToTauTau_M125_ybyt_UL18MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
 
 ls $dirMC2/bbHToWWTo2L2Nu_M-125_yb2/*.root > $OUTDIR/bbHToWWTo2L2Nu_yb2_M125
 ls $dirMC2/bbHToWWTo2L2Nu_M-125_ybyt/*.root > $OUTDIR/bbHToWWTo2L2Nu_ybyt_M125
@@ -82,10 +80,10 @@ if [[ $CHANNEL == "em" ]]; then
     ls $dirEmbedded/EmbeddingRun2018C_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018C
     ls $dirEmbedded/EmbeddingRun2018D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018D
 elif [[ $CHANNEL == "tt" ]]; then
-    ls $dirData_AB/Tau-Run2018A-UL2018/*.root > $OUTDIR/Tau_Run2018A
-    ls $dirData_AB/Tau-Run2018B-UL2018/*.root > $OUTDIR/Tau_Run2018B
-    ls $dirData_CD/Tau_Run2018C/*.root > $OUTDIR/Tau_Run2018C
-    ls $dirData_CD/Tau_Run2018D/*.root > $OUTDIR/Tau_Run2018D
+    ls $dirData/Tau-Run2018A-UL2018/*.root > $OUTDIR/Tau_Run2018A
+    ls $dirData/Tau-Run2018B-UL2018/*.root > $OUTDIR/Tau_Run2018B
+    ls $dirData/Tau_Run2018C-UL2018/*.root > $OUTDIR/Tau_Run2018C
+    ls $dirData/Tau_Run2018D-UL2018/*.root > $OUTDIR/Tau_Run2018D
 
     ls $dirEmbedded/EmbeddingRun2018A_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2018A
     ls $dirEmbedded/EmbeddingRun2018B_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2018B

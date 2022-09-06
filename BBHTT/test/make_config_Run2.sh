@@ -27,7 +27,7 @@ fi
 
 # define parameters which are different between MC and data configs
 KEY_LIST=(isData ApplyPUweight ApplyLepSF ApplyBTagScaling ApplyBTagReshape)
-VALUE_LIST_MC=(false true true true false)
+VALUE_LIST_MC=(false true true false true)
 VALUE_LIST_DATA=(true false false false false)
 VALUE_LIST_EMBEDDED=(true false true false false)
 

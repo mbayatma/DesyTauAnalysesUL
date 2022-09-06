@@ -64,15 +64,18 @@ ls $dirMC2/bbHToWWTo2L2Nu_M-125_yb2/*.root > $OUTDIR/bbHToWWTo2L2Nu_yb2_M125
 ls $dirMC2/bbHToWWTo2L2Nu_M-125_ybyt/*.root > $OUTDIR/bbHToWWTo2L2Nu_ybyt_M125
 
 if [[ $CHANNEL == "em" ]]; then
-    ls $dirData/MuonEG-Run2018A-UL2018/*.root > $OUTDIR/MuonEG_Run2018A
-    ls $dirData/MuonEG-Run2018B-UL2018/*.root > $OUTDIR/MuonEG_Run2018B
-    ls $dirData/MuonEG-Run2018C-UL2018/*.root > $OUTDIR/MuonEG_Run2018C
-    ls $dirData/MuonEG-Run2018D-UL2018/*.root > $OUTDIR/MuonEG_Run2018D
+    ls $dirData/MuonEG_Run2017B/*.root > $OUTDIR/MuonEG_Run2017B
+    ls $dirData/MuonEG_Run2017C/*.root > $OUTDIR/MuonEG_Run2017C
+    ls $dirData/MuonEG_Run2017D/*.root > $OUTDIR/MuonEG_Run2017D
+    ls $dirData/MuonEG_Run2017E/*.root > $OUTDIR/MuonEG_Run2017E
+    ls $dirData/MuonEG_Run2017F/*.root > $OUTDIR/MuonEG_Run2017F
 
-    ls $dirEmbedded/EmbeddingRun2018A_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018A
-    ls $dirEmbedded/EmbeddingRun2018B_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018B
-    ls $dirEmbedded/EmbeddingRun2018C_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018C
-    ls $dirEmbedded/EmbeddingRun2018D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2018D
+    ls $dirEmbedded/EmbeddingRun2017B_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017B
+    ls $dirEmbedded/EmbeddingRun2017C_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017C
+    ls $dirEmbedded/EmbeddingRun2017D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017D
+    ls $dirEmbedded/EmbeddingRun2017E_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017E
+    ls $dirEmbedded/EmbeddingRun2017F_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2017F
+
 elif [[ $CHANNEL == "tt" ]]; then
 
     ls $dirData/Tau_Run2017B/*.root > $OUTDIR/Tau_Run2017B

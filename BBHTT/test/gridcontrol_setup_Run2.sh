@@ -3,10 +3,10 @@
 YEAR=20${1}
 CHANNEL=$2
 if [[ $CHANNEL == "em" ]]; then
-    OUTDIR=./emu/$YEAR
+    OUTDIR=./$YEAR
 else  
     if [[ $CHANNEL == "tt" ]]; then
-	OUTDIR=./tautau/$YEAR
+	OUTDIR=./$YEAR
     else
 	echo "ERROR: please run the script with ./gridcontrol_setup_mt_Run2.sh <year={16_pre,16_post,17,18}> <channel={tt,em}>"
 	exit
@@ -24,9 +24,9 @@ if [ ! -d "$OUTDIR" ]; then
   cp ./add_samples.sh $OUTDIR/.
 fi
 
-./make_config_Run2.sh $1 $CHANNEL MC 
-./make_config_Run2.sh $1 $CHANNEL data 
-./make_config_Run2.sh $1 $CHANNEL embedded 
+./make_config_Run2.sh $1 MC $CHANNEL
+./make_config_Run2.sh $1 data $CHANNEL
+./make_config_Run2.sh $1 embedded $CHANNEL 
 ./make_lists_${YEAR}.sh $CHANNEL
 
 cd ./$OUTDIR

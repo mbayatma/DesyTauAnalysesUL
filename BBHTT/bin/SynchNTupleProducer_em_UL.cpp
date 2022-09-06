@@ -467,14 +467,14 @@ int main(int argc, char * argv[]){
   // Workspace with corrections
   TString workspace_filename = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileName;
   TString workspace_filename_emb = TString(cmsswBase) + "/src/" + CorrectionWorkspaceFileNameEmb;
-  cout << "Taking correction workspace (IC) from " << workspace_filename << endl;
+  cout << "Taking correction workspace for SFs from " << workspace_filename << endl;
   TFile *f_workspace = new TFile(workspace_filename, "read");
   if (f_workspace->IsZombie()) {
     std::cout << " workspace file " << workspace_filename << " not found. Please check. " << std::endl;
      exit(-1);
    }
 
-  cout << "Taking correction workspace (KIT) from " << workspace_filename_emb << endl;
+  cout << "Taking correction workspace for embedded weights from " << workspace_filename_emb << endl;
   TFile *f_workspace_emb = new TFile(workspace_filename_emb, "read");
   if (f_workspace_emb->IsZombie()) {
     std::cout << " workspace file " << workspace_filename_emb << " not found. Please check. " << std::endl;
@@ -918,7 +918,7 @@ int main(int argc, char * argv[]){
       otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
       otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
 
-      bool isSRevent = otree->iso_1<0.15&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
+      bool isSRevent = otree->iso_1<0.5&&otree->iso_2<0.5&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
 
       // when producing synch tuples for final datacards reduces the size of tuples.
       //      if (ApplySystShift&&!isSRevent) continue;
@@ -1010,6 +1010,7 @@ int main(int argc, char * argv[]){
 	otree->trkeffweight_1 = scaleFactors->getTrk1_SF();
 	otree->trkeffweight_2 = scaleFactors->getTrk2_SF();
        
+
 	otree->trigweight_1 = sf_trig_e;
 	otree->trigweight_2 = sf_trig_m;
 	
@@ -1023,6 +1024,7 @@ int main(int argc, char * argv[]){
 
 	// e-mu trigger
 	otree->trigweightEMu = scaleFactors->getTrigger_SF();
+
 	otree->trigweight = otree->trigweightEMu;
 	
 	/*
@@ -1047,6 +1049,13 @@ int main(int argc, char * argv[]){
 	otree->weightSingle = otree->effweightSingle;
 	otree->weightEMu = otree->effweightEMu;
       }
+      /*
+      std::cout << std::endl;
+      std::cout << "idisoweight_1 = " << otree->idisoweight_1 << std::endl;
+      std::cout << "idisoweight_2 = " << otree->idisoweight_2 << std::endl;
+      std::cout << "trigweightEMu = " << otree->trigweightEMu << std::endl;
+      std::cout << "btagweight    = " << otree->btagweight << std::endl;
+      */
 
       // embedded weight
       otree->embweight = 1.0;
@@ -1234,11 +1243,11 @@ int main(int argc, char * argv[]){
           if (bosonPtX < ptxmin)     bosonPtX = ptxmin + h_zptweight->GetYaxis()->GetBinWidth(1)*0.5;
           if (bosonPtX > ptxmax)     bosonPtX = ptxmax - h_zptweight->GetYaxis()->GetBinWidth(h_zptweight->GetYaxis()->GetNbins())*0.5;
           zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(bosonMassX), h_zptweight->GetYaxis()->FindBin(bosonPtX));
-          }	
-          otree->zptweight = zptmassweight;
-	  otree->weight *= zptmassweight;
-	  otree->weightSingle *= zptmassweight;
-	  otree->weightEMu *= zptmassweight;
+	}	
+	otree->zptweight = zptmassweight;
+	otree->weight *= zptmassweight;
+	otree->weightSingle *= zptmassweight;
+	otree->weightEMu *= zptmassweight;
       }
       
       ////////////////////////////////////////////////////////////

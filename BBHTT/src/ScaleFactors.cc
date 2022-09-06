@@ -73,6 +73,8 @@ void ScaleFactors::computeSFs() {
     isoweight_1 = correctionWS->function("e_idiso_binned_ic_ratio")->getVal();
     isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
   }
+  
+
 
   double eff_data_trig_mhigh = correctionWS->function("m_trg_23_ic_data")->getVal();
   double eff_data_trig_mlow = correctionWS->function("m_trg_8_ic_data")->getVal();

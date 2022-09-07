@@ -1,7 +1,7 @@
 #!/bin/sh
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc
 dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
-dirData=/pnfs/desy.de/cms/tier2/store/user/cardini/ntuples/Oktoberfest21/2018/data
+dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/emb
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/mc
 
@@ -34,8 +34,6 @@ for index in {1..9}
 do
     ls $dirMC_UL/TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8/*${index}.root >> $OUTDIR/TTToSemiLeptonic
 done
-
-
 ls $dirMC_UL/TTToHadronic_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/TTToHadronic
 
 ls $dirMC_UL/ST_t-channel_antitop_4f_InclusiveDecays_TuneCP5_13TeV-powheg-madspin-pythia8/*root > $OUTDIR/ST_t-channel_antitop_4f
@@ -82,8 +80,8 @@ if [[ $CHANNEL == "em" ]]; then
 elif [[ $CHANNEL == "tt" ]]; then
     ls $dirData/Tau-Run2018A-UL2018/*.root > $OUTDIR/Tau_Run2018A
     ls $dirData/Tau-Run2018B-UL2018/*.root > $OUTDIR/Tau_Run2018B
-    ls $dirData/Tau_Run2018C-UL2018/*.root > $OUTDIR/Tau_Run2018C
-    ls $dirData/Tau_Run2018D-UL2018/*.root > $OUTDIR/Tau_Run2018D
+    ls $dirData/Tau-Run2018C-UL2018/*.root > $OUTDIR/Tau_Run2018C
+    ls $dirData/Tau-Run2018D-UL2018/*.root > $OUTDIR/Tau_Run2018D
 
     ls $dirEmbedded/EmbeddingRun2018A_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2018A
     ls $dirEmbedded/EmbeddingRun2018B_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2018B

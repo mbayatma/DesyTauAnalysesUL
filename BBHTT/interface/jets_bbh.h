@@ -337,7 +337,18 @@ namespace jets{
    TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
 
    double bweight_event = 1.0;
-   
+
+   float dRmin1 = 2.0;
+   float dRmin2 = 2.0;
+
+   otree->jleppt_1 = 0;
+   otree->jlepeta_1 = - 100;
+   otree->jlepphi_1 = - 100;
+
+   otree->jleppt_2 = 0;
+   otree->jlepeta_2 = -100;
+   otree->jlepphi_2 = -100;
+
    for (unsigned int jet = 0; jet < analysisTree->pfjet_count; ++jet) {
      
      float jetEta    = analysisTree->pfjet_eta[jet];
@@ -360,9 +371,21 @@ namespace jets{
      correctedJet *= jetPt/uncorrectedJet.Pt();
      
      float dR1 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_1, otree->phi_1);
+     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
+     if (dR1<dRmin1) {
+       otree->jleppt_1 = correctedJet.Pt();
+       otree->jlepeta_1 = correctedJet.Eta();
+       otree->jlepphi_1 = correctedJet.Phi();
+       dRmin1 = dR1;
+     }
+     if (dR2<dRmin2) {
+       otree->jleppt_2 = correctedJet.Pt();
+       otree->jlepeta_2 = correctedJet.Eta();
+       otree->jlepphi_2 = correctedJet.Phi();
+       dRmin2 = dR2;
+     }
      if (dR1 <= dRJetLeptonCut) continue;
      
-     float dR2 = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
      if (dR2 <= dRJetLeptonCut) continue;
      
      if (rawPt>10 && !(is2017 && rawPt < 50 && absJetEta > 2.65 && absJetEta < 3.139)) {

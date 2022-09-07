@@ -10,7 +10,7 @@ BTagReshape::BTagReshape(const std::string inputFileName) {
   const std::string measType = "iterativefit";
   const std::string sysType = "central";
   
-  BTagCalibration calib("deepFlavour", inputFileName, true);
+  BTagCalibration calib("deepFlavour", inputFileName);
   reader =  new BTagCalibrationReader(BTagEntry::OP_RESHAPING, sysType) ;
   
   reader->load(calib, BTagEntry::FLAV_B, measType);

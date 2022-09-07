@@ -1565,6 +1565,7 @@ int main(int argc, char * argv[]){
 	static_cast<double>(otree->dr_tt)
       };
       */
+      
       //      otree->ff_nom = fns_["ff_tt_medium_dmbins"]->eval(args.data());
       w_fakefactors->var("pt")->setVal(otree->pt_1);
       //      w_fakefactors->var("dm")->setVal(otree->tau_decay_mode_1);
@@ -1574,13 +1575,16 @@ int main(int argc, char * argv[]){
       w_fakefactors->var("dR")->setVal(otree->dr_tt);
       w_fakefactors->var("pt_2")->setVal(otree->pt_2);
       w_fakefactors->var("met")->setVal(otree->puppimet);
+      w_fakefactors->var("jetpt")->setVal(otree->jleppt_1);
       otree->ff_nom = w_fakefactors->function("ff_total")->getVal();
 
-      double PT2 = otree->pt_2;
-      if (PT2<40.) PT2 = 40.5;
-      if (PT2>150.) PT2 = 149.5;
-      double ff_closure = histFF_Closure->GetBinContent(histFF_Closure->FindBin(PT2));
-      otree->ff_nom *= ff_closure;
+      std::cout << "ff_nom = " << otree->ff_nom << std::endl;
+
+      //      double PT2 = otree->pt_2;
+      //      if (PT2<40.) PT2 = 40.5;
+      //      if (PT2>150.) PT2 = 149.5;
+      //      double ff_closure = histFF_Closure->GetBinContent(histFF_Closure->FindBin(PT2));
+      //      otree->ff_nom *= ff_closure;
       
       //      std::cout << "dm_1 = " << otree->tau_decay_mode_1 << " njets = " << otree->njets << std::endl;
       //      for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {

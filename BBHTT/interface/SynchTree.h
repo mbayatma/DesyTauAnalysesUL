@@ -147,6 +147,13 @@ public :
   Float_t         gen_ipphi_1;
   Float_t         gen_ipeta_1;
 
+  Float_t         jleppt_1;
+  Float_t         jlepeta_1;
+  Float_t         jlepphi_1;
+  Float_t         jleppt_2;
+  Float_t         jlepeta_2;
+  Float_t         jlepphi_2;
+
   Float_t         ip_covxx_1;
   Float_t         ip_covxy_1;
   Float_t         ip_covxz_1;

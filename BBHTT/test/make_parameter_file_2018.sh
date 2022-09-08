@@ -68,6 +68,9 @@ if [[ $CHANNEL = "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WplusHToWWTo2L2Nu_M125 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WminusHToWWTo2L2Nu_M125 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHToWWTo2L2Nu_M125 10
+    # BBHToWW
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_yb2_M125 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_ybyt_M125 5
 fi
 # H->tautau
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf GluGluHToTauTau_M125 10
@@ -75,7 +78,6 @@ fi
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WplusHToTauTau_M125 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WminusHToTauTau_M125 10
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf ZHToTauTau_M125_13TeV 10
-
 
 # BBH
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToTauTau_yb2_M125 5
@@ -86,6 +88,3 @@ fi
 # Interference
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToTauTau_ybyt_M125 5
 
-# BBHToWW
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_yb2_M125 5
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf bbHToWWTo2L2Nu_ybyt_M125 5

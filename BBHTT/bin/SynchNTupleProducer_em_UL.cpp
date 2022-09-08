@@ -918,7 +918,7 @@ int main(int argc, char * argv[]){
       otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
       otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
 
-      bool isSRevent = otree->iso_1<0.5&&otree->iso_2<0.5&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
+      bool isSRevent = otree->iso_1<0.4&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
 
       // when producing synch tuples for final datacards reduces the size of tuples.
       //      if (ApplySystShift&&!isSRevent) continue;
@@ -1050,11 +1050,6 @@ int main(int argc, char * argv[]){
 	otree->weightEMu = otree->effweightEMu;
       }
       /*
-      std::cout << std::endl;
-      std::cout << "idisoweight_1 = " << otree->idisoweight_1 << std::endl;
-      std::cout << "idisoweight_2 = " << otree->idisoweight_2 << std::endl;
-      std::cout << "trigweightEMu = " << otree->trigweightEMu << std::endl;
-      std::cout << "btagweight    = " << otree->btagweight << std::endl;
       */
 
       // embedded weight
@@ -1391,16 +1386,21 @@ int main(int argc, char * argv[]){
       // ++++++++ Systematic uncertainties +++++++++++++++
       // +++++++++++++++++++++++++++++++++++++++++++++++++
       
-      /*
+      /*      
       std::cout << "before systematics -> " << std::endl;
       std::cout << "pt_1      = " << otree->pt_1 << std::endl;
       std::cout << "pt_2      = " << otree->pt_2 << std::endl;
       std::cout << "m_sv      = " << otree->m_sv << std::endl;
-      std::cout << "weightEMu = " << otree->weightEMu << std::endl;
-
+      std::cout << "weightEMu     = " << otree->weightEMu << std::endl;
+      std::cout << "embedweight   = " << otree->embweight << std::endl;
+      std::cout << "mcweight      = " << otree->mcweight << std::endl;
+      std::cout << "idisoweight_1 = " << otree->idisoweight_1 << std::endl;
+      std::cout << "idisoweight_2 = " << otree->idisoweight_2 << std::endl;
+      std::cout << "trigweightEMu = " << otree->trigweightEMu << std::endl;
+      std::cout << "puweight      = " << otree->puweight << std::endl;
+      std::cout << "btagweight    = " << otree->btagweight << std::endl;
+      std::cout << std::endl;
       */
-
-      //      std::cout << "Puppi met before systematics = " << otree->puppimet << std::endl;
 
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){

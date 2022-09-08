@@ -11,10 +11,10 @@ if [[ $CHANNEL == "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018D 20
 
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018A 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018B 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018C 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018D 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018A 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018B 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018C 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018D 4
 elif [[ $CHANNEL == "tt" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018A 20
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018B 20
@@ -22,10 +22,10 @@ elif [[ $CHANNEL == "tt" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018D 20
 
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018A 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018B 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018C 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018D 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018A 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018B 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018C 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018D 4
 fi
     
 # DY

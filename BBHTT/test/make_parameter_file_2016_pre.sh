@@ -13,11 +13,11 @@ if [[ $CHANNEL == "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf MuonEG_Run2016F 10
     
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016B 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016C 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016D 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016E 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016F 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016B 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016C 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016D 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016E 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedElMu_Run2016F 4
 elif [[ $CHANNEL == "tt" ]]; then
     # data
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf Tau_Run2016B 10
@@ -27,11 +27,11 @@ elif [[ $CHANNEL == "tt" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf Tau_Run2016F 10
     
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016B 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016C 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016D 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016E 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016F 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016B 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016C 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016D 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016E 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016F 4
 fi
 
 # DY

@@ -11,9 +11,9 @@ if [[ $CHANNEL == "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_dataGH.conf MuonEG_Run2016H 10
     
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016F 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016G 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016H 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016F 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016G 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016H 4
 elif [[ $CHANNEL == "tt" ]]; then
     # data
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016F 10
@@ -21,9 +21,9 @@ elif [[ $CHANNEL == "tt" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016H 10
     
     # Embedded
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016F 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016G 4
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016H 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016F 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016G 4
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016H 4
 fi
 
 # DY

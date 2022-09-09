@@ -989,6 +989,14 @@ public :
   TBranch  *b_nphi_1;
   TBranch  *b_nm_1;
 
+  TBranch         *b_jleppt_1;
+  TBranch         *b_jlepeta_1;
+  TBranch         *b_jlepphi_1;
+  TBranch         *b_jleppt_2;
+  TBranch         *b_jlepeta_2;
+  TBranch         *b_jlepphi_2;
+
+
   TBranch	 *b_pt_2;
   TBranch	 *b_pt_uncorr_2;
   TBranch	 *b_phi_2;

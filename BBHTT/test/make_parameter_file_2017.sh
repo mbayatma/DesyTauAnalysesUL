@@ -11,23 +11,23 @@ if [[ $CHANNEL = "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017E 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf MuonEG_Run2017F 10
     
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017B 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017C 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017D 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017E 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017F 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017B 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017C 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017D 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017E 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedElMu_Run2017F 4
 elif [[ $CHANNEL == "tt" ]]; then
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_dataB.conf Tau_Run2017B 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf Tau_Run2017B 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf Tau_Run2017C 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf Tau_Run2017D 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf Tau_Run2017E 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf Tau_Run2017F 10
     
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017B 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017C 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017D 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017E 4
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017F 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017B 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017C 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017D 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017E 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017F 4
 fi 
 
 # DY
@@ -70,6 +70,9 @@ if [[ $CHANNEL = "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WplusHToWWTo2L2Nu_M125 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WminusHToWWTo2L2Nu_M125 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf ZHToWWTo2L2Nu_M125 10
+# BBHToWW
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToWWTo2L2Nu_yb2_M125 5
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToWWTo2L2Nu_ybyt_M125 5
 fi
 
 # H->tautau
@@ -81,14 +84,7 @@ fi
 
 # BBH
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToTauTau_yb2_M125 5
-
-# GGH+bb
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToTauTau_yt2_M125 5
-
-# Interference
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToTauTau_ybyt_M125 5
 
-# BBHToWW
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToWWTo2L2Nu_yb2_M125 5
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToWWTo2L2Nu_ybyt_M125 5
 

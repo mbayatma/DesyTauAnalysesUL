@@ -659,6 +659,19 @@ int main(int argc, char * argv[]){
     std::cout << "file " << iF + 1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     
     TFile *file_ = TFile::Open(fileList[iF].data());
+
+    if (file_==0)
+      continue;
+
+    if (file_->GetListOfKeys()->GetSize() == 0)
+      continue; 
+
+    if (file_->GetEND() > file_->GetSize())
+      continue; 
+
+    if (file_->GetSeekKeys()<=file_->GetEND()-file_->GetSize())
+      continue;
+
     TTree *_tree = NULL;
     _tree = (TTree*)file_->Get(TString(ntupleName));  
     if (_tree == NULL) continue;
@@ -1578,8 +1591,6 @@ int main(int argc, char * argv[]){
       w_fakefactors->var("jetpt")->setVal(otree->jleppt_1);
       otree->ff_nom = w_fakefactors->function("ff_total")->getVal();
 
-      std::cout << "ff_nom = " << otree->ff_nom << std::endl;
-
       //      double PT2 = otree->pt_2;
       //      if (PT2<40.) PT2 = 40.5;
       //      if (PT2>150.) PT2 = 149.5;
@@ -1590,14 +1601,14 @@ int main(int argc, char * argv[]){
       //      for (unsigned int i=0; i<otree->ff_sysnames.size(); ++i) {
       //	std::string sysname = otree->ff_sysnames.at(i);
       //	TString SysName(sysname);
-	//	if (SysName!="qcd_pt2")
-	  //	  otree->ff_sys[i] = fns_[sysname]->eval(args.data())*ff_closure/otree->ff_nom;
-	  //	  otree->ff_sys[i] = w_fakefactors->function(sysname.c_str())->getVal()*ff_closure/otree->ff_nom;
-	//	else
-	//	  otree->ff_sys[i] = ff_closure;
-	//	std::cout << sysname << " : " << otree->ff_sys[i] << std::endl;
-	//      }
-      otree->ff_nom_sys = 0.15;
+      //	if (SysName!="qcd_pt2")
+      //	  otree->ff_sys[i] = fns_[sysname]->eval(args.data())*ff_closure/otree->ff_nom;
+      //	  otree->ff_sys[i] = w_fakefactors->function(sysname.c_str())->getVal()*ff_closure/otree->ff_nom;
+      //	else
+      //	  otree->ff_sys[i] = ff_closure;
+      //	std::cout << sysname << " : " << otree->ff_sys[i] << std::endl;
+      //      }
+      //      otree->ff_nom_sys = 0.15;
       
       /*
       auto args_mva = std::vector<double>{
@@ -1612,6 +1623,7 @@ int main(int argc, char * argv[]){
       otree->ff_mva_sys = 0.15;
       */
       
+      /*
       cout << "Trigger weight = " << otree->trigweight << endl;
       cout << "mc weight      = " << otree->mcweight << endl;
       cout << "pu weight      = " << otree->puweight << endl;
@@ -1626,15 +1638,14 @@ int main(int argc, char * argv[]){
 	cout << "gen_match_1 = " << otree->gen_match_1 << "   id/Iso1 weight = " << otree->idisoweight_1 << endl;
       if (otree->gen_match_2!=5)
 	cout << "gen_match_2 = " << otree->gen_match_2 << "   id/Iso2 weight = " << otree->idisoweight_2 << endl;
-      
+      */
 
       bool isSRevent = true; //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
-      if(!Synch){
-	//	std::cout << "trigger = " << otree->trg_doubletau << " : " 
-	//		  << "VVVL_1 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_1 
-	//		  << "VVVL_2 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_2 << std::endl;
-	isSRevent = (otree->trg_doubletau>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_1>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5 && otree->dr_tt>0.5);
-      }
+      //	std::cout << "trigger = " << otree->trg_doubletau << " : " 
+      //		  << "VVVL_1 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_1 
+      //		  << "VVVL_2 = " << otree->byVVVLooseDeepTau2017v2p1VSjet_2 << std::endl;
+      isSRevent = (otree->trg_doubletau>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_1>0.5 && otree->byVVVLooseDeepTau2017v2p1VSjet_2>0.5 && otree->dr_tt>0.5);
+      if (!isSRevent) continue;
 
       /*
 	if (!isSRevent) { 
@@ -1658,9 +1669,8 @@ int main(int argc, char * argv[]){
       otree->pt_fast = -10;
       otree->phi_fast = -10;
       otree->eta_fast = -10;
-      if ( (ApplySVFit||ApplyFastMTT) && isSRevent ) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);        
+      if ( (ApplySVFit||ApplyFastMTT)) svfit_variables(ch, &analysisTree, otree, &cfg, inputFile_visPtResolution);        
       //      std::cout << " here we are " << isSRevent << std::endl;
-      if (!isSRevent && ApplySystShift) continue;
 
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){

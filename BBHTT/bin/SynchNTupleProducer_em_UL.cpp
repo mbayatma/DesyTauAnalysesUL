@@ -691,6 +691,19 @@ int main(int argc, char * argv[]){
     std::cout << "file " << iF + 1 << " out of " << fileList.size() << " filename : " << fileList[iF] << std::endl;
     
     TFile *file_ = TFile::Open(fileList[iF].data());
+
+    if (file_==0)
+      continue;
+
+    if (file_->GetListOfKeys()->GetSize() == 0)
+      continue; 
+
+    if (file_->GetEND() > file_->GetSize())
+      continue; 
+
+    if (file_->GetSeekKeys()<=file_->GetEND()-file_->GetSize())
+      continue;
+
     if (file_->IsZombie()) {
       cout << "cannot open file " << fileList[iF].data() << std::endl;
       continue;

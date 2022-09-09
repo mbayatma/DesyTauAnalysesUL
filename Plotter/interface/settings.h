@@ -25,6 +25,7 @@ using namespace std;
     {"ST_t-channel_antitop_4f"  , 80.95}, 
     {"ST_tW_top_5f"             , 35.85}, 
     {"ST_tW_antitop_5f"         , 35.85}, 
+    {"WWTo2L2Nu"                , 11.59},
     {"VVTo2L2Nu"                , 13.84},
     {"WWToLNuQQ"                , 49.997},
     {"WZTo2L2Q"                 , 5.52},
@@ -34,6 +35,7 @@ using namespace std;
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
+    {"ZZTo2L2Nu"                , 2.00},
     {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
     {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
@@ -83,6 +85,7 @@ using namespace std;
     {"ST_tW_top_5f"             , 35.85}, 
     {"ST_tW_antitop_5f"         , 35.85}, 
     {"VVTo2L2Nu"                , 13.84},
+    {"WWTo2L2Nu"                , 11.59},
     {"WWToLNuQQ"                , 49.997},
     {"WZTo2L2Q"                 , 5.52},
     {"WZTo1L1Nu2Q"              , 10.71},
@@ -91,6 +94,7 @@ using namespace std;
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
+    {"ZZTo2L2Nu"                , 2.00},
     {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
     {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
@@ -142,6 +146,7 @@ using namespace std;
     {"ST_tW_top_5f"             , 35.85}, 
     {"ST_tW_antitop_5f"         , 35.85}, 
     {"VVTo2L2Nu"                , 13.84},
+    {"WWTo2L2Nu"                , 11.59},
     {"WWToLNuQQ"                , 49.997},
     {"WZTo2L2Q"                 , 5.52},
     {"WZTo1L1Nu2Q"              , 10.71},
@@ -150,6 +155,7 @@ using namespace std;
     {"WZTo3LNu"                 , 4.43},
     {"ZZTo4L"                   , 1.26},
     {"ZZTo2L2Q"                 , 3.38},
+    {"ZZTo2L2Nu"                , 2.00},
     {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
     {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
     {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
@@ -351,12 +357,28 @@ std::vector<TString> DYJets = {
   "DY4JetsToLL_M-50"  
 };
 
+std::vector<TString> EWK_UL = {
+  "ST_t-channel_top_4f",
+  "ST_t-channel_antitop_4f",
+  "ST_tW_top_5f",
+  "ST_tW_antitop_5f",
+  //  "VVTo2L2Nu",
+  "WWTo2L2Nu",
+  "ZZTo2L2Nu",
+  "WZTo2L2Q",
+  "WZTo3LNu",
+  "ZZTo2L2Q",
+  "ZZTo4L",
+};
+
 std::vector<TString> EWK = {
   "ST_t-channel_top_4f",
   "ST_t-channel_antitop_4f",
   "ST_tW_top_5f",
   "ST_tW_antitop_5f",
   "VVTo2L2Nu",
+  //  "WWTo2L2Nu",
+  //  "ZZTo2L2Nu",
   "WZTo2L2Q",
   "WZTo3LNu",
   "ZZTo2L2Q",
@@ -395,6 +417,13 @@ std::vector<TString> qqH125 = {
   //  "WplusHToTauTau_M125",
   //  "WminusHToTauTau_M125",
   //  "ZHToTauTau_M125_13TeV"
+};
+
+std::map<TString,double> LUMI = {
+  {"2016_pre",19500},
+  {"2016_post",16800},
+  {"2017",41500},
+  {"2018",59800}
 };
 
 const TString BaseTreeName = "TauCheck"; 

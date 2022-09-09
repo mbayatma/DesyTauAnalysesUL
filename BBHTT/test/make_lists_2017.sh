@@ -1,5 +1,7 @@
 #!/bin/sh
 
+CHANNEL=$1
+
 dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/mc_2
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2017/mc
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2017/mc
@@ -39,7 +41,7 @@ ls $dirMC_UL/ST_tW_antitop_5f/*root > $OUTDIR/ST_tW_antitop_5f
 
 ls $dirMC_UL/WWTo2L2Nu/*root > $OUTDIR/WWTo2L2Nu
 ls $dirMC_UL/ZZTo2L2Nu/*root > $OUTDIR/ZZTo2L2Nu 
-ls $dirMC_UL/WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC_UL/WZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/WZTo2L2Q
 ls $dirMC_UL/WZTo3LNu/*root > $OUTDIR/WZTo3LNu
 ls $dirMC_UL/ZZTo2Q2L_mllmin4p0_TuneCP5_13TeV-amcatnloFXFX-pythia8/*root > $OUTDIR/ZZTo2L2Q
 ls $dirMC_UL/ZZTo4L/*root > $OUTDIR/ZZTo4L
@@ -48,7 +50,7 @@ ls $dirMC_UL/GluGluHToTauTau/*root > $OUTDIR/GluGluHToTauTau_M125
 ls $dirMC_UL/VBFHToTauTau/*.root > $OUTDIR/VBFHToTauTau_M125
 ls $dirMC_UL/WplusHToTauTau/*.root > $OUTDIR/WplusHToTauTau_M125
 ls $dirMC_UL/WminusHToTauTau/*.root > $OUTDIR/WminusHToTauTau_M125
-ls $dirMC_UL/ZHToTauTau_M125_13TeV_powheg_pythia8/*root > $OUTDIR/ZHToTauTau_M125
+ls $dirMC_UL/ZHToTauTau_M125_CP5_13TeV-powheg-pythia8_ext1/*root > $OUTDIR/ZHToTauTau_M125
 
 ls $dirMC_UL/GluGluHToWWTo2L2Nu/*root > $OUTDIR/GluGluHToWWTo2L2Nu_M125
 ls $dirMC_UL/VBFHToWWTo2L2Nu/*root > $OUTDIR/VBFHToWWTo2L2Nu_M125

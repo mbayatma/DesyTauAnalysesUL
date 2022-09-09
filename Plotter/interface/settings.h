@@ -311,11 +311,39 @@ std::vector<TString> MuonEG_2016 = {
   "MuonEG_Run2016H"
 };
 
+std::vector<TString> MuonEG_2016_post = {
+  "MuonEG_Run2016F",
+  "MuonEG_Run2016G",
+  "MuonEG_Run2016H"
+};
+
+std::vector<TString> MuonEG_2016_pre = {
+  "MuonEG_Run2016B",
+  "MuonEG_Run2016C",
+  "MuonEG_Run2016D",
+  "MuonEG_Run2016E",
+  "MuonEG_Run2016F",
+};
+
 std::vector<TString> Tau_2016 = {
   "Tau_Run2016B",
   "Tau_Run2016C",
   "Tau_Run2016D",
   "Tau_Run2016E",
+  "Tau_Run2016F",
+  "Tau_Run2016G",
+  "Tau_Run2016H"
+};
+
+std::vector<TString> Tau_2016_pre = {
+  "Tau_Run2016B",
+  "Tau_Run2016C",
+  "Tau_Run2016D",
+  "Tau_Run2016E",
+  "Tau_Run2016F",
+};
+
+std::vector<TString> Tau_2016_post = {
   "Tau_Run2016F",
   "Tau_Run2016G",
   "Tau_Run2016H"
@@ -331,6 +359,20 @@ std::vector<TString> EmbeddedElMu_2016 = {
   "EmbeddedElMu_Run2016H"
 };
 
+std::vector<TString> EmbeddedElMu_2016_post = {
+  "EmbeddedElMu_Run2016F",
+  "EmbeddedElMu_Run2016G",
+  "EmbeddedElMu_Run2016H"
+};
+
+std::vector<TString> EmbeddedElMu_2016_pre = {
+  "EmbeddedElMu_Run2016B",
+  "EmbeddedElMu_Run2016C",
+  "EmbeddedElMu_Run2016D",
+  "EmbeddedElMu_Run2016E",
+  "EmbeddedElMu_Run2016F",
+};
+
 std::vector<TString> EmbeddedTauTau_2016 = {
   "EmbeddedTauTau_Run2016B",
   "EmbeddedTauTau_Run2016C",
@@ -339,6 +381,20 @@ std::vector<TString> EmbeddedTauTau_2016 = {
   "EmbeddedTauTau_Run2016F",
   "EmbeddedTauTau_Run2016G",
   "EmbeddedTauTau_Run2016H"
+};
+
+std::vector<TString> EmbeddedTauTau_2016_post = {
+  "EmbeddedTauTau_Run2016F",
+  "EmbeddedTauTau_Run2016G",
+  "EmbeddedTauTau_Run2016H"
+};
+
+std::vector<TString> EmbeddedTauTau_2016_pre = {
+  "EmbeddedTauTau_Run2016B",
+  "EmbeddedTauTau_Run2016C",
+  "EmbeddedTauTau_Run2016D",
+  "EmbeddedTauTau_Run2016E",
+  "EmbeddedTauTau_Run2016F"
 };
 
 std::vector<TString> WJets = {

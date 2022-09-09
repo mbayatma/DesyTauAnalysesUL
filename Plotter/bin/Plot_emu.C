@@ -11,8 +11,12 @@
 #include <map>
 #include <string>
 
-TString SpecificCut(TString sample) {
+TString SpecificCut(TString era, TString sample) {
   TString cut("");
+  if (era=="2016_pre"&&sample.Contains("Embed"))
+    cut = "&&run<278769";
+  if (era=="2016_post"&&sample.Contains("Embed"))
+    cut = "&&run>=278769";  
   if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
     cut = "&&gen_noutgoing==0";
   return cut;
@@ -66,6 +70,7 @@ int main(int argc, char * argv[]) {
   float yLower = 0;
 
   bool embedded = cfg.get<bool>("Embedded");
+  bool isUL = cfg.get<bool>("isUL");
   string era_string = cfg.get<string>("Era");
   TString era(era_string);
   string input_dir = cfg.get<string>("InputDir");
@@ -149,11 +154,7 @@ int main(int argc, char * argv[]) {
   TString CutsZTT_SS  = CutsSS + TString("&&gen_match_1==3&&gen_match_2==4");
   TString CutsZLL_SS  = CutsSS + TString("&&!(gen_match_1==3&&gen_match_2==4)");
 
-  double lumi = 59740;
-  if (era=="2017")
-    lumi = 41500;
-  if (era=="2016")
-    lumi = 35890;
+  double lumi = LUMI[era];
 
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
@@ -163,6 +164,7 @@ int main(int argc, char * argv[]) {
   std::vector<TString> DYSamples = DYJets;
   std::vector<TString> WJetsSamples = WJets;
   std::vector<TString> EWKSamples = EWK;
+  if (isUL) EWKSamples = EWK_UL;
   std::vector<TString> TTSamples = TT_EXCL;
   std::vector<TString> HiggsSamples = H125;
 
@@ -173,6 +175,14 @@ int main(int argc, char * argv[]) {
   if (era=="2016") {
     MuonEG = MuonEG_2016;
     EmbedSamples = EmbeddedElMu_2016;
+  }
+  if (era=="2016_pre") {
+    MuonEG = MuonEG_2016_pre;
+    EmbedSamples = EmbeddedElMu_2016_pre;
+  }
+  if (era=="2016_post") {
+    MuonEG = MuonEG_2016_post;
+    EmbedSamples = EmbeddedElMu_2016_post;
   }
 
   struct SampleAttributes {
@@ -318,7 +328,7 @@ int main(int argc, char * argv[]) {
       TString sampleName = Samples.at(j);
       //      TFile * file = new TFile(dir+"/"+sampleName+"_"+era+".root");
       TFile * file = new TFile(dir+"/"+sampleName+".root");
-      if (file->IsZombie()) {
+      if (file==0||file->IsZombie()) {
 	std::cout << "file " << dir << "/" << sampleName << ".root does not exist" << std::endl;
 	std::cout << "quitting..." << std::endl;
 	exit(-1);
@@ -334,8 +344,8 @@ int main(int argc, char * argv[]) {
       TH1D * histSampleSS = new TH1D(histNameSS,"",nBins,xmin,xmax);
       histSample->Sumw2();
       histSampleSS->Sumw2();
-      TString CutsSample = sampleAttr.cuts + SpecificCut(sampleName);
-      TString CutsSampleSS = sampleAttr.cutsSS + SpecificCut(sampleName);
+      TString CutsSample = sampleAttr.cuts + SpecificCut(era,sampleName);
+      TString CutsSampleSS = sampleAttr.cutsSS + SpecificCut(era,sampleName);
       tree->Draw(Variable+">>"+histName,WeightSample+"("+CutsSample+")");
       tree->Draw(Variable+">>"+histNameSS,WeightSampleQCD+"("+CutsSampleSS+")");
       double norm = 1.0;

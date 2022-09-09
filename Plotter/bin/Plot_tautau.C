@@ -22,8 +22,12 @@ struct SampleAttributes {
   TH1D * histSingleFake;
 };
 
-TString SpecificCut(TString sample) {
+TString SpecificCut(TString era, TString sample) {
   TString cut("");
+  if (era=="2016_pre"&&sample.Contains("Embed"))
+    cut = "&&run<278769";
+  if (era=="2016_post"&&sample.Contains("Embed"))
+    cut = "&&run>=278769";  
   if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
     //  if (sample.Contains("WJetsToLNu"))
     cut = "&&gen_noutgoing==0";
@@ -101,6 +105,7 @@ int main(int argc, char * argv[]) {
   float xmax = atof(argv[5]);
 
   bool embedded = cfg.get<bool>("Embedded");
+  bool isUL = cfg.get<bool>("isUL");
   string era_string = cfg.get<string>("Era");
   TString era(era_string);
   string input_dir = cfg.get<string>("InputDir");
@@ -119,7 +124,7 @@ int main(int argc, char * argv[]) {
   std::map<TString,double> normScale = {
     {"2016",1.16},
     {"2017",0.94},
-    {"2018",0.88}
+    {"2018",1.27}
   };
 
   float yLower =                10;
@@ -151,8 +156,9 @@ int main(int argc, char * argv[]) {
     lumi_13TeV = "2016, 36 fb^{-1}";
 
   TString Weight("weight*");
-  TString FFWeight("ff_nom*ff_qcd_pt2*");
+  TString FFWeight("ff_nom*");
 
+  /*
   TString FF_pt2_2016("1.05*(1.0*(pt_2<=120.)+0.80*(pt_2>120.))*");
   TString FF_pt2_2017("1.06*(1.0*(pt_2<=80.)+0.90*(pt_2>80.))*");
   TString FF_pt2_2018("1.06*(1.0*(pt_2<=80.)+0.85*(pt_2>80.&&pt_2<=95.)+0.6*(pt_2>95.))*");
@@ -160,7 +166,9 @@ int main(int argc, char * argv[]) {
   TString FF_btg_2016("(1.0*(nbtag==0)+0.93*(nbtag==1)+1.00*(nbtag>=2))*");
   TString FF_btg_2017("(1.0*(nbtag<=1)+0.60*(nbtag==2)+0.50*(nbtag>=3))*");
   TString FF_btg_2018("(1.0*(nbtag==0)+0.93*(nbtag==1)+0.52*(nbtag>=2))*");
+  */
 
+  /*
   if (embedded) {
     if (era=="2016")
       FFWeight += FF_pt2_2016+FF_btg_2016;
@@ -169,7 +177,8 @@ int main(int argc, char * argv[]) {
     if (era=="2018")
       FFWeight += FF_pt2_2018+FF_btg_2018;    
   }
-  
+  */  
+
   TString WeightQCD = Weight + FFWeight;
   
   TString CutsSR("&&byMediumDeepTau2017v2p1VSjet_1>0.5&&byMediumDeepTau2017v2p1VSjet_2>0.5");
@@ -191,17 +200,14 @@ int main(int argc, char * argv[]) {
   TString genCutsSingleFake = CutsSR + mcCutsSingleFake;
   TString genCutsSingleFake_L = CutsSR + mcCutsSingleFake + mcCutsNotTauTau;
 
-  double lumi = 59740;
-  if (era=="2017")
-    lumi = 41500;
-  if (era=="2016")
-    lumi = 35890;
+  double lumi = LUMI[era];
 
   std::vector<TString> DataSamples = Tau_2018;
   std::vector<TString> EmbedSamples = EmbeddedTauTau_2018;
   std::vector<TString> DYSamples = DYJets;
   std::vector<TString> WJetsSamples = WJets;
   std::vector<TString> EWKSamples = EWK;
+  if (isUL) EWKSamples = EWK_UL;
   std::vector<TString> TTSamples = TT_EXCL;
   std::vector<TString> bbHSamples = bbH125;
 
@@ -212,6 +218,14 @@ int main(int argc, char * argv[]) {
   if (era=="2016") {
     DataSamples = Tau_2016;
     EmbedSamples = EmbeddedTauTau_2016;
+  }
+  if (era=="2016_pre") {
+    DataSamples = Tau_2016_pre;
+    EmbedSamples = EmbeddedTauTau_2016_pre;
+  }
+  if (era=="2016_post") {
+    DataSamples = Tau_2016_post;
+    EmbedSamples = EmbeddedTauTau_2016_post;
   }
 
   std::vector<TString> names = {"Data","EMB","VVL","TTL","W","ZTT","ZL","VVT","TTT"};
@@ -269,13 +283,17 @@ int main(int argc, char * argv[]) {
     TString WeightSampleSB = sampleAttr.weightSB;
     TString WeightSampleSingleFake = sampleAttr.weightSingleFake;
 
-
     double kfactor = 1.0;
     for (unsigned int j=0; j<Samples.size(); ++j) {
 
       TString sampleName = Samples.at(j);
 
       TFile * file = new TFile(dir+"/"+sampleName+".root");
+      if (file==0||file->IsZombie()) {
+	std::cout << "file " << dir << "/" << sampleName << ".root does not exist" << std::endl;
+	std::cout << "quitting..." << std::endl;
+	exit(-1);
+      }
       TTree * tree = (TTree*)file->Get("TauCheck");
       TH1D * histWeightsH = (TH1D*)file->Get("nWeightedEvents");
 
@@ -283,9 +301,9 @@ int main(int argc, char * argv[]) {
       TH1D * histSampleSB = new TH1D("histSB","",nbins,xmin,xmax);
       TH1D * histSampleSingleFake = new TH1D("histSingleFake","",nbins,xmin,xmax);
 
-      TString CutsSample   = sampleAttr.cuts   + SpecificCut(sampleName);
-      TString CutsSampleSB = sampleAttr.cutsSB + SpecificCut(sampleName);
-      TString CutsSampleSingleFake = sampleAttr.cutsSingleFake + SpecificCut(sampleName);
+      TString CutsSample   = sampleAttr.cuts   + SpecificCut(era,sampleName);
+      TString CutsSampleSB = sampleAttr.cutsSB + SpecificCut(era,sampleName);
+      TString CutsSampleSingleFake = sampleAttr.cutsSingleFake + SpecificCut(era,sampleName);
       
       tree->Draw(Variable+">>hist",WeightSample+"("+CutsSample+")");
       tree->Draw(Variable+">>histSB",WeightSampleSB+"("+CutsSampleSB+")");
@@ -367,7 +385,8 @@ int main(int argc, char * argv[]) {
   double normScaleX = embNorm/zttNorm;
   
   if (applyDYScale)
-    ZTT->Scale(normScale[era]);
+    //    ZTT->Scale(normScale[era]);
+    ZTT->Scale(normScaleX);
 
   if (embedded) {
     ZTT = nameAttributes["EMB"].hist;

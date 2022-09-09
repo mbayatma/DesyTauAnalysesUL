@@ -119,6 +119,14 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
      fChain->SetBranchAddress("gen_ipphi_1", &gen_ipphi_1, &b_gen_ipphi_1);
      fChain->SetBranchAddress("gen_ipeta_1", &gen_ipeta_1, &b_gen_ipeta_1);
 
+     fChain->SetBranchAddress("jleppt_1", &jleppt_1, &b_jleppt_1);
+     fChain->SetBranchAddress("jlepeta_1", &jlepeta_1, &b_jlepeta_1);
+     fChain->SetBranchAddress("jlepphi_1", &jlepphi_1, &b_jlepphi_1);
+
+     fChain->SetBranchAddress("jleppt_2", &jleppt_2, &b_jleppt_2);
+     fChain->SetBranchAddress("jlepeta_2", &jlepeta_2, &b_jlepeta_2);
+     fChain->SetBranchAddress("jlepphi_2", &jlepphi_2, &b_jlepphi_2);
+
      fChain->SetBranchAddress("ip_covxx_1", &ip_covxx_1, &b_ip_covxx_1);
      fChain->SetBranchAddress("ip_covxy_1", &ip_covxy_1, &b_ip_covxy_1);
      fChain->SetBranchAddress("ip_covxz_1", &ip_covxz_1, &b_ip_covxz_1);
@@ -864,6 +872,14 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
       fChain->Branch("ff_"+TString(ff_sysnames[i]),&ff_sys[i],"ff_"+TString(ff_sysnames[i])+"/F");
     }
   }
+
+  fChain->Branch("jleppt_1",&jleppt_1,"jleppt_1/F");
+  fChain->Branch("jlepeta_1",&jlepeta_1,"jlepeta_1/F");
+  fChain->Branch("jlepphi_1",&jlepphi_1,"jlepphi_1/F");
+
+  fChain->Branch("jleppt_2",&jleppt_2,"jleppt_2/F");
+  fChain->Branch("jlepeta_2",&jlepeta_2,"jlepeta_2/F");
+  fChain->Branch("jlepphi_2",&jlepphi_2,"jlepphi_2/F");
 
   fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
 

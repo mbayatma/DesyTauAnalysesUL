@@ -971,7 +971,7 @@ int main(int argc, char * argv[]){
       //        FillGenTree(&analysisTree, gentreeForGoodRecoEvtsOnly);       
     
       
-      // initialize JER (including data and embedded) 
+      // initialize JES (including data and embedded) 
       otree->apply_recoil = ApplyRecoilCorrections;
       jets::initializeJER(&analysisTree);
 

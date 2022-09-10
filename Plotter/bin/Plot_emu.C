@@ -11,18 +11,6 @@
 #include <map>
 #include <string>
 
-TString SpecificCut(TString era, TString sample) {
-  TString cut("");
-  if (era=="2016_pre"&&sample.Contains("Embed"))
-    cut = "&&run<278769";
-  if (era=="2016_post"&&sample.Contains("Embed"))
-    cut = "&&run>=278769";  
-  if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
-    cut = "&&gen_noutgoing==0";
-  return cut;
-
-}
-
 using namespace std;
 
 map<TString, TString> xtitles = {
@@ -104,7 +92,7 @@ int main(int argc, char * argv[]) {
   TString AdditionalCut(additional_cut);
   bool isBTag = cfg.get<bool>("ApplyBTagQCDScale");
   TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.");
-  Selection += "&&weightEMu<20000."; // protection against large weights
+  Selection += "&&weightEMu<100."; // protection against large weights
   Selection += AdditionalCut; // additional cut, for example nbtag>=1
   string SelSuffix = cfg.get<string>("FileSuffix");
   TString sel_suffix(SelSuffix);
@@ -122,14 +110,9 @@ int main(int argc, char * argv[]) {
   if (embedded) suffix = "embedded";
 
   // ******** end of settings *********
-
   //  std::cout << dir << std::endl;
 
-  lumi_13TeV = "2018, 59.7 fb^{-1}";
-  if (era=="2017")
-    lumi_13TeV = "2017, 41.5 fb^{-1}";
-  if (era=="2016")
-    lumi_13TeV = "2016, 35.9 fb^{-1}";
+  lumi_13TeV = LUMI_label["era"];
 
   TString Weight("weightEMu*");
   TString QCDW("qcdweight*");
@@ -359,7 +342,9 @@ int main(int argc, char * argv[]) {
 	nevents = histWeightsH->GetSumOfWeights();
 	norm = xsec*lumi/nevents;
       }
-      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield =" << norm*histSample->GetSumOfWeights() << std::endl;
+      double yield = norm*histSample->GetSumOfWeights();
+      //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield =" << norm*histSample->GetSumOfWeights() << std::endl;
+      std::cout << "   " << sampleName << "   yield = " << yield << std::endl;
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
       sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,norm);
       //      delete file;
@@ -409,6 +394,7 @@ int main(int argc, char * argv[]) {
   TH1D * ZTT_SS      = ZttAttr.histSS;
   TH1D * Higgs_SS    = HiggsAttr.histSS;
 
+  std::cout << std::endl;
   std::cout << "Variable : " << Variable << std::endl;
   std::cout << "---------------------------" << std::endl;
   std::cout << "Same-sign - > " << std::endl;
@@ -590,8 +576,10 @@ int main(int argc, char * argv[]) {
       chi2 += diff2/(xMC+eMC*eMC);
     }
   }
+  double ndof = nBins - 1;
+  double prob = TMath::Prob(chi2,ndof);
   std::cout << std::endl;
-  std::cout << "Chi2/ndof = " << chi2 << std::endl;
+  std::cout << "Chi2/ndof = " << chi2 << "/" << ndof << " -> p-value = " << prob << std::endl;
   std::cout << std::endl;
 
   TLegend * leg;

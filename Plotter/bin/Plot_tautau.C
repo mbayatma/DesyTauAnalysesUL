@@ -22,18 +22,6 @@ struct SampleAttributes {
   TH1D * histSingleFake;
 };
 
-TString SpecificCut(TString era, TString sample) {
-  TString cut("");
-  if (era=="2016_pre"&&sample.Contains("Embed"))
-    cut = "&&run<278769";
-  if (era=="2016_post"&&sample.Contains("Embed"))
-    cut = "&&run>=278769";  
-  if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
-    //  if (sample.Contains("WJetsToLNu"))
-    cut = "&&gen_noutgoing==0";
-  return cut;
-
-}
 
 SampleAttributes CreateSampleAttributes(TString name, 
 					std::vector<TString> sampleNames,
@@ -149,11 +137,7 @@ int main(int argc, char * argv[]) {
   TString suffix = "mc";
   if (embedded) suffix = "embedded";
 
-  lumi_13TeV = "2018, 60 fb^{-1}";
-  if (era=="2017")
-    lumi_13TeV = "2017, 41 fb^{-1}";
-  if (era=="2016")
-    lumi_13TeV = "2016, 36 fb^{-1}";
+  lumi_13TeV = LUMI_label["era"];
 
   TString Weight("weight*");
   TString FFWeight("ff_nom*");
@@ -283,7 +267,6 @@ int main(int argc, char * argv[]) {
     TString WeightSampleSB = sampleAttr.weightSB;
     TString WeightSampleSingleFake = sampleAttr.weightSingleFake;
 
-    double kfactor = 1.0;
     for (unsigned int j=0; j<Samples.size(); ++j) {
 
       TString sampleName = Samples.at(j);
@@ -321,10 +304,12 @@ int main(int argc, char * argv[]) {
       else { 
 	xsec = xsecs[sampleName];
 	nevents = histWeightsH->GetSumOfWeights();
-	norm = xsec*lumi*kfactor/nevents;
+	norm = xsec*lumi/nevents;
 
       }
-      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield = " << histSample->GetSumOfWeights() << std::endl;
+      //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield = " << histSample->GetSumOfWeights() << std::endl;
+      double yield = norm * histSample->GetSumOfWeights();
+      std::cout << "   " << sampleName << "  yield = " << yield << std::endl; 
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
       sampleAttr.histSB->Add(sampleAttr.histSB,histSampleSB,1.,norm);
       sampleAttr.histSingleFake->Add(sampleAttr.histSingleFake,histSampleSingleFake,1.,norm);
@@ -385,7 +370,6 @@ int main(int argc, char * argv[]) {
   double normScaleX = embNorm/zttNorm;
   
   if (applyDYScale)
-    //    ZTT->Scale(normScale[era]);
     ZTT->Scale(normScaleX);
 
   if (embedded) {
@@ -398,22 +382,27 @@ int main(int argc, char * argv[]) {
   }
   EWK->Add(EWK,nameAttributes["ZL"].hist,1.,1.);
 
+  std::cout << std::endl;
+  std::cout << "Variable -> " << Variable << std::endl;
   std::cout << "Top   : " << TT->GetSumOfWeights()  << std::endl;
   std::cout << "EWK   : " << EWK->GetSumOfWeights() << std::endl;
-  std::cout << "ZTT   : " << ZTT->GetSumOfWeights() << std::endl;
+  if (embedded)
+    std::cout << "EMB   : " << ZTT->GetSumOfWeights() << std::endl;
+  else 
+    std::cout << "ZTT   : " << ZTT->GetSumOfWeights() << std::endl;
   std::cout << "Fakes : " << Fakes->GetSumOfWeights() << std::endl;
   double total = TT->GetSumOfWeights() + EWK->GetSumOfWeights() + ZTT->GetSumOfWeights() + Fakes->GetSumOfWeights();
   std::cout << "Total : " << total << std::endl;
   std::cout << "Data  : " << histData->GetSumOfWeights() << std::endl;
 
   //  adding normalization systematics
-  double ZTT_norm   = 0.03; //  normalization ZTT :  4% (EMBEDDED)
-  double EWK_norm   = 0.05; //  normalization EWK :  5%
-  double QCD_norm   = 0.07; //  normalization Fakes : 10%
-  double TT_norm    = 0.00; //  normalization TT  :  7%
+  double ZTT_norm   = 0.04; //  normalization ZTT   :  4% (EMBEDDED)
+  double EWK_norm   = 0.05; //  normalization EWK   :  5%
+  double QCD_norm   = 0.07; //  normalization Fakes :  7%
+  double TT_norm    = 0.06; //  normalization TT    :  6%
 
-  double eff_Emb = 0.03;
-  double eff_MC  = 0.03;
+  double eff_Emb = 0.04;
+  double eff_MC  = 0.04;
 
   bool applyNormSys = cfg.get<bool>("ApplySystematics");
   if (applyNormSys) {
@@ -443,11 +432,8 @@ int main(int argc, char * argv[]) {
     }
   }
 
-  //  for (int i=1; i<=6; ++i) 
-  //    Fakes->SetBinContent(i,0.9*Fakes->GetBinContent(i));
-
   std::cout << std::endl;
-  std::cout << "normZTT = " << normScaleX << std::endl;
+  std::cout << "norm ZTT MC/Emb = " << normScaleX << std::endl;
   std::cout << std::endl;
 
   EWK->Add(EWK,TT);
@@ -518,7 +504,7 @@ int main(int argc, char * argv[]) {
   Fakes->Draw("sameh");
   ZTT->Draw("sameh");
   EWK->Draw("sameh");
-  //  TT->Draw("sameh");
+  TT->Draw("sameh");
   histData->Draw("e1same");
   bkgdErr->Draw("e2same");
   histData->Draw("e1same");
@@ -526,13 +512,16 @@ int main(int argc, char * argv[]) {
   for (int iB=1; iB<=nbins; ++iB) {
     float xData = histData->GetBinContent(iB);
     float xMC = ZTT->GetBinContent(iB);
+    float eMC = bkgdErr->GetBinError(iB);
     if (xMC>1e-1) {
       float diff2 = (xData-xMC)*(xData-xMC);
-      chi2 += diff2/xMC;
+      chi2 += diff2/(xMC+eMC*eMC);
     }
   }
+  double ndof = nbins - 1;
+  double prob = TMath::Prob(chi2,ndof); 
   std::cout << std::endl;
-  std::cout << "Chi2 = " << chi2 << std::endl;
+  std::cout << "Chi2/ndof = " << chi2 << "/" << ndof << " -> p-value = " << prob << std::endl;
   std::cout << std::endl;
 
   TLegend * leg;
@@ -542,12 +531,12 @@ int main(int argc, char * argv[]) {
   leg->SetTextSize(0.044);
   leg->AddEntry(histData,"Data","lp");
   leg->AddEntry(Fakes,"Fakes","f");
-  //  if (embedded) 
-  leg->AddEntry(ZTT,"genuine #tau#tau","f");
-    //  else 
-    //    leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
-  leg->AddEntry(EWK,"rest","f");
-  //  leg->AddEntry(TT,"t#bar{t}","f");
+  if (embedded) 
+    leg->AddEntry(ZTT,"genuine #tau#tau","f");
+  else 
+    leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
+  leg->AddEntry(EWK,"electroweak","f");
+  leg->AddEntry(TT,"t#bar{t}","f");
   if (plotLegend) leg->Draw();
   writeExtraText = true;
   extraText = "Preliminary";

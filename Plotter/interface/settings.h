@@ -186,7 +186,6 @@ using namespace std;
     {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
   };
 
-
 std::vector<TString> SingleMuon_2018 = {
   "SingleMuon_Run2018A",
   "SingleMuon_Run2018B",
@@ -476,11 +475,33 @@ std::vector<TString> qqH125 = {
 };
 
 std::map<TString,double> LUMI = {
-  {"2016_pre",19500},
-  {"2016_post",16800},
-  {"2017",41500},
-  {"2018",59800}
+  {"2016",     36330},
+  {"2016_pre", 19520},
+  {"2016_post",16810},
+  {"2017",     41480},
+  {"2018",     59830}
 };
+
+std::map<TString, TString> LUMI_label = {
+  {"2016"     ,"2016, 36.3 fb^{-1}"},
+  {"2016_pre" ,"2016, preVFP, 19.5 fb^{-1}"},
+  {"2016_post","2016, postVFP, 16.8 fb^{-1}"},
+  {"2017"     ,"2017, 41.5 fb^{-1}"},
+  {"2018"     ,"2018, 59.8 fb^{-1}"}
+};
+
+TString SpecificCut(TString era, TString sample) {
+  TString cut("");
+  if (era=="2016_pre"&&sample.Contains("Embed"))
+    cut = "&&run<278769";
+  if (era=="2016_post"&&sample.Contains("Embed"))
+    cut = "&&run>=278769";  
+  if (sample.Contains("WJetsToLNu")||sample.Contains("DYJetsToLL_M-50"))
+    //  if (sample.Contains("WJetsToLNu"))
+    cut = "&&gen_noutgoing==0";
+  return cut;
+
+}
 
 const TString BaseTreeName = "TauCheck"; 
 vector<TString> SystematicsNames = {"",  

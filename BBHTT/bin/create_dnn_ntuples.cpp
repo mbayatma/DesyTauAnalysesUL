@@ -17,7 +17,7 @@ bool applyPreselection = true;
 int main(int argc, char * argv[]) {
 
 
-  bool useFriend=true;
+  bool useFriend=false;
   bool TEST = false;
 
   TString process(argv[1]);
@@ -74,7 +74,7 @@ if (argc!=4) {
   //TString output_dir = "";
   samples_map[channel + "-NOMINAL_ntuple_"+Sample     ] = map_sample.at(Sample);
   if(channel=="em")
-      input_dir = "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/synch_NTuples_2018/"; 
+      input_dir = "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/updated_Synch_UL_Sep/synch_NTuples_2018_updated_12922"; 
   //      input_dir = "/nfs/dust/cms/user/cardinia/Maryam/SynchNTuples_UL_v2/"; 
     //"/nfs/dust/cms/user/makou/ULFW/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/"+ era;
     //input_dir= "/nfs/dust/cms/user/rasp/Run/emu_MSSM/Feb10/" + era;
@@ -107,7 +107,7 @@ if (argc!=4) {
   //TF1 *hOS_SS_transfer_factors_njet1= NULL;
   //TF1 *hOS_SS_transfer_factors_njet0= NULL;
   
-  TString output_dir= "/nfs/dust/cms/user/cardinia/Maryam/NTuplesULfriend_" + era; 
+  TString output_dir= "/nfs/dust/cms/user/makou/bbh_analysis_NTuples/HTauTau_emu/Inputs/DNN_Ntuples/NTuples_" + era; 
   //TString output_dir= "./NTuples_" + era; 
   gSystem -> Exec("mkdir " + output_dir);
 
@@ -208,7 +208,8 @@ if (era == "2018"){
     xsec_map    = &xsec_map_2016;
     process_map = &process_map_2016;
     //n_events_per_sample = n_events_per_sample_2016;
-    luminosity  = 35920;               // Take number from LUMI twiki : https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#SummaryTable
+    //entered lumi for pre VFP, previous number 35920
+    luminosity  = 19520;               // Take number from LUMI twiki : https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#SummaryTable
     trigger_filter_efficiency = 0.979;
     qcd_ss_os_iso_relaxed_ratio = 2.3;
     embedded_trigger_weight  = 1.0;
@@ -249,10 +250,14 @@ if (era == "2018"){
   double xsecW3Jets = 0;
   double xsecW4Jets = 0;
   double xsecDYIncl     = 0;
+  double xsecDY0Jets    = 0;
   double xsecDY1Jets    = 0;
   double xsecDY2Jets    = 0;
+  
+  /*double xsecDY1Jets    = 0;
+  double xsecDY2Jets    = 0;
   double xsecDY3Jets    = 0;
-  double xsecDY4Jets    = 0;
+  double xsecDY4Jets    = 0;*/
 
   double neventsWIncl = 0;
   double neventsW1Jets  = 0;
@@ -260,10 +265,14 @@ if (era == "2018"){
   double neventsW3Jets  = 0;
   double neventsW4Jets  = 0;
   double neventsDYIncl  = 0;
+  double neventsDY0Jets = 0;
+  double neventsDY1Jets = 0;
+  double neventsDY2Jets = 0;
+  /*double neventsDYIncl  = 0;
   double neventsDY1Jets = 0;
   double neventsDY2Jets = 0;
   double neventsDY3Jets = 0;
-  double neventsDY4Jets = 0;
+  double neventsDY4Jets = 0;*/
   double neventsGluGluHIncl = 0;
   double neventsGluGluHBin104to105   = 0;
   double neventsGluGluHBin107to109   = 0; 
@@ -289,6 +298,17 @@ if (era == "2018"){
   }
   if (Sample.Contains("DYJets")){
      neventsDYIncl  = getNEventsProcessed(input_dir+"/"+process_map->at("DYJets")+".root");
+     neventsDY0Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY0Jets")+".root");
+     neventsDY1Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY1Jets")+".root");
+     neventsDY2Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY2Jets")+".root");
+     xsecDYIncl     = xsec_map->at(process_map->at("DYJets"));
+     xsecDY0Jets    = xsec_map->at(process_map->at("DY0Jets"));
+     xsecDY1Jets    = xsec_map->at(process_map->at("DY1Jets"));
+     xsecDY2Jets    = xsec_map->at(process_map->at("DY2Jets"));
+    
+
+  /*if (Sample.Contains("DYJets")){
+     neventsDYIncl  = getNEventsProcessed(input_dir+"/"+process_map->at("DYJets")+".root");
      neventsDY1Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY1Jets")+".root");
      neventsDY2Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY2Jets")+".root");
      neventsDY3Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY3Jets")+".root");
@@ -297,7 +317,7 @@ if (era == "2018"){
      xsecDY1Jets    = xsec_map->at(process_map->at("DY1Jets"));
      xsecDY2Jets    = xsec_map->at(process_map->at("DY2Jets"));
      xsecDY3Jets    = xsec_map->at(process_map->at("DY3Jets"));
-     xsecDY4Jets    = xsec_map->at(process_map->at("DY4Jets"));
+     xsecDY4Jets    = xsec_map->at(process_map->at("DY4Jets"));*/
   }/*
   else{
      neventsWIncl   = n_events_per_sample.at(process_map->at("WJets"));
@@ -672,12 +692,15 @@ if (era == "2018"){
 	  else if(gen_noutgoing== 3) xsec_lumi_weight = luminosity / ( neventsW3Jets/xsecW3Jets + neventsWIncl/xsecWIncl );
 	  else if(gen_noutgoing== 4) xsec_lumi_weight = luminosity / ( neventsW4Jets/xsecW4Jets + neventsWIncl/xsecWIncl );
 	  else                   xsec_lumi_weight = luminosity / ( neventsWIncl/xsecWIncl );
-	}
-	else if( subsample.Contains("DY") && subsample.Contains("JetsToLL_M-50") ){
-	  if(gen_noutgoing== 1)      xsec_lumi_weight = luminosity / ( neventsDY1Jets/xsecDY1Jets + neventsDYIncl/xsecDYIncl );
+	} //changed the DYJETS for amcatnlo
+	else if( subsample.Contains("DY") && subsample.Contains("amcatnlo") ){
+	  if(gen_noutgoing== 0)      xsec_lumi_weight = luminosity / ( neventsDY0Jets/xsecDY0Jets + neventsDYIncl/xsecDYIncl );
+	  else if(gen_noutgoing== 1) xsec_lumi_weight = luminosity / ( neventsDY1Jets/xsecDY1Jets + neventsDYIncl/xsecDYIncl );
+          else if(gen_noutgoing== 2) xsec_lumi_weight = luminosity / ( neventsDY2Jets/xsecDY2Jets + neventsDYIncl/xsecDYIncl );
+         /*if(gen_noutgoing== 1)      xsec_lumi_weight = luminosity / ( neventsDY1Jets/xsecDY1Jets + neventsDYIncl/xsecDYIncl );
 	  else if(gen_noutgoing== 2) xsec_lumi_weight = luminosity / ( neventsDY2Jets/xsecDY2Jets + neventsDYIncl/xsecDYIncl );
 	  else if(gen_noutgoing== 3) xsec_lumi_weight = luminosity / ( neventsDY3Jets/xsecDY3Jets + neventsDYIncl/xsecDYIncl );
-	  else if(gen_noutgoing== 4) xsec_lumi_weight = luminosity / ( neventsDY4Jets/xsecDY4Jets + neventsDYIncl/xsecDYIncl );
+	  //else if(gen_noutgoing== 4) xsec_lumi_weight = luminosity / ( neventsDY4Jets/xsecDY4Jets + neventsDYIncl/xsecDYIncl );*/
 	  else                   xsec_lumi_weight = luminosity / ( neventsDYIncl/xsecDYIncl );
 	}
    // Stitching for STXS binned signal samples

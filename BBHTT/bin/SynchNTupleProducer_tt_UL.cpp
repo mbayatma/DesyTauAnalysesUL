@@ -52,6 +52,33 @@ bool triggerMatching(AC1B * analysisTree, Float_t eta, Float_t phi, bool isFilte
    
    return trigMatch;
 }
+float getZPtEmbeddedWeight(const AC1B *analysisTree, TH2D * hist) {
+
+  std::vector<TLorentzVector> taus; taus.clear();
+  float emWeight = 1;
+  for (unsigned int igentau = 0; igentau < analysisTree->gentau_count; ++igentau) {
+    TLorentzVector tauLV; tauLV.SetXYZT(analysisTree->gentau_px[igentau], 
+					analysisTree->gentau_py[igentau],
+					analysisTree->gentau_pz[igentau],
+					analysisTree->gentau_e[igentau]);
+    if (analysisTree->gentau_isPrompt[igentau]&&analysisTree->gentau_isFirstCopy[igentau]) {
+      taus.push_back(tauLV);
+    }
+  }
+
+  //  std::cout << "n taus = " << taus.size() << std::endl;
+
+  if (taus.size() == 2) {
+    double mass = (taus[0]+taus[1]).M();
+    double pT = (taus[0]+taus[1]).Pt();
+    if (mass<1000.&&pT<1000.) {
+      emWeight = hist->GetBinContent(hist->FindBin(mass,pT));
+      //      std::cout << "M = " << mass << "  pT = " << pT << "  weight = " << emWeight << std::endl;
+    }
+  }
+  return emWeight; 
+}
+
 void CorrectPuppiMET(const AC1B * analysisTree, SynchTree * otree, double scale, double resolution);
 
 int main(int argc, char * argv[]){
@@ -147,6 +174,8 @@ int main(int argc, char * argv[]){
 
   //zptweight file 
   const string ZptweightFile = cfg.get<string>("ZptweightFile");
+  const string ZptNLOweightFile = cfg.get<string>("ZptNLOweightFile");
+  const string ZptEmbweightFile = cfg.get<string>("ZptEmbweightFile");
 
   //b-tag scale factors
   const string BTagAlgorithm = cfg.get<string>("BTagAlgorithm");
@@ -224,7 +253,8 @@ int main(int argc, char * argv[]){
   RooWorkspace * w_fakefactors = (RooWorkspace*)ff_file->Get("w");
 
   // MET Recoil Corrections
-  const bool isDY = (infiles.find("DY") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
+  const bool isDY = (infiles.find("DYJets") != string::npos) || (infiles.find("DY1Jets") != string::npos) || (infiles.find("DY2Jets") != string::npos) || (infiles.find("DY3Jets") != string::npos) || (infiles.find("DY4Jets") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
+  const bool isDYamcatnlo = (infiles.find("amcatnlo") != string::npos) && isDY;
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
   const bool isHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("WminusHTo")!= string::npos) || (infiles.find("WplusHTo")!= string::npos) || (infiles.find("ZHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos); 
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
@@ -419,7 +449,49 @@ int main(int argc, char * argv[]){
 
   // Zpt reweighting for LO DY samples 
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
+  if (f_zptweight==0 || f_zptweight->IsZombie()) {
+    std::cout << "File " << TString(cmsswBase) << "/src/" << ZptweightFile << " not found" << std::endl;
+    std::cout << "quitting.." << std::endl;
+    exit(-1);
+  }  
   TH2D *h_zptweight = (TH2D*)f_zptweight->Get("zptmass_histo");
+  if (h_zptweight==NULL) {
+    std::cout << "histogram zptmass_histo is absent in file " 
+	      << "File " << TString(cmsswBase) << "/src/" << ZptweightFile << std::endl;
+    std::cout << "quitting..." << std::endl;
+    exit(-1);
+  }
+
+  // Zpt reweighting for NLO DY samples
+  TFile *f_zptNLOweight = new TFile(TString(cmsswBase) + "/src/" + ZptNLOweightFile, "read");
+  if (f_zptNLOweight==0 || f_zptNLOweight->IsZombie()) {
+    std::cout << "file " << TString(cmsswBase) << "/src/" << ZptNLOweightFile << " not found" << std::endl;
+    std::cout << "quitting..." << std::endl;
+    exit(-1);
+  }
+
+  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO");
+  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_1btag");
+  TH2D * h_zptNLOweight_2btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_2btag");
+  if (h_zptNLOweight == NULL ||
+      h_zptNLOweight_1btag == NULL ||
+      h_zptNLOweight_2btag == NULL) {
+    std::cout << "File " << TString(cmsswBase) << "/src/" << ZptNLOweightFile 
+	      << " is empty. check content" << std::endl;
+    exit(-1);
+  }
+
+  // Zpt reweighting for embedded
+  TFile * f_zptweight_emb = new TFile(TString(cmsswBase) + "/src/" + ZptEmbweightFile, "read");
+
+  TString era_shift("2016");
+  if (era_int==2017) era_shift = "2017";
+  if (era_int==2018) era_shift = "2018";
+  TH2D * h_zptweight_emb = (TH2D*)f_zptweight_emb->Get("shifts_"+era_shift);
+  if (h_zptweight_emb==NULL) {
+    std::cout << "Problem opening file with embedded zpt weights" << std::endl;
+    exit(-1);
+  }
 
   const string mutau_fr_filename = cfg.get<string>("MuTauFRFileName");
   const string etau_fr_filename = cfg.get<string>("ETauFRFileName");
@@ -457,7 +529,7 @@ int main(int argc, char * argv[]){
     std::cout << "file " << TString(cmsswBase) << "/src/DesyTauAnalyses/Common/data/FF_closure.root does not exist" << std::endl;
     exit(-1);
   }
-  TH1F * histFF_Closure;
+  TH1F * histFF_Closure = NULL;
   if (Era.Contains("2016")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2016");
   if (Era.Contains("2017")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2017");
   if (Era.Contains("2018")) histFF_Closure = (TH1F*)fileFF_Closure.Get("pt2_closure_2018");
@@ -1078,6 +1150,11 @@ int main(int argc, char * argv[]){
       }
       otree->weight = otree->puweight * otree->mcweight;
 
+      otree->zptembweight = 1.0;
+      if (isEmbedded) {
+        otree->zptembweight = getZPtEmbeddedWeight(&analysisTree,h_zptweight_emb);
+      }
+
       // applying trigger/ID SFs       
       if ((!isData || isEmbedded) && ApplyLepSF) {
 
@@ -1368,18 +1445,18 @@ int main(int argc, char * argv[]){
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
       otree->zptweight = 1.;
-      if (!isData && isDY){
+      if (!isData && isDY && !isDYamcatnlo){
         genV = genTools::genV(analysisTree); // gen Z boson ?
       	float bosonMass = genV.M();
       	float bosonPt = genV.Pt();
-
+	
         //Merijn determine here some min and max values:
         double massxmin = h_zptweight->GetXaxis()->GetXmin();
         double massxmax = h_zptweight->GetXaxis()->GetXmax();
-
+	
         double ptxmin = h_zptweight->GetYaxis()->GetXmin();
         double ptxmax = h_zptweight->GetYaxis()->GetXmax();
-
+	
       	//Merijn 2019 6 13: adjust to T/M functions, to get boundaries right. Otherwise, for 2017 data we get few outliers that screw up the weight histogram dramatically.
       	Float_t zptmassweight = 1;
       	if (bosonMass > 50.0) {
@@ -1389,10 +1466,40 @@ int main(int argc, char * argv[]){
           if (bosonPtX < ptxmin)     bosonPtX = ptxmin + h_zptweight->GetYaxis()->GetBinWidth(1)*0.5;
           if (bosonPtX > ptxmax)     bosonPtX = ptxmax - h_zptweight->GetYaxis()->GetBinWidth(h_zptweight->GetYaxis()->GetNbins())*0.5;
           zptmassweight = h_zptweight->GetBinContent(h_zptweight->GetXaxis()->FindBin(bosonMassX), h_zptweight->GetYaxis()->FindBin(bosonPtX));
-          }	
-          otree->zptweight = zptmassweight;
+	}	
+	//	std::cout << "madgraph -> " << std::endl;
+	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
+	otree->zptweight = zptmassweight;
       }
-      otree->weight *= otree->zptweight;
+      if (!isData && isDY && isDYamcatnlo) {
+	genV = genTools::genV(analysisTree); // gen Z boson ?
+        float bosonMass = genV.M();
+        float bosonPt = genV.Pt();
+	TH2D * histZPt = h_zptNLOweight;
+	if (otree->nbtag==1) {
+	  histZPt = h_zptNLOweight_1btag;
+	}
+	if (otree->nbtag>=2) {
+	  histZPt = h_zptNLOweight_2btag;
+	}
+	int massBins = histZPt->GetNbinsY();
+	int ptBins = histZPt->GetNbinsX();
+	float MassMin = histZPt->GetYaxis()->GetBinLowEdge(1);
+	float MassMax = histZPt->GetYaxis()->GetBinLowEdge(massBins+1);
+	float ptMin = histZPt->GetXaxis()->GetBinLowEdge(1);
+	float ptMax = histZPt->GetXaxis()->GetBinLowEdge(ptBins+1);
+	float zptmassweight = 1;
+	if (bosonMass<MassMin) bosonMass = MassMin+0.5;
+	if (bosonMass>MassMax) bosonMass = MassMax-0.5;
+	if (bosonPt<ptMin) bosonPt = ptMin+0.5;
+	if (bosonPt>ptMax) bosonPt = ptMax-0.5;
+	zptmassweight = histZPt->GetBinContent(histZPt->FindBin(bosonPt,bosonMass));
+	//	std::cout << "amcatnlo -> " << std::endl;
+	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
+	otree->zptweight = zptmassweight;
+      }
+
+      //      otree->weight *= otree->zptweight;
       
       ////////////////////////////////////////////////////////////
       // Top pt weight

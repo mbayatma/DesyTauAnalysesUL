@@ -72,6 +72,8 @@ void ScaleFactors::computeSFs() {
     // id/iso/trk scale factors (UL)
     isoweight_1 = correctionWS->function("e_idiso_binned_ic_ratio")->getVal();
     isoweight_2 = correctionWS->function("m_idlooseiso_binned_ic_ratio")->getVal();
+    trkeffweight_1 = correctionWS->function("e_trk_ratio")->getVal();
+    trkeffweight_2 = correctionWS->function("m_trk_ratio")->getVal();
   }
   
 

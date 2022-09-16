@@ -32,21 +32,49 @@ elif [[ $CHANNEL == "tt" ]]; then
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016D 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016E 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_embedded.conf EmbeddedTauTau_Run2016F 4
+
+elif [[ $CHANNEL == "mm" ]]; then
+
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf SingleMuon_Run2016B 30
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf SingleMuon_Run2016C 30
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf SingleMuon_Run2016D 30
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf SingleMuon_Run2016E 30
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_data.conf SingleMuon_Run2016F 30
+
+fi
+
+if [[ $CHANNEL = "mm" ]];
+    # W+jets
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WJetsToLNu 20
+
+else
+    # W+jets
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WJetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W1JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W2JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W3JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W4JetsToLNu 20
+
+    # H->tautau
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf GluGluHToTauTau_M125_amcatnlo 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf GluGluHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf VBFHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WplusHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WminusHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf ZHToTauTau_M125 4
+
+    # H->tautau+b's
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_yb2_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_yt2_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_ybyt_M125 4
+
 fi
 
 # DY
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DYJetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DY1JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DY2JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DY3JetsToLL_M-50 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DY4JetsToLL_M-50 10
-
-# W+jets
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WJetsToLNu 20
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W1JetsToLNu 20
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W2JetsToLNu 20
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W3JetsToLNu 20
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf W4JetsToLNu 20
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DYJetsToLL_M-50_amcatnlo 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DYJetsToLL_0J_amcatnlo 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DYJetsToLL_1J_amcatnlo 10
+./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf DYJetsToLL_2J_amcatnlo 10
 
 # Exclusive VV
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WWTo2L2Nu 10
@@ -81,16 +109,4 @@ if [[ $CHANNEL == "em" ]]; then
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToWWTo2L2Nu_ybyt_M125 4
 fi
 
-# H->tautau
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf GluGluHToTauTau_M125_amcatnlo 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf GluGluHToTauTau_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf VBFHToTauTau_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WplusHToTauTau_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WminusHToTauTau_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf ZHToTauTau_M125 4
-
-# H->tautau+b's
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_yb2_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_yt2_M125 4
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf bbHToTauTau_ybyt_M125 4
 

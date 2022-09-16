@@ -8,11 +8,14 @@ else
     if [[ $CHANNEL == "tt" ]]; then
 	OUTDIR=./$YEAR
     else
-	echo "ERROR: please run the script with ./gridcontrol_setup_mt_Run2.sh <year={16_pre,16_post,17,18}> <channel={tt,em}>"
-	exit
+	if [[ $CHANNEL == "mm" ]]; then
+	    OUTDIR=./$YEAR
+	else
+	    echo "ERROR: please run the script with ./gridcontrol_setup_Run2.sh <year={16_pre,16_post,17,18}> <channel={tt,em,mm}>"
+	    exit
+	fi
     fi
 fi
-
 echo $OUTDIR
 
 if [ ! -d "$OUTDIR" ]; then

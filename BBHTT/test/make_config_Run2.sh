@@ -19,7 +19,7 @@ else
     echo
     echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
     echo
-    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
+    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={em,tt,mm}>"
     echo
     echo "year is not 16_pre,16_post, 17 or 18 - exiting"
     exit
@@ -44,7 +44,7 @@ else
     echo
     echo "To produce the scripts for a specific year and either data or MC this script is to be run with a command:"
     echo
-    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={mt,et}>"
+    echo "  ./make_config_Run2.sh <year={16_pre,16_post,17,18}> <data_type={data, MC, embedded}> <channel={em,tt,mm}>"
     echo
     echo "data_type is neither data nor MC - exiting"
     exit
@@ -54,6 +54,8 @@ fi
 if [[ $CHANNEL == "em" ]]; then
     OUTDIR=./20$YEAR
 elif [[ $CHANNEL == "tt" ]]; then
+    OUTDIR=./20$YEAR
+elif [[ $CHANNEL == "mm" ]]; then
     OUTDIR=./20$YEAR
 fi
 

@@ -1112,6 +1112,9 @@ int main(int argc, char * argv[]){
       otree->zptembweight = 1.0;
       if (isEmbedded) {
 	otree->zptembweight = getZPtEmbeddedWeight(&analysisTree,h_zptweight_emb);
+	otree->weight *= otree->zptembweight;
+	otree->weightSingle *= otree->zptembweight;
+	otree->weightEMu *= otree->zptembweight;
       }
 
       // PU weight

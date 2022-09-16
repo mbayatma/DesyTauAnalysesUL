@@ -1154,6 +1154,7 @@ int main(int argc, char * argv[]){
       if (isEmbedded) {
         otree->zptembweight = getZPtEmbeddedWeight(&analysisTree,h_zptweight_emb);
       }
+      otree->weight *= otree->zptembweight; 
 
       // applying trigger/ID SFs       
       if ((!isData || isEmbedded) && ApplyLepSF) {
@@ -1499,7 +1500,7 @@ int main(int argc, char * argv[]){
 	otree->zptweight = zptmassweight;
       }
 
-      //      otree->weight *= otree->zptweight;
+      otree->weight *= otree->zptweight;
       
       ////////////////////////////////////////////////////////////
       // Top pt weight

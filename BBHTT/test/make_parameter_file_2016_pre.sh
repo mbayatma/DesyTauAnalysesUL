@@ -43,7 +43,7 @@ elif [[ $CHANNEL == "mm" ]]; then
 
 fi
 
-if [[ $CHANNEL = "mm" ]];
+if [[ $CHANNEL = "mm" ]]; then 
     # W+jets
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_pre_MC.conf WJetsToLNu 20
 

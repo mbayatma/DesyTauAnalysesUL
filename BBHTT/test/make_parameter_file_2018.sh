@@ -5,10 +5,10 @@ echo "CONFIGFILE,FILELIST" > parameters.txt
 
 if [[ $CHANNEL == "em" ]]; then
     # data
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018A 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018B 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018C 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018D 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018A 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018B 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018C 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf MuonEG_Run2018D 20
 
     # Embedded
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018A 4
@@ -17,10 +17,10 @@ if [[ $CHANNEL == "em" ]]; then
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedElMu_Run2018D 4
 elif [[ $CHANNEL == "tt" ]]; then
 
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018A 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018B 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018C 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018D 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018A 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018B 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018C 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf Tau_Run2018D 20
 
     # Embedded
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_embedded.conf EmbeddedTauTau_Run2018A 4
@@ -30,26 +30,28 @@ elif [[ $CHANNEL == "tt" ]]; then
 
 elif [[ $CHANNEL == "mm" ]]; then
 
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018A 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018B 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018C 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018D 40
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018A 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018B 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018C 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_data.conf SingleMuon_Run2018D 20
 
 fi
     
 # DY
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-50_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_0J_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_1J_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_2J_amcatnlo 10
 
 # W+jets
 
 if [[ $CHANNEL == "mm" ]]; then
 
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WJetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-50_amcatnlo 10
 
 else 
+
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_M-50_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_0J_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_1J_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf DYJetsToLL_2J_amcatnlo 10
 
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf WJetsToLNu 20
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_18_MC.conf W1JetsToLNu 20

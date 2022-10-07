@@ -1,6 +1,6 @@
 #!/bin/sh
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc
-dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
+dirMC_2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
 dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/emb
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/mc
@@ -106,11 +106,10 @@ elif [[ $CHANNEL == "mm" ]]; then
     ls $dirData/SingleMuon-Run2018A-UL2018/*.root > $OUTDIR/SingleMuon_Run2018A
     ls $dirData/SingleMuon-Run2018B-UL2018/*.root > $OUTDIR/SingleMuon_Run2018B
     ls $dirData/SingleMuon-Run2018C-UL2018/*.root > $OUTDIR/SingleMuon_Run2018C
-
     ls $dirData/SingleMuon-Run2018D-UL2018/*0.root > $OUTDIR/SingleMuon_Run2018D
     for index in {1..9}
     do
-	ls $dirData/SingleMuon-Run2018D-UL2018/*${index}.root > $OUTDIR/SingleMuon_Run2018D
+	ls $dirData/SingleMuon-Run2018D-UL2018/*${index}.root >> $OUTDIR/SingleMuon_Run2018D
     done
     
 fi

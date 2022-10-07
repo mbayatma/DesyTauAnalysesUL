@@ -340,7 +340,6 @@ int main(int argc, char * argv[]) {
   float ZweightPtMin = histZMassPtWeights->GetXaxis()->GetBinLowEdge(1);
   float ZweightPtMax = histZMassPtWeights->GetXaxis()->GetBinLowEdge(nBinsZweightPt+1);
 
-
   // *****************************
   // ******** MET filters ********
   // *****************************
@@ -531,7 +530,12 @@ int main(int argc, char * argv[]) {
   
   TH1D * dimuonPtBSelH = new TH1D("dimuonPtBSelH","",100,0,1000);
   TH1D * dimuonEtaBSelH = new TH1D("dimuonEtaBSelH","",120,-6,6);
+
+  TH2D * dimuonMassPtBSelH = new TH2D("dimuonMassPtBSelH","",100,0,1000,100,0,1000);
+  TH2D * dimuonPtMassBSelH = new TH2D("dimuonPtMassBSelH","",100,0,1000,100,0,1000);
+
   
+
   // Z mass window --->
 
   TH1D * metZSelH  = new TH1D("metZSelH","",200,0,400);
@@ -2007,6 +2011,8 @@ int main(int argc, char * argv[]) {
 	    etaTrailingMuBSelH->Fill(analysisTree.muon_eta[indx2],weight);
 	    dimuonPtBSelH->Fill(dimuonPt,weight);
 	    dimuonEtaBSelH->Fill(dimuonEta,weight);
+	    dimuonPtMassBSelH->Fill(dimuonPt,massSel,weight);
+	    dimuonMassPtBSelH->Fill(massSel,dimuonPt,weight);
 	  }
 
 	  //	  std::cout << std::endl;

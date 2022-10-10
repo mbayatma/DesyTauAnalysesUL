@@ -31,21 +31,27 @@ elif [[ $CHANNEL == "tt" ]]; then
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_embedded.conf EmbeddedTauTau_Run2017F 4
 elif [[ $CHANNEL == "mm" ]]; then
 
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017B 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017C 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017D 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017E 40
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017F 40
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017B 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017C 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017D 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017E 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_data.conf SingleMuon_Run2017F 10
     
 fi 
 
 
-# W+jets
+# DY and W+jets
 if [[ $CHANNEL == "mm" ]]; then
 
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_M-50_amcatnlo 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
 
 else 
+
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_M-50_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_0J_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_1J_amcatnlo 10
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_2J_amcatnlo 10
 
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W1JetsToLNu 20
@@ -67,11 +73,6 @@ else
 
 fi
 
-# DY
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_M-50_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_0J_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_1J_amcatnlo 10
-./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_2J_amcatnlo 10
 
 # Exclusive VV
 ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WWTo2L2Nu 10

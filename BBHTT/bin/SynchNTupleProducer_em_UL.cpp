@@ -764,8 +764,11 @@ int main(int argc, char * argv[]){
 	_inittree->GetEntry(iEntry);
 	if (isData && !isEmbedded)
 	  nWeightedEventsH->Fill(0.,1.);
-	else
-	  nWeightedEventsH->Fill(0.,genweight);
+	else {
+	  double gen_weight = 1.0;
+	  if (genweight<0) gen_weight = -1.0;
+	  nWeightedEventsH->Fill(0.,gen_weight);
+	}
       }
     }
 
@@ -1130,10 +1133,16 @@ int main(int argc, char * argv[]){
       // generator weight
       otree->mcweight = 1.0;
       if(!isData || isEmbedded){
-        otree->mcweight = analysisTree.genweight;
+	otree->mcweight = 1.0;
+	if (analysisTree.genweight<0.) otree->mcweight = -1.0;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
-	if (isEmbedded&&otree->mcweight>1.0)
-	  otree->mcweight = 0.0;
+	if (isDYamcatnlo)
+	  otree->gen_noutgoing = analysisTree.genparticles_noutgoing_NLO;
+	if (isEmbedded) {
+	  otree->mcweight = analysisTree.genweight;
+	  if (otree->mcweight>1.0)
+	    otree->mcweight = 0.0;
+	}
 	otree->weight *= otree->mcweight;
 	otree->weightSingle *= otree->mcweight;
 	otree->weightEMu *= otree->mcweight;	

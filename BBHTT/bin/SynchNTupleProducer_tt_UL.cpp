@@ -789,10 +789,13 @@ int main(int argc, char * argv[]){
         for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {
             _inittree->GetEntry(iEntry);
             if (isData && !isEmbedded)
-                nWeightedEventsH->Fill(0.,1.);
-            else
-                nWeightedEventsH->Fill(0.,genweight);
-        }
+	      nWeightedEventsH->Fill(0.,1.);
+            else {
+	      double gen_weight = 1.0;
+	      if (genweight<0) gen_weight = -1.0;
+	      nWeightedEventsH->Fill(0.,gen_weight);
+	    }
+	}
     }
     delete _inittree;
 
@@ -1142,11 +1145,19 @@ int main(int argc, char * argv[]){
 
       if ((!isData || isEmbedded) && ApplyPUweight) 
         otree->puweight = float(PUofficial->get_PUweight(double(analysisTree.numtruepileupinteractions)));
+
       if(!isData || isEmbedded){
-        otree->mcweight = analysisTree.genweight;
+        otree->mcweight = 1.0;
+	if (analysisTree.genweight<0.0)
+	  otree->mcweight = -1.0;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
-	if (isEmbedded&&otree->mcweight>1.0)
-	  otree->mcweight = 0.0;
+	if (isDYamcatnlo)
+	  otree->gen_noutgoing = analysisTree.genparticles_noutgoing_NLO;
+	if (isEmbedded) {
+	  otree->mcweight = analysisTree.genweight;
+	  if (otree->mcweight>1.0)
+	    otree->mcweight = 0.0;
+	}
       }
       otree->weight = otree->puweight * otree->mcweight;
 

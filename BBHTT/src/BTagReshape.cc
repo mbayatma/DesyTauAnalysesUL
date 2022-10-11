@@ -3,8 +3,31 @@
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "CondFormats/BTauObjects/interface/BTagEntry.h"
 
-
 BTagReshape::BTagReshape(const std::string inputFileName) {
+  
+  isCSV = false;
+
+  TString fileName(inputFileName);
+
+  file = new TFile(fileName);
+
+  for (auto flavor : flavors) {
+    for (auto sysname : systematics) {
+      TString histName = flavor + "_" + sysname;
+      TH3D * histo = (TH3D*)file->Get(histName);
+      if (histo==NULL) {
+	std::cout << "histogram " << histo << " is not present in the BTagReshape file... quitting" << std::endl;
+	exit(-1);
+      }
+      map_histo[histName] = histo;
+    }
+  }
+
+  isHistogram = true;
+
+}
+
+void BTagReshape::SetCSV(const std::string inputFileName) {
   
   const std::string algo = "deepFlavour";
   const std::string measType = "iterativefit";
@@ -37,13 +60,41 @@ BTagReshape::BTagReshape(const std::string inputFileName) {
     }
   }
   std::cout << std::endl;
-
+  isCSV = true;
 }
 
 double BTagReshape::getWeight(double jetPt,
 			      double jetEta,
 			      double jetDiscr,
-			      int jetFlavor) const {
+			      int jetFlavor) {
+
+  int absFlavor = TMath::Abs(jetFlavor);
+  double absJetEta = TMath::Abs(jetEta);
+  double jetPtForBTag = jetPt;
+  if (jetPt>199.) jetPtForBTag = 199.;
+  TString histName = "light_central";
+  if (absFlavor==4)
+    histName = "c_central";
+  if (absFlavor==5)
+    histName = "b_central";
+
+  TH3D * hist = map_histo[histName];
+
+  double wgt = hist->GetBinContent(hist->FindBin(absJetEta,jetPtForBTag,jetDiscr));
+
+  return wgt;
+
+}
+
+double BTagReshape::getWeightCSV(double jetPt,
+				 double jetEta,
+				 double jetDiscr,
+				 int jetFlavor) const {
+
+  if (!isCSV) {
+    std::cout << "csv format is not available... returning weight 1..." << std::endl;
+    return 1.0;
+  }
 
   int absJetFlavor = TMath::Abs(jetFlavor);  
   double absJetEta = TMath::Abs(jetEta);
@@ -61,7 +112,8 @@ double BTagReshape::getWeight(double jetPt,
 }
 
 BTagReshape::~BTagReshape() {
-  delete reader;
+  if (isHistogram) delete file;
+  if (isCSV) delete reader;
 }
 
 

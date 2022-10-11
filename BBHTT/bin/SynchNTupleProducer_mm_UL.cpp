@@ -320,8 +320,8 @@ int main(int argc, char * argv[]) {
   // Z (mass,pt) reweighting
   const string zMassPtWeightsFileName   = cfg.get<string>("ZMassPtWeightsFileName");
   TString ZMassPtWeightsFileName(zMassPtWeightsFileName);
-  const string zMassPtWeightsHistName   = cfg.get<string>("ZMassPtWeightsHistName");
-  TString ZMassPtWeightsHistName(zMassPtWeightsHistName);
+  TString ZMassPtWeightsHistName(cfg.get<string>("ZMassPtWeightsHistName"));
+  TString ZMassPtWeightsBHistName(cfg.get<string>("ZMassPtWeightsBHistName"));
   // Z mass pt weights
   TFile * fileZMassPtWeights = new TFile(TString(cmsswBase)+"/src/"+ZMassPtWeightsFileName); 
   if (fileZMassPtWeights->IsZombie()) {
@@ -333,6 +333,12 @@ int main(int argc, char * argv[]) {
     std::cout << "histogram " << ZMassPtWeightsHistName << " is not found in file " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << std::endl;
     exit(-1);
   }
+  TH2D * histZMassPtWeightsB = (TH2D*)fileZMassPtWeights->Get(ZMassPtWeightsBHistName); 
+  if (histZMassPtWeightsB==NULL) {
+    std::cout << "histogram " << ZMassPtWeightsBHistName << " is not found in file " << TString(cmsswBase) << "/src/" << ZMassPtWeightsFileName << std::endl;
+    exit(-1);
+  }
+
   int nBinsZweightMass = histZMassPtWeights->GetNbinsY();
   int nBinsZweightPt   = histZMassPtWeights->GetNbinsX();
   float ZweightMassMin = histZMassPtWeights->GetYaxis()->GetBinLowEdge(1);
@@ -372,6 +378,13 @@ int main(int argc, char * argv[]) {
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
+
+  BTagReshape * btagReshape;
+
+  const string btagReshapeFile = cmsswBase + "/src/" + cfg.get<string>("BTagReshapeFileName");
+
+  if (!isData && applyBTagReshape)
+    btagReshape = new BTagReshape(btagReshapeFile);
 
   if (!isData && applyBTagScaling) {
     calib = BTagCalibration(btagAlgorithm, BtagSfFile);
@@ -1016,6 +1029,10 @@ int main(int argc, char * argv[]) {
     }
   }
 
+  // need for btag reshaping
+  TH1D * sumOfWeightsH  = new TH1D("sumOfWeightsH","",2,0.,2.);
+  TH1D * sumOfWeightsBTagH = new TH1D("sumOfWeightsBTagH","",2,0.,2.);
+
   // *****************************************
   // ******** end of histograms **************
   // *****************************************
@@ -1097,7 +1114,10 @@ int main(int argc, char * argv[]) {
       if (nEvents%10000==0) 
 	cout << "      processed " << nEvents << " events" << endl; 
 
-      float weight = 1;
+      float weight = 1.;
+      float dyweight = 1.;
+      float dyweightB = 1.;
+      float btagWeight = 1.; // btag reshaping weight
 
       //------------------------------------------------
 
@@ -1238,9 +1258,9 @@ int main(int argc, char * argv[]) {
 	  if (genZMass<ZweightMassMin) genZMass=ZweightMassMin+0.5;
 	  if (genZPt>ZweightPtMax) genZPt=ZweightPtMax-0.5;
 	  if (genZPt<ZweightPtMin) genZPt=ZweightPtMin+0.5; 
-	  float dyWeight = histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZPt,genZMass));
+	  dyweight = histZMassPtWeights->GetBinContent(histZMassPtWeights->FindBin(genZPt,genZMass));
 	  //	  std::cout << "ZPt = " << genZPt << "  Zmass = " << genZMass << "   dyweight = " << dyWeight << std::endl;
-	  weight *= dyWeight;
+	  dyweightB = histZMassPtWeightsB->GetBinContent(histZMassPtWeightsB->FindBin(genZPt,genZMass));
 	}
 	
 	/*
@@ -1642,6 +1662,7 @@ int main(int argc, char * argv[]) {
 	int indexSubLeadingBJet = -1;
 	float ptSubLeadingBJet = -1;
 	float scoreSubLeadingBJet = -1.1;
+
 	for (unsigned int jet=0; jet<analysisTree.pfjet_count; ++jet) {
 	  //	  std::cout << analysisTree.pfjet_jecUncertainty[jet] << std::endl;
 	  float scale = 1;
@@ -1723,6 +1744,7 @@ int main(int argc, char * argv[]) {
 
 	      //	      std::cout << "bdiscr = " << bdiscr << "   cut = " << btagCut << std::endl;
 	      
+
 	      bool tagged = bdiscr>btagCut;
 
 	      float JetPtForBTag = analysisTree.pfjet_pt[jet];
@@ -1731,8 +1753,13 @@ int main(int argc, char * argv[]) {
 	      if (JetPtForBTag<MinBJetPt) JetPtForBTag = MinBJetPt + 0.1;
 	      float jet_scalefactor = 1;
 	      float tageff = 1;
+	      int flavor = abs(analysisTree.pfjet_flavour[jet]);
+
+	      if (applyBTagReshape)
+		btagWeight *= btagReshape->getWeight(JetPtForBTag,absJetEta,bdiscr,flavor); 
+
+
 	      if (!isData && !isEmbedded && applyBTagScaling) {
-		int flavor = abs(analysisTree.pfjet_flavour[jet]);
 		if (flavor==5) { // b-quark
 		  jet_scalefactor = reader_B.eval_auto_bounds("central",BTagEntry::FLAV_B, absJetEta, JetPtForBTag);
 		  tageff = tagEff_B->GetBinContent(tagEff_B->FindBin(JetPtForBTag,absJetEta));
@@ -1795,6 +1822,15 @@ int main(int argc, char * argv[]) {
 	  }	  
 
 
+	}
+	// ******************************
+	// ***** Applying DY weight
+	// ******************************
+	if (isDY&&applyZMassPtReweighting) {
+	  if (nJets20BTagMedium>=1)
+	    weight *= dyweightB;
+	  else
+	    weight *= dyweight;
 	}
 
 	float mjj = -1;
@@ -1936,6 +1972,12 @@ int main(int argc, char * argv[]) {
 	  puppimet_ey = pfmetcorr_ey;
 	  
 	}
+	// *************************
+	// After all weights ->
+	// *************************
+	sumOfWeightsH->Fill(1.,weight);
+	sumOfWeightsBTagH->Fill(1.,weight*btagWeight);
+	weight *= btagWeight;
 
 	// selection on mass
 	if (massSel>dimuonMassCut) {
@@ -2003,6 +2045,7 @@ int main(int argc, char * argv[]) {
 	  dimuonEtaSelH->Fill(dimuonEta,weight);
 
 	  if (nJets20BTagMedium>=1) {
+
 	    massBSelH->Fill(massSel,weight);
 	    massExtendedBSelH->Fill(massSel,weight);
 	    ptLeadingMuBSelH->Fill(analysisTree.muon_pt[indx1],weight);

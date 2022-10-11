@@ -223,10 +223,10 @@ const map<TString, double> xsec_map_2018 = {
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
   {"W3JetsToLNu" , 1132.5}, // NNLO (4)
   {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-  {"DYJetsToLL_M-50_amcatnlo", 6435.0}, // NNLO (20)
-  {"DYJetsToLL_0J_amcatnlo"  , 5125.0}, //
-  {"DYJetsToLL_1J_amcatnlo"  , 951.4}, //
-  {"DYJetsToLL_2J_amcatnlo"  , 358.6},
+  {"DYJetsToLL_M-50_amcatnlo", 6077.2}, // NNLO
+  {"DYJetsToLL_0J_amcatnlo"  , 4840.0}, // NNLO
+  {"DYJetsToLL_1J_amcatnlo"  , 898.5},  // NNLO
+  {"DYJetsToLL_2J_amcatnlo"  , 338.7},  // NNLO
   {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
   {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
@@ -273,10 +273,10 @@ const map<TString, double> xsec_map_2017 = {
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
   {"W3JetsToLNu" , 1132.5}, // NNLO (4)
   {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-  {"DYJetsToLL_M-50_amcatnlo", 6435.0}, // NNLO (20)
-  {"DYJetsToLL_0J_amcatnlo"  , 5125.0}, //
-  {"DYJetsToLL_1J_amcatnlo"  , 951.4},  //
-  {"DYJetsToLL_2J_amcatnlo"  , 358.6},  //
+  {"DYJetsToLL_M-50_amcatnlo", 6077.2}, // NNLO
+  {"DYJetsToLL_0J_amcatnlo"  , 4840.0}, // NNLO
+  {"DYJetsToLL_1J_amcatnlo"  , 898.5},  // NNLO
+  {"DYJetsToLL_2J_amcatnlo"  , 338.7},  // NNLO
   {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
   {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
@@ -322,11 +322,11 @@ const map<TString, double> xsec_map_2016 = {
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
   {"W3JetsToLNu" , 1132.5}, // NNLO (4)
   {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-  {"DYJetsToLL_M-50_amcatnlo", 6435.0}, // NNLO (20)
-  {"DYJetsToLL_0J_amcatnlo"  , 5125.0}, //
-  {"DYJetsToLL_1J_amcatnlo"  , 951.4},  //
-  {"DYJetsToLL_2J_amcatnlo"  , 358.6},  //
-  {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
+  {"DYJetsToLL_M-50_amcatnlo", 6077.2}, // NNLO 
+  {"DYJetsToLL_0J_amcatnlo"  , 4840.0}, // NNLO
+  {"DYJetsToLL_1J_amcatnlo"  , 898.5},  // NNLO
+  {"DYJetsToLL_2J_amcatnlo"  , 338.7},  // NNLO
+  {"DYJetsToLL_M-50"       , 6077.22},  // NNLO
   {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
   {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
@@ -448,15 +448,10 @@ const map<TString , TString> process_map_2018 = {
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
-  { "DYJets_amcatnlo"  , "DYJetsToLL_M-50_amcatnlo"},
-  { "DY0Jets_amcatnlo" , "DYJetsToLL_0J_amcatnlo"},
-  { "DY1Jets_amcatnlo" , "DYJetsToLL_1J_amcatnlo"},
-  { "DY2Jets_amcatnlo" , "DYJetsToLL_2J_amcatnlo"},   
-  /*{ "DYJets"  , "DYJetsToLL_M-50"},
-  { "DY1Jets" , "DY1JetsToLL_M-50"},
-  { "DY2Jets" , "DY2JetsToLL_M-50"},
-  { "DY3Jets" , "DY3JetsToLL_M-50"},
-  { "DY4Jets" , "DY4JetsToLL_M-50"},*/
+  { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
+  { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
+  { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
+  { "DY2Jets" , "DYJetsToLL_2J_amcatnlo"}
 };
 
 const map<TString , TString> process_map_2017 = {
@@ -465,11 +460,10 @@ const map<TString , TString> process_map_2017 = {
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
-  { "DYJets"  , "DYJetsToLL_M-50"},
-  { "DY1Jets" , "DY1JetsToLL_M-50"},
-  { "DY2Jets" , "DY2JetsToLL_M-50"},
-  { "DY3Jets" , "DY3JetsToLL_M-50"},
-  { "DY4Jets" , "DY4JetsToLL_M-50"},
+  { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
+  { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
+  { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
+  { "DY2Jets" , "DYJetsToLL_2J_amcatnlo"}
 };
 
 const map<TString , TString> process_map_2016 = {
@@ -478,11 +472,18 @@ const map<TString , TString> process_map_2016 = {
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
-  { "DYJets"  , "DYJetsToLL_M-50"},
-  { "DY1Jets" , "DY1JetsToLL_M-50"},
-  { "DY2Jets" , "DY2JetsToLL_M-50"},
-  { "DY3Jets" , "DY3JetsToLL_M-50"},
-  { "DY4Jets" , "DY4JetsToLL_M-50"},
+  { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
+  { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
+  { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
+  { "DY2Jets" , "DYJetsToLL_2J_amcatnlo"}
+};
+
+std::map<TString,double> LUMI = {
+  {"2016",     36330},
+  {"2016_pre", 19520},
+  {"2016_post",16810},
+  {"2017",     41480},
+  {"2018",     59830}
 };
 
 double getNEventsProcessed(TString filename)

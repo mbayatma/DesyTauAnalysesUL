@@ -217,6 +217,7 @@ int main(int argc, char * argv[]){
     cout<<BtagSfFile<<" not found. Please check."<<endl;
     exit(-1);
   }
+  cout<<"using "<<BTagAlgorithm<<endl;
   
   // JER
   const string m_resolution_filename = cfg.get<string>("JERResolutionFileName");
@@ -521,12 +522,11 @@ int main(int argc, char * argv[]){
     std::cout << "quitting..." << std::endl;
     exit(-1);
   }
-  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO");
-  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_1btag");
-  TH2D * h_zptNLOweight_2btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_2btag");
+  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptNLOhist")));
+  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptBNLOhist")));
+  //  TH2D * h_zptNLOweight_2btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_2btag");
   if (h_zptNLOweight == NULL ||
-      h_zptNLOweight_1btag == NULL ||
-      h_zptNLOweight_2btag == NULL) {
+      h_zptNLOweight_1btag == NULL) {
     std::cout << "File " << TString(cmsswBase) << "/src/" << ZptNLOweightFile 
 	      << " is empty. check content" << std::endl;
     exit(-1);
@@ -1304,11 +1304,8 @@ int main(int argc, char * argv[]){
         float bosonMass = genV.M();
         float bosonPt = genV.Pt();
 	TH2D * histZPt = h_zptNLOweight;
-	if (otree->nbtag==1) {
+	if (otree->nbtag>=1) {
 	  histZPt = h_zptNLOweight_1btag;
-	}
-	if (otree->nbtag>=2) {
-	  histZPt = h_zptNLOweight_2btag;
 	}
 	int massBins = histZPt->GetNbinsY();
 	int ptBins = histZPt->GetNbinsX();

@@ -470,12 +470,10 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
 
-  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO");
-  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_1btag");
-  TH2D * h_zptNLOweight_2btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_2btag");
+  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptNLOhist")));
+  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptBNLOhist")));
   if (h_zptNLOweight == NULL ||
-      h_zptNLOweight_1btag == NULL ||
-      h_zptNLOweight_2btag == NULL) {
+      h_zptNLOweight_1btag == NULL) {
     std::cout << "File " << TString(cmsswBase) << "/src/" << ZptNLOweightFile 
 	      << " is empty. check content" << std::endl;
     exit(-1);
@@ -1483,18 +1481,14 @@ int main(int argc, char * argv[]){
 	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
 	otree->zptweight = zptmassweight;
       }
-      /*
-      if (!isData && isDY && isDYamcatnlo && otree->nbtag>=1) {
+      if (!isData && isDY && isDYamcatnlo) {
 	genV = genTools::genV(analysisTree); // gen Z boson ?
         float bosonMass = genV.M();
         float bosonPt = genV.Pt();
 	TH2D * histZPt = h_zptNLOweight;
-	//	if (otree->nbtag==1) {
-	//	  histZPt = h_zptNLOweight_1btag;
-	//	}
-	//	if (otree->nbtag>=2) {
-	//	  histZPt = h_zptNLOweight_2btag;
-	//	}
+	if (otree->nbtag>=1) {
+	  histZPt = h_zptNLOweight_1btag;
+	}
 	int massBins = histZPt->GetNbinsY();
 	int ptBins = histZPt->GetNbinsX();
 	float MassMin = histZPt->GetYaxis()->GetBinLowEdge(1);
@@ -1507,11 +1501,10 @@ int main(int argc, char * argv[]){
 	if (bosonPt<ptMin) bosonPt = ptMin+0.5;
 	if (bosonPt>ptMax) bosonPt = ptMax-0.5;
 	zptmassweight = histZPt->GetBinContent(histZPt->FindBin(bosonPt,bosonMass));
-	std::cout << "amcatnlo -> " << std::endl;
-	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
+	//	std::cout << "amcatnlo -> " << std::endl;
+	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
 	otree->zptweight = zptmassweight;
       }
-      */
       otree->weight *= otree->zptweight;
       
       ////////////////////////////////////////////////////////////

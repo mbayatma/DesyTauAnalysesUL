@@ -179,6 +179,20 @@ const vector<TString> BBHToTauTau =  {
    "bbHToTauTau_ybyt_M125"
 };
 
+const vector<TString> BBHToTauTau_YB2 =  {
+  "bbHToTauTau_yb2_M125"
+};
+
+const vector<TString> BBHToTauTau_YT2 =  {
+  "bbHToTauTau_yt2_M125"
+};
+
+const vector<TString> BBHToTauTau_YBYT =  {
+  "bbHToTauTau_ybyt_M125"
+};
+
+
+
 const vector<TString> VBFHToTauTau = { 
   "VBFHToTauTau_M125"
 };
@@ -359,9 +373,9 @@ const map<TString, double> xsec_map_2016 = {
   {"HWminusJ_HToWW_M125"      , 0.114},
   {"HWplusJ_HToWW_M125"       , 0.18},
   {"ZHJ_HToWW_M125"           , 0.163},
-  {"bbHToTauTau_yb2_M125", 0.0972},
-  {"bbHToTauTau_yt2_M125", 0.307},
-  {"bbHToTauTau_ybyt_M125", 0.0157},
+  {"bbHToTauTau_yb2_M125"     , 0.0972},
+  {"bbHToTauTau_yt2_M125"     , 0.307},
+  {"bbHToTauTau_ybyt_M125"    , 0.0157},
 };
 
 const map<TString, vector<TString> > map_sample = {
@@ -438,7 +452,22 @@ const map<TString, vector<TString> > map_sample = {
   {"BBHToTauTau_2018",BBHToTauTau},
   {"BBHToTauTau_2017",BBHToTauTau},
   {"BBHToTauTau_2016_pre",BBHToTauTau},
-  {"BBHToTauTau_2016_post",BBHToTauTau}
+  {"BBHToTauTau_2016_post",BBHToTauTau},
+
+  {"BBHToTauTau_YT2_2018",BBHToTauTau_YT2},
+  {"BBHToTauTau_YT2_2017",BBHToTauTau_YT2},
+  {"BBHToTauTau_YT2_2016_pre",BBHToTauTau_YT2},
+  {"BBHToTauTau_YT2_2016_post",BBHToTauTau_YT2},
+
+  {"BBHToTauTau_YB2_2018",BBHToTauTau_YB2},
+  {"BBHToTauTau_YB2_2017",BBHToTauTau_YB2},
+  {"BBHToTauTau_YB2_2016_pre",BBHToTauTau_YB2},
+  {"BBHToTauTau_YB2_2016_post",BBHToTauTau_YB2},
+
+  {"BBHToTauTau_YBYT_2018",BBHToTauTau_YBYT},
+  {"BBHToTauTau_YBYT_2017",BBHToTauTau_YBYT},
+  {"BBHToTauTau_YBYT_2016_pre",BBHToTauTau_YBYT},
+  {"BBHToTauTau_YBYT_2016_post",BBHToTauTau_YBYT},
 
 };
 

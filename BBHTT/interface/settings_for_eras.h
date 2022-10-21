@@ -140,6 +140,10 @@ const vector<TString> DYJets_amcatnlo = {
   "DYJetsToLL_2J_amcatnlo"
 };
 
+const vector<TString> DYJets_amcatnlo_incl = { 
+  "DYJetsToLL_M-50_amcatnlo"
+};
+
 const vector<TString> WJets = { 
   "W1JetsToLNu" ,
   "W2JetsToLNu" ,
@@ -279,7 +283,7 @@ const map<TString, double> xsec_map_2018 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
 
 };
 
@@ -331,7 +335,7 @@ const map<TString, double> xsec_map_2017 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
 };
 
 // 2016 (taken from AN-19-177)
@@ -382,7 +386,7 @@ const map<TString, double> xsec_map_2016 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
 };
 
 const map<TString, vector<TString> > map_sample = {
@@ -406,6 +410,11 @@ const map<TString, vector<TString> > map_sample = {
   {"EmbeddedTauTau_2016_pre", EmbeddedTauTau_2016_pre},
   {"EmbeddedTauTau_2016_post", EmbeddedTauTau_2016_post},
 
+  {"DYJets_incl_2018",DYJets_amcatnlo_incl},
+  {"DYJets_incl_2017",DYJets_amcatnlo_incl},
+  {"DYJets_incl_2016_pre",DYJets_amcatnlo_incl},
+  {"DYJets_incl_2016_post",DYJets_amcatnlo_incl},
+  
   {"DYJets_2018",DYJets},
   {"DYJets_2017",DYJets},
   {"DYJets_2016_pre",DYJets},

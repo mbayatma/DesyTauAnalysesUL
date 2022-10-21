@@ -134,6 +134,7 @@ const vector<TString> DYJets = {
 };
 
 const vector<TString> DYJets_amcatnlo = { 
+  "DYJetsToLL_M-50_amcatnlo",
   "DYJetsToLL_0J_amcatnlo",
   "DYJetsToLL_1J_amcatnlo",
   "DYJetsToLL_2J_amcatnlo"
@@ -274,9 +275,11 @@ const map<TString, double> xsec_map_2018 = {
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
-  {"bbHToTauTau_yb2_M125"     , 0.0972},
-  {"bbHToTauTau_yt2_M125", 0.307},
-  {"bbHToTauTau_ybyt_M125", 0.0157},
+  // from AN-21-090
+  // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
+  {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
+  {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
 
 };
 
@@ -324,9 +327,11 @@ const map<TString, double> xsec_map_2017 = {
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
-  {"bbHToTauTau_yb2_M125"     , 0.0972},
-  {"bbHToTauTau_yt2_M125"     , 0.307},
-  {"bbHToTauTau_ybyt_M125"    , 0.0157},
+  // from AN-21-090
+  // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
+  {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
+  {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
 };
 
 // 2016 (taken from AN-19-177)
@@ -373,9 +378,11 @@ const map<TString, double> xsec_map_2016 = {
   {"HWminusJ_HToWW_M125"      , 0.114},
   {"HWplusJ_HToWW_M125"       , 0.18},
   {"ZHJ_HToWW_M125"           , 0.163},
-  {"bbHToTauTau_yb2_M125"     , 0.0972},
-  {"bbHToTauTau_yt2_M125"     , 0.307},
-  {"bbHToTauTau_ybyt_M125"    , 0.0157},
+  // from Pascal (AN-2021-090)
+  // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
+  {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
+  {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
 };
 
 const map<TString, vector<TString> > map_sample = {

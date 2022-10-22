@@ -8,6 +8,22 @@
  <use name="DesyTauAnalyses/Common"/>
 </bin>
 
+<bin name="PlotEMu_dnn" file="Plot_emu_stitched.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotTauTau_dnn" file="Plot_tautau_stitched.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
 <bin name="PlotDatacards" file="PlotDatacards.cpp">
  <use name="rootgraphics"/>
  <use name="root"/>

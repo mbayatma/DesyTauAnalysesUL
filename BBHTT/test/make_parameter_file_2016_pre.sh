@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CHANNEL=em
+CHANNEL=$1
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
 

@@ -10,6 +10,8 @@
 
 #include <map>
 #include <string>
+#include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -32,7 +34,8 @@ map<TString, TString> xtitles = {
   {"bpt_2","trailing b-jet p_{T} [GeV]"},
   {"bcsv_1","b-tag discriminant 1"},
   {"bcsv_1","b-tag discriminant 2"},
-  {"dr_tt","#DeltaR(e,#mu)"}
+  {"dr_tt","#DeltaR(e,#mu)"},
+  {"pt_tt","p_{T}(#tau#tau) [GeV]"}
 };
 
 // triggerOption = 0 (e+mu), 1 (single-lep), 2 (comb)
@@ -42,6 +45,7 @@ int main(int argc, char * argv[]) {
   if (argc<6) {
     std::cout << "Code should be run with 5 arguments" << std::endl;
     std::cout << "PlotEMu [config_file] [var] [nbins] [xmin] [xmax]" << std::endl;
+    exit(-1);
   }
 
   Config cfg(argv[1]);
@@ -58,7 +62,6 @@ int main(int argc, char * argv[]) {
   float yLower = 0;
 
   bool embedded = cfg.get<bool>("Embedded");
-  bool isUL = cfg.get<bool>("isUL");
   string era_string = cfg.get<string>("Era");
   TString era(era_string);
   string input_dir = cfg.get<string>("InputDir");
@@ -66,13 +69,13 @@ int main(int argc, char * argv[]) {
   string output_dir = cfg.get<string>("OutputDir");
   TString outputGraphics(output_dir);
     
-  SetStyle();
+  std::cout << std::endl;
+  std::cout << "dir    = " << dir << std::endl;
+  std::cout << std::endl;
+  std::cout << "output = " << outputGraphics << std::endl;
+  std::cout << std::endl;
 
-  std::map<TString,double> xsecs = xsecs_2016;
-  if (era=="2017")
-    xsecs = xsecs_2017;
-  if (era=="2018")
-    xsecs = xsecs_2018;
+  SetStyle();
 
   // ****************************************
   // ****** Variable to plot ****************
@@ -89,11 +92,10 @@ int main(int argc, char * argv[]) {
   bool logY = cfg.get<bool>("logY");
   bool logX = cfg.get<bool>("logX");
   string additional_cut = cfg.get<string>("AdditionalCut");
-  bool inclusiveDY = cfg.get<bool>("InclusiveDY");
   TString AdditionalCut(additional_cut);
   bool isBTag = cfg.get<bool>("ApplyBTagQCDScale");
+  bool isDYamcatnlo = cfg.get<bool>("IsDYamcatnlo");
   TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.");
-  Selection += "&&weightEMu<100."; // protection against large weights
   Selection += AdditionalCut; // additional cut, for example nbtag>=1
   string SelSuffix = cfg.get<string>("FileSuffix");
   TString sel_suffix(SelSuffix);
@@ -101,6 +103,8 @@ int main(int argc, char * argv[]) {
   std::map<TString,double> scaleQCD_btag = 
     {
       {"2016",0.71},
+      {"2016_pre",0.71},
+      {"2016_post",0.71},
       {"2017",0.69},
       {"2018",0.67},
     };
@@ -111,11 +115,20 @@ int main(int argc, char * argv[]) {
   if (embedded) suffix = "embedded";
 
   // ******** end of settings *********
+
   //  std::cout << dir << std::endl;
 
-  lumi_13TeV = LUMI_label["era"];
+  lumi_13TeV = "2018, 59.8 fb^{-1}";
+  if (era=="2017")
+    lumi_13TeV = "2017, 41.5 fb^{-1}";
+  if (era=="2016")
+    lumi_13TeV = "2016, 36.3 fb^{-1}";
+  if (era=="2016_pre")
+    lumi_13TeV = "2016 preVFP, 19.5 fb^{-1}";
+  if (era=="2016_post")
+    lumi_13TeV = "2016 postVFP, 16.8 fb^{-1}";
 
-  TString Weight("weightEMu*");
+  TString Weight("xsec_lumi_weight*");
   TString QCDW("qcdweight*");
   TString WeightQCD = Weight + QCDW;
 
@@ -143,35 +156,21 @@ int main(int argc, char * argv[]) {
   TH1::SetDefaultSumw2();
   TH2::SetDefaultSumw2();
 
-  std::vector<TString> MuonEG = MuonEG_2018;
-  std::vector<TString> EmbedSamples = EmbeddedElMu_2018;
-  std::vector<TString> DYSamples = DYJets_amcatnlo;
-  if (inclusiveDY) DYSamples = DYJets_amcatnlo_incl;
-  std::vector<TString> WJetsSamples = WJets;
-  std::vector<TString> EWKSamples = EWK;
-  std::vector<TString> TTSamples = TT;
-  std::vector<TString> HiggsSamples = H125;
+  TString dnn_prefix("em-NOMINAL_ntuple_");
 
-  if (era=="2017") {
-    MuonEG = MuonEG_2017;
-    EmbedSamples = EmbeddedElMu_2017;
-  }
-  if (era=="2016") {
-    MuonEG = MuonEG_2016;
-    EmbedSamples = EmbeddedElMu_2016;
-  }
-  if (era=="2016_pre") {
-    MuonEG = MuonEG_2016_pre;
-    EmbedSamples = EmbeddedElMu_2016_pre;
-  }
-  if (era=="2016_post") {
-    MuonEG = MuonEG_2016_post;
-    EmbedSamples = EmbeddedElMu_2016_post;
-  }
+  std::vector<TString> MuonEG = {"MuonEG"};
+  std::vector<TString> EmbedSamples = {"EmbeddedElMu"};
+  std::vector<TString> DYSamples = {"DYJets"};
+  std::vector<TString> WJetsSamples = {"WJets"};
+  std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
+  std::vector<TString> TTSamples = {"TTbar"};
+  std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau"};
 
   struct SampleAttributes {
     TString name;
     std::vector<TString> sampleNames;
+    TString Weight;
+    TString WeightQCD;
     TString cuts;
     TString cutsSS;
     TH1D * hist;
@@ -205,6 +204,8 @@ int main(int argc, char * argv[]) {
   // data
   SampleAttributes DataEMuAttr;
   DataEMuAttr.name = "Data_EMu";
+  DataEMuAttr.Weight = "1.0*";
+  DataEMuAttr.WeightQCD = "qcdweight*";
   DataEMuAttr.sampleNames = MuonEG;
   DataEMuAttr.cuts = CutsDataEMu_OS;
   DataEMuAttr.cutsSS = CutsDataEMu_SS;
@@ -216,6 +217,8 @@ int main(int argc, char * argv[]) {
   ZttAttr.name = "ZTT";
   if (embedded) {
     ZttAttr.name = "EmbeddedZTT";
+    ZttAttr.Weight = Weight;
+    ZttAttr.WeightQCD = WeightQCD;
     ZttAttr.sampleNames = EmbedSamples;
     ZttAttr.cuts = CutsOS;
     ZttAttr.cutsSS = CutsSS;
@@ -223,6 +226,8 @@ int main(int argc, char * argv[]) {
   else {
     ZttAttr.name = "ZTT";
     ZttAttr.sampleNames = DYSamples;
+    ZttAttr.Weight = Weight;
+    ZttAttr.WeightQCD = WeightQCD;
     ZttAttr.cuts = CutsZTT_OS;
     ZttAttr.cutsSS = CutsZTT_SS;
   }
@@ -233,6 +238,8 @@ int main(int argc, char * argv[]) {
   SampleAttributes ZllAttr;
   ZllAttr.name = "ZLL";
   ZllAttr.sampleNames = DYSamples;
+  ZllAttr.Weight = Weight;
+  ZllAttr.WeightQCD = WeightQCD;
   ZllAttr.cuts = CutsZLL_OS;
   ZllAttr.cutsSS = CutsZLL_SS;
   ZllAttr.hist = zllH;
@@ -242,6 +249,8 @@ int main(int argc, char * argv[]) {
   SampleAttributes HiggsAttr;
   HiggsAttr.sampleNames = HiggsSamples;
   HiggsAttr.cuts = CutsOS;
+  HiggsAttr.Weight = Weight;
+  HiggsAttr.WeightQCD = WeightQCD;
   HiggsAttr.cutsSS = CutsSS;
   HiggsAttr.hist = higgsH;
   HiggsAttr.histSS = higgsSSH;
@@ -249,7 +258,9 @@ int main(int argc, char * argv[]) {
   // WJets
   SampleAttributes WJetsAttr;
   WJetsAttr.name = "WJets";
-  WJetsAttr.sampleNames = WJetsSamples;
+  WJetsAttr.sampleNames = WJetsSamples; 
+  WJetsAttr.Weight = Weight;
+  WJetsAttr.WeightQCD = WeightQCD;
   WJetsAttr.cuts = CutsOS;
   WJetsAttr.cutsSS = CutsSS;
   WJetsAttr.hist = wH;
@@ -267,7 +278,8 @@ int main(int argc, char * argv[]) {
     EWKAttr.cuts = CutsOS;
     EWKAttr.cutsSS = CutsSS;
   }
-
+  EWKAttr.Weight = Weight;
+  EWKAttr.WeightQCD = WeightQCD;
   EWKAttr.hist = ewkH;
   EWKAttr.histSS = ewkSSH;
 
@@ -275,15 +287,10 @@ int main(int argc, char * argv[]) {
   SampleAttributes TTAttr = EWKAttr;
   TTAttr.name = "TTBar";
   TTAttr.sampleNames = TTSamples;
+  TTAttr.Weight = Weight;
+  TTAttr.WeightQCD = WeightQCD;
   TTAttr.hist = ttH;
   TTAttr.histSS = ttSSH;  
-
-  // TTBarSys
-  SampleAttributes TTSysAttr = TTAttr;
-  TTSysAttr.name = "TTBarSys";
-  TTSysAttr.sampleNames = TTSamples;
-  TTSysAttr.hist = ttSysH;
-  TTSysAttr.histSS = ttSysSSH;  
 
   std::vector<SampleAttributes> AllSamples;  
   AllSamples.push_back(ZttAttr);
@@ -291,7 +298,6 @@ int main(int argc, char * argv[]) {
   AllSamples.push_back(WJetsAttr);
   AllSamples.push_back(EWKAttr);
   AllSamples.push_back(TTAttr);
-  AllSamples.push_back(HiggsAttr);
   AllSamples.push_back(DataEMuAttr);
   
   //  Weight = "puweight*mcweight*prefiringweight*zptweight*effweightEMu*";
@@ -306,12 +312,11 @@ int main(int argc, char * argv[]) {
     SampleAttributes sampleAttr = AllSamples.at(i);
     TString name = sampleAttr.name; 
     std::vector<TString> Samples = sampleAttr.sampleNames;
-    TString WeightSample = Weight;
-    TString WeightSampleQCD = WeightQCD;
+    TString WeightSample = sampleAttr.Weight;
+    TString WeightSampleQCD = sampleAttr.WeightQCD;
     for (unsigned int j=0; j<Samples.size(); ++j) {
       TString sampleName = Samples.at(j);
-      //      TFile * file = new TFile(dir+"/"+sampleName+"_"+era+".root");
-      TFile * file = new TFile(dir+"/"+sampleName+".root");
+      TFile * file = new TFile(dir+"/"+dnn_prefix+sampleName+"_"+era+".root");
       if (file==0||file->IsZombie()) {
 	std::cout << "file " << dir << "/" << sampleName << ".root does not exist" << std::endl;
 	std::cout << "quitting..." << std::endl;
@@ -321,33 +326,33 @@ int main(int argc, char * argv[]) {
       //      std::cout << "Processing sample : " 
       //		<< sampleName << "  number of entries in tree : " 
       //		<< tree->GetEntries() << std::endl;      
-      TH1D * histWeightsH = (TH1D*)file->Get("nWeightedEvents");
+      //      TH1D * histWeightsH = (TH1D*)file->Get("nWeightedEvents");
       TString histName = sampleName + "_os";
       TString histNameSS = sampleName + "_ss";
       TH1D * histSample = new TH1D(histName,"",nBins,xmin,xmax);
       TH1D * histSampleSS = new TH1D(histNameSS,"",nBins,xmin,xmax);
       histSample->Sumw2();
       histSampleSS->Sumw2();
-      TString CutsSample = sampleAttr.cuts + SpecificCut(era,sampleName);
-      TString CutsSampleSS = sampleAttr.cutsSS + SpecificCut(era,sampleName);
+      TString CutsSample = sampleAttr.cuts;// + SpecificCut(era,sampleName);
+      TString CutsSampleSS = sampleAttr.cutsSS;// + SpecificCut(era,sampleName);
       tree->Draw(Variable+">>"+histName,WeightSample+"("+CutsSample+")");
       tree->Draw(Variable+">>"+histNameSS,WeightSampleQCD+"("+CutsSampleSS+")");
-      double norm = 1.0;
-      double nevents = 1.0;
-      double xsec = 1.0;
-      if (name.Contains("Data")||name.Contains("Embed")) {
-	norm = 1.;
-      }
-      else { 
-	xsec = xsecs[sampleName];
-	nevents = histWeightsH->GetSumOfWeights();
-	norm = xsec*lumi/nevents;
-      }
-      double yield = norm*histSample->GetSumOfWeights();
-      //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield =" << norm*histSample->GetSumOfWeights() << std::endl;
-      std::cout << "   " << sampleName << "   yield = " << yield << std::endl;
-      sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
-      sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,norm);
+      //      double norm = 1.0;
+      //      double nevents = 1.0;
+      //      double xsec = 1.0;
+      //      if (name.Contains("Data")||name.Contains("Embed")) {
+      //	norm = 1.;
+      //	nevents = histWeightsH->GetSumOfWeights();
+      //      }
+      //      else { 
+      //	xsec = xsecs[sampleName];
+      //	nevents = histWeightsH->GetSumOfWeights();
+      //	norm = xsec*lumi/nevents;
+      //      }
+      double yield = histSample->GetSumOfWeights();
+      std::cout << setw(30) << sampleName << " : " << setw(6) << int(yield) << std::endl;
+      sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,1.);
+      sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,1.);
       //      delete file;
       //      delete histSample;
       //      delete histSampleSS;
@@ -577,10 +582,10 @@ int main(int argc, char * argv[]) {
       chi2 += diff2/(xMC+eMC*eMC);
     }
   }
+  std::cout << std::endl;
   double ndof = nBins - 1;
   double prob = TMath::Prob(chi2,ndof);
-  std::cout << std::endl;
-  std::cout << "Chi2/ndof = " << chi2 << "/" << ndof << " -> p-value = " << prob << std::endl;
+  std::cout << "Chi2/ndof = " << chi2 << "/" << ndof << "  p-value = " << prob << std::endl;
   std::cout << std::endl;
 
   TLegend * leg;
@@ -694,7 +699,9 @@ int main(int argc, char * argv[]) {
   canv1->SetSelected(canv1);
   canv1->Update();
   TString suffixLOGY("");
+  TString suffixDY("");
+  if (isDYamcatnlo) suffixDY = "_DYamcatnlo";
   if (logY) suffixLOGY = "_logY";
-  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+suffix+"_"+sel_suffix+suffixLOGY+".png");
+  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+suffix+"_"+sel_suffix+suffixDY+suffixLOGY+".png");
 
 }

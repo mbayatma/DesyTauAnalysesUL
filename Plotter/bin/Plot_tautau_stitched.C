@@ -7,6 +7,8 @@
 #include "TString.h"
 #include "TTree.h"
 #include "TH1.h"
+#include <iostream>
+#include <iomanip>
 
 struct SampleAttributes {
   TString name;
@@ -55,7 +57,7 @@ using namespace std;
 map<TString, TString> xtitles = {
   {"pzeta","D_{#zeta} [GeV]"},
   {"pt_1","leading #tau p_{T} [GeV]"},
-  {"pt_2","trailing #tau [GeV]"},
+  {"pt_2","trailing #tau p_{T} [GeV]"},
   {"eta_1","leading #tau #eta"},
   {"eta_2","trailing #tau #eta"},
   {"nbtag","N_{btag}"},
@@ -71,11 +73,13 @@ map<TString, TString> xtitles = {
   {"bpt_2","trailing b-jet p_{T} [GeV]"},
   {"bcsv_1","b-tag discriminant 1"},
   {"bcsv_1","b-tag discriminant 2"},
-  {"dr_tt","#DeltaR(#tau_1,#tau_2)"},
-  {"puppimetcov00","Cov(0,0) [GeV^{2}]"},
-  {"puppimetcov01","Cov(0,1) [GeV^{2}]"}
+  {"dr_tt","#DeltaR(#tau_{1},#tau_{2})"},
+  {"pt_tt","p_{T}(#tau#tau) [GeV]"}
 };
 int main(int argc, char * argv[]) { 
+
+  TH1::SetDefaultSumw2(true);
+  TH2::SetDefaultSumw2(true);
 
   if (argc<6) {
     std::cout << "Code should be run with 5 arguments" << std::endl;
@@ -94,37 +98,14 @@ int main(int argc, char * argv[]) {
   float xmin = atof(argv[4]);
   float xmax = atof(argv[5]);
 
-  bool embedded = cfg.get<bool>("Embedded");
   string era_string = cfg.get<string>("Era");
   TString era(era_string);
   string input_dir = cfg.get<string>("InputDir");
   TString dir(input_dir);
   string output_dir = cfg.get<string>("OutputDir");
   TString outputGraphics(output_dir);
-
-  bool computeZttNorm = false;
-  double xmin_mass = 50.;
-  double xmax_mass = 80.;
-
-  if (Variable=="m_sv"||Variable=="m_vis") {
-    computeZttNorm = true;
-    if (Variable=="m_vis") {
-      xmin_mass = 50.;
-      xmax_mass = 80.;
-    }
-    else if (Variable=="m_sv") {
-      xmin_mass = 70.;
-      xmax_mass = 100.;
-    }
-  }
-
+    
   SetStyle();
-
-  std::map<TString,double> xsecs = xsecs_2016;
-  if (era=="2017")
-    xsecs = xsecs_2017;
-  if (era=="2018")
-    xsecs = xsecs_2018;
 
   float yLower =                10;
   float scaleYUpper =           10;
@@ -138,55 +119,24 @@ int main(int argc, char * argv[]) {
   bool logX = cfg.get<bool>("logX");
   string additional_cut = cfg.get<string>("AdditionalCut");
   TString AdditionalCut(additional_cut);
-  string ffcorr = cfg.get<string>("FFcorrection");
-  TString FFcorr(ffcorr);
-  float dyNorm = cfg.get<float>("DYnorm");
-  bool inclusiveDY = cfg.get<bool>("InclusiveDY");
-  bool DY_LO = cfg.get<bool>("DY_LO");
-
-  bool dropZPtWeight = cfg.get<bool>("DropZPtWeight");
-  bool dropTrigWeight = cfg.get<bool>("DropTrigWeight");
-  bool dropIdWeight = cfg.get<bool>("DropIdWeight");
-  bool dropEffWeight = cfg.get<bool>("DropEffWeight");
-
   string FileSuffix = cfg.get<string>("FileSuffix");
   TString sel_suffix(FileSuffix);
-
-  // OS cut is not applied (it is a part of additional cut)
-  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1");
+  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1");
 
   Selection += AdditionalCut;
 
-  TString suffix = "mc";
-  if (embedded) suffix = "embedded";
+  lumi_13TeV = "2018, 59.8 fb^{-1}";
+  if (era=="2017")
+    lumi_13TeV = "2017, 41.5 fb^{-1}";
+  if (era=="2016")
+    lumi_13TeV = "2016, 36.3 fb^{-1}";
+  if (era=="2016_pre")
+    lumi_13TeV = "2016 preVFP, 19.5 fb^{-1}";
+  if (era=="2016_post")
+    lumi_13TeV = "2016 postVFP, 16.8 fb^{-1}";
 
-  lumi_13TeV = LUMI_label[era];
-
-  TString Weight("weight*");
-  TString FFbasicWeight("ff_nom*");
-  
-  TString FFWeight = FFbasicWeight + FFcorr + "*";
-
-  /*
-  TString FF_pt2_2016("1.05*(1.0*(pt_2<=120.)+0.80*(pt_2>120.))*");
-  TString FF_pt2_2017("1.06*(1.0*(pt_2<=80.)+0.90*(pt_2>80.))*");
-  TString FF_pt2_2018("1.06*(1.0*(pt_2<=80.)+0.85*(pt_2>80.&&pt_2<=95.)+0.6*(pt_2>95.))*");
-
-  TString FF_btg_2016("(1.0*(nbtag==0)+0.93*(nbtag==1)+1.00*(nbtag>=2))*");
-  TString FF_btg_2017("(1.0*(nbtag<=1)+0.60*(nbtag==2)+0.50*(nbtag>=3))*");
-  TString FF_btg_2018("(1.0*(nbtag==0)+0.93*(nbtag==1)+0.52*(nbtag>=2))*");
-  */
-
-  /*
-  if (embedded) {
-    if (era=="2016")
-      FFWeight += FF_pt2_2016+FF_btg_2016;
-    if (era=="2017")
-      FFWeight += FF_pt2_2017+FF_btg_2017;    
-    if (era=="2018")
-      FFWeight += FF_pt2_2018+FF_btg_2018;    
-  }
-  */  
+  TString Weight("xsec_lumi_weight*");
+  TString FFWeight("ff_total*");
 
   TString WeightQCD = Weight + FFWeight;
   
@@ -209,41 +159,18 @@ int main(int argc, char * argv[]) {
   TString genCutsSingleFake = CutsSR + mcCutsSingleFake;
   TString genCutsSingleFake_L = CutsSR + mcCutsSingleFake + mcCutsNotTauTau;
 
-  double lumi = LUMI[era];
+  std::vector<TString> DataSamples = {"Tau"};
+  std::vector<TString> DYSamples = {"DYJets_amcatnlo"};
+  std::vector<TString> WJetsSamples = {"WJets"};
+  std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
+  std::vector<TString> TTSamples = {"TTbar"};
+  std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau"};
+  std::vector<TString> bbHSamples = {"BBHToTauTau_YT2","BBHToTauTau_YB2","BBHToTauTau_YBYT"};
 
-  std::vector<TString> DataSamples = Tau_2018;
-  std::vector<TString> EmbedSamples = EmbeddedTauTau_2018;
-  std::vector<TString> DYSamples = DYJets_amcatnlo;
-  if (inclusiveDY) DYSamples = DYJets_amcatnlo_incl;
-  if (DY_LO) DYSamples = DYJets;
-  std::vector<TString> WJetsSamples = WJets;
-  std::vector<TString> EWKSamples = EWK;
-  std::vector<TString> TTSamples = TT;
-  //  std::vector<TString> bbHSamples = bbH125;
-
-  if (era=="2017") {
-    DataSamples = Tau_2017;
-    EmbedSamples = EmbeddedTauTau_2017;
-  }
-  if (era=="2016") {
-    DataSamples = Tau_2016;
-    EmbedSamples = EmbeddedTauTau_2016;
-  }
-  if (era=="2016_pre") {
-    DataSamples = Tau_2016_pre;
-    EmbedSamples = EmbeddedTauTau_2016_pre;
-  }
-  if (era=="2016_post") {
-    DataSamples = Tau_2016_post;
-    EmbedSamples = EmbeddedTauTau_2016_post;
-  }
-
-  //  std::vector<TString> names = {"Data","EMB","VVL","TTL","W","ZTT","ZL","VVT","TTT"};
-  std::vector<TString> names = {"Data","VVL","TTL","W","ZTT","ZL","VVT","TTT"};
-
+  std::vector<TString> names = {"Data","VVL","TTL","W","ZTT","ZL","VVT","TTT","Higgs","bbH"};
+  
   std::map<TString, std::vector<TString>> nameSamples = {
     {"Data",DataSamples},
-    //    {"EMB",DYSamples},
     {"VVL",EWKSamples},
     {"TTL",TTSamples},
     {"W",WJetsSamples},
@@ -251,48 +178,35 @@ int main(int argc, char * argv[]) {
     {"ZL",DYSamples},
     {"VVT",EWKSamples},
     {"TTT",TTSamples},
+    {"Higgs",HiggsSamples},
+    {"bbH",bbHSamples}
   };
-
+  
   std::map<TString, std::vector<TString> > nameCuts = {
-    {"Data",{CutsSR,      CutsSB,     CutsSR}},
-    //    {"EMB", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"VVL", {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"TTL", {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"W",   {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"ZTT", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"ZL",  {genCutsSR_L, genCutsSB_L,genCutsSingleFake_L}},
-    {"VVT", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"TTT", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"Data",  {CutsSR,      CutsSB,     CutsSR}},
+    {"VVL",   {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"TTL",   {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"W",     {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"ZTT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"ZL",    {genCutsSR_L, genCutsSB_L,genCutsSingleFake_L}},
+    {"VVT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"TTT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"Higgs", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"bbH",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}}
   };
 
   std::map<TString, SampleAttributes> nameAttributes;
   for (auto name : names) {
     std::vector<TString> nSamples = nameSamples[name];
     std::vector<TString> nCuts = nameCuts[name];
-    TString WeightSample = Weight;
-    TString WeightSampleQCD = WeightQCD;
-    if (name=="ZTT") {
-      if (dropZPtWeight) {
-	WeightSample = "(weight/zptweight)*";
-	WeightSampleQCD = "((weight*ff_nom)/zptweight)*";
-      }
-      if (dropTrigWeight) {
-	WeightSample = "(weight/trigweight)*";
-        WeightSampleQCD = "((weight*ff_nom)/trigweight)*";
-      }
-      if (dropIdWeight) {
-	WeightSample = "(weight/trigweight)*";
-        WeightSampleQCD = "((weight*ff_nom)/idisoweight_1*idisoweight_2)*";
-      }
-    }
     SampleAttributes attr = CreateSampleAttributes(name,
 						   nSamples,
 						   nCuts[0],
 						   nCuts[1],
 						   nCuts[2],
-						   WeightSample,
-						   WeightSampleQCD,
-						   WeightSample,
+						   Weight,
+						   WeightQCD,
+						   Weight,
 						   nbins,
 						   xmin,
 						   xmax);
@@ -314,7 +228,7 @@ int main(int argc, char * argv[]) {
 
       TString sampleName = Samples.at(j);
 
-      TFile * file = new TFile(dir+"/"+sampleName+".root");
+      TFile * file = new TFile(dir+"/tt-NOMINAL_ntuple_"+sampleName+"_"+era+".root");
       if (file==0||file->IsZombie()) {
 	std::cout << "file " << dir << "/" << sampleName << ".root does not exist" << std::endl;
 	std::cout << "quitting..." << std::endl;
@@ -327,35 +241,18 @@ int main(int argc, char * argv[]) {
       TH1D * histSampleSB = new TH1D("histSB","",nbins,xmin,xmax);
       TH1D * histSampleSingleFake = new TH1D("histSingleFake","",nbins,xmin,xmax);
 
-      TString CutsSample   = sampleAttr.cuts   + SpecificCut(era,sampleName);
-      TString CutsSampleSB = sampleAttr.cutsSB + SpecificCut(era,sampleName);
-      TString CutsSampleSingleFake = sampleAttr.cutsSingleFake + SpecificCut(era,sampleName);
-
+      TString CutsSample   = sampleAttr.cuts;
+      TString CutsSampleSB = sampleAttr.cutsSB;
+      TString CutsSampleSingleFake = sampleAttr.cutsSingleFake;
+      
       tree->Draw(Variable+">>hist",WeightSample+"("+CutsSample+")");
       tree->Draw(Variable+">>histSB",WeightSampleSB+"("+CutsSampleSB+")");
       tree->Draw(Variable+">>histSingleFake",WeightSampleSingleFake+"("+CutsSampleSingleFake+")");
-
-      double norm = 1.0;
-      double nevents = 1.0;
-      double xsec = 1.0;
-      if (name.Contains("Data")) {
-	norm = 1.;
-      }
-      else if (name.Contains("EMB")) {
-	norm = 1.;
-      }
-      else { 
-	xsec = xsecs[sampleName];
-	nevents = histWeightsH->GetSumOfWeights();
-	norm = xsec*lumi/nevents;
-
-      }
-      //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield = " << histSample->GetSumOfWeights() << std::endl;
-      double yield = norm * histSample->GetSumOfWeights();
-      std::cout << "   " << sampleName << "  xsec = " << xsec << "  lumi = " << lumi << "  norm = " << norm << std::endl; 
-      sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
-      sampleAttr.histSB->Add(sampleAttr.histSB,histSampleSB,1.,norm);
-      sampleAttr.histSingleFake->Add(sampleAttr.histSingleFake,histSampleSingleFake,1.,norm);
+      double yield = histSample->GetSumOfWeights();
+      std::cout << setw(30) << sampleName << " : " << setw(6) << int(yield) << std::endl; 
+      sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,1.);
+      sampleAttr.histSB->Add(sampleAttr.histSB,histSampleSB,1.,1.);
+      sampleAttr.histSingleFake->Add(sampleAttr.histSingleFake,histSampleSingleFake,1.,1.);
       delete histSample;
       delete histSampleSB;
       delete histSampleSingleFake;
@@ -363,7 +260,7 @@ int main(int argc, char * argv[]) {
     }
   }  
   delete dummy;
-  
+ 
   // *******************
   // adding data samples 
   // *******************
@@ -372,95 +269,50 @@ int main(int argc, char * argv[]) {
   TH1D * SingleFake = nameAttributes["TTL"].histSingleFake;
 
   double fakes0 = Fakes->GetSumOfWeights();
-
-  //  if (embedded) {
-  //    Fakes->Add(Fakes,nameAttributes["EMB"].histSB,1.,-1.);
-  //    Fakes->Add(Fakes,nameAttributes["ZL"].histSB,1.,-1.);
-  //    SingleFake->Add(SingleFake,nameAttributes["EMB"].histSingleFake,1.,1.);
-  //    SingleFake->Add(SingleFake,nameAttributes["ZL"].histSingleFake,1.,1.);
-  //  }
-  //  else {
   Fakes->Add(Fakes,nameAttributes["ZTT"].histSB,1.,-1.);
-  SingleFake->Add(SingleFake,nameAttributes["ZTT"].histSingleFake,1.,1.);
-  //  }
-
   Fakes->Add(Fakes,nameAttributes["TTL"].histSB,1.,-1.);
   Fakes->Add(Fakes,nameAttributes["VVL"].histSB,1.,-1.);
   Fakes->Add(Fakes,nameAttributes["W"].histSB,1.,-1.);
-
   double fakes1 = Fakes->GetSumOfWeights();
 
+  SingleFake->Add(SingleFake,nameAttributes["ZTT"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["VVL"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["W"].histSingleFake,1.,1.);
 
   Fakes->Add(Fakes,SingleFake,1.,1.);
   double fakes2 = Fakes->GetSumOfWeights();
 
-  std::cout << "Fakes : " << fakes0 << " vs. " << fakes1 << " vs. " << fakes2 << std::endl;
+  std::cout << "Fakes : " << fakes0 << "(QCD) + " << fakes1 << "(WJets) = " << fakes2 << std::endl;
 
   TH1D * TT  = nameAttributes["TTL"].hist;
   TH1D * EWK = nameAttributes["VVL"].hist;
   TH1D * ZTT = nameAttributes["ZTT"].hist;
-  ZTT->Scale(dyNorm);
+  TH1D * Higgs = nameAttributes["Higgs"].hist;
+  TH1D * bbH = nameAttributes["bbH"].hist;
 
-  TH1D * Ztt = (TH1D*)ZTT->Clone("Ztt");
-
-  //  TH1D * EMB = nameAttributes["EMB"].hist;
-  TH1D * TTT  = nameAttributes["TTT"].hist;
-  TH1D * EWKT = nameAttributes["VVT"].hist;
-  
-  if (computeZttNorm) {
-    double zttNorm = 0; 
-    double dataNorm = 0;
-    for (int bin=1; bin<=nbins; ++bin) {
-      float bin_center = Ztt->GetBinCenter(bin);
-      if (bin_center>xmin_mass&&bin_center<xmax_mass) {
-	double zttX = Ztt->GetBinContent(bin);
-	double dataX = histData->GetBinContent(bin)-Fakes->GetBinContent(bin);
-	zttNorm += zttX;
-	dataNorm += dataX;
-      }
-    }      
-    double normScaleX = dataNorm/zttNorm;
-    std::cout << std::endl;
-    std::cout << "norm ZTT = " << normScaleX << std::endl;
-    std::cout << std::endl;
-  }
-
-  //  if (embedded) {
-  //    ZTT = nameAttributes["EMB"].hist;
-  //    ZTT->Add(ZTT,nameAttributes["ZL"].hist,1.,1.);
-  //  }
-  //  else {
   TT->Add(TT,nameAttributes["TTT"].hist,1.,1.);
   EWK->Add(EWK,nameAttributes["VVT"].hist,1.,1.);
-  //  }
   EWK->Add(EWK,nameAttributes["ZL"].hist,1.,1.);
 
   std::cout << std::endl;
   std::cout << "Variable -> " << Variable << std::endl;
   std::cout << "Top   : " << TT->GetSumOfWeights()  << std::endl;
   std::cout << "EWK   : " << EWK->GetSumOfWeights() << std::endl;
-  //  if (embedded)
-  //    std::cout << "EMB   : " << ZTT->GetSumOfWeights() << std::endl;
-  //  else 
   std::cout << "ZTT   : " << ZTT->GetSumOfWeights() << std::endl;
   std::cout << "Fakes : " << Fakes->GetSumOfWeights() << std::endl;
   double total = TT->GetSumOfWeights() + EWK->GetSumOfWeights() + ZTT->GetSumOfWeights() + Fakes->GetSumOfWeights();
-  double total_data = histData->GetSumOfWeights();
   std::cout << "Total : " << total << std::endl;
-  std::cout << "Data  : " << total_data << std::endl;
+  std::cout << "Data  : " << histData->GetSumOfWeights() << std::endl;
   std::cout << std::endl;
-  std::cout << "ratio : " << total_data/total << std::endl;
-
+  std::cout << "Higgs : " << Higgs->GetSumOfWeights() << std::endl;
+  std::cout << "bbH   : " << bbH->GetSumOfWeights() << std::endl;
+ 
   //  adding normalization systematics
-  double ZTT_norm   = 0.04; //  normalization ZTT   :  4% (EMBEDDED)
-  double EWK_norm   = 0.05; //  normalization EWK   :  5%
-  double QCD_norm   = 0.07; //  normalization Fakes :  7%
+  double ZTT_norm   = 0.05; //  normalization ZTT   :  5%
+  double QCD_norm   = 0.08; //  normalization Fakes :  7%
   double TT_norm    = 0.06; //  normalization TT    :  6%
-
-  double eff_Emb = 0.04;
-  double eff_MC  = 0.04;
+  double EWK_norm   = 0.05; //  normalization EWK   :  5%
+  double eff_MC  = 0.04; // efficiency MC
 
   bool applyNormSys = cfg.get<bool>("ApplySystematics");
   if (applyNormSys) {
@@ -468,8 +320,8 @@ int main(int argc, char * argv[]) {
 
       float ztt  = ZTT->GetBinContent(iB);
       float ztte = ZTT->GetBinError(iB);
-      ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_Emb*eff_Emb));
-      if (!embedded) ZTT->SetBinError(iB,0.5*ztte);
+      ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_MC*eff_MC));
+      ZTT->SetBinError(iB,ztte);
       
       float ewk  = EWK->GetBinContent(iB);
       float ewke = EWK->GetBinError(iB);
@@ -485,11 +337,11 @@ int main(int argc, char * argv[]) {
       float tte = TT->GetBinError(iB);
       tte = TMath::Sqrt(tte*tte+tt*tt*(TT_norm*TT_norm+eff_MC*eff_MC));
       TT->SetBinError(iB,tte);
-
-
+      float total = tt+ewk+ztt+qcd;
+      if (total>0)
+	std::cout << iB << " : " << ztte/total << std::endl;
     }
   }
-
 
   EWK->Add(EWK,TT);
   ZTT->Add(ZTT,EWK);
@@ -586,10 +438,7 @@ int main(int argc, char * argv[]) {
   leg->SetTextSize(0.044);
   leg->AddEntry(histData,"Data","lp");
   leg->AddEntry(Fakes,"Fakes","f");
-  if (embedded) 
-    leg->AddEntry(ZTT,"genuine #tau#tau","f");
-  else 
-    leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
+  leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
   if (plotLegend) leg->Draw();
@@ -692,6 +541,6 @@ int main(int argc, char * argv[]) {
   canv1->Update();
   TString suffixLOGY("");
   if (logY) suffixLOGY = "_logY";
-  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+suffix+"_"+sel_suffix+suffixLOGY+".png");
+  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+sel_suffix+suffixLOGY+".png");
 
 }

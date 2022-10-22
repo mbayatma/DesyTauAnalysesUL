@@ -618,7 +618,7 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("njetingap20", &njetingap20, &b_njetingap20);
      //}
    //   fChain->SetBranchAddress("njetshad", &njetshad, &b_njetshad);
-   //   fChain->SetBranchAddress("njetspt20", &njetspt20, &b_njetspt20);
+   fChain->SetBranchAddress("njetspt20_central", &njetspt20_central, &b_njetspt20_central);
    
    //Misc   
    fChain->SetBranchAddress("gen_noutgoing", &gen_noutgoing, &b_gen_noutgoing);
@@ -1380,7 +1380,8 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     fChain->Branch("njetingap20", &njetingap20, "njetingap20/I");
     
   }
-  
+  fChain->Branch("njetspt20_central", &njetspt20_central,"njetspt20_central/I");
+
   //Misc   
   fChain->Branch("gen_noutgoing", &gen_noutgoing, "gen_noutgoing/I");
   fChain->Branch("os", &os, "os/I");

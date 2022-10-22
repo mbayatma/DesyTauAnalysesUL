@@ -1483,6 +1483,7 @@ public :
   TBranch	 *b_njets;
   TBranch	 *b_njetshad;
   TBranch	 *b_njetspt20;
+  TBranch        *b_njetspt20_central;
   TBranch	 *b_jpt_1;
   TBranch	 *b_jeta_1;
   TBranch	 *b_jphi_1;

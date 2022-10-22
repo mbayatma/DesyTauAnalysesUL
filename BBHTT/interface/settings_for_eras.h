@@ -325,7 +325,7 @@ const map<TString, double> xsec_map_2017 = {
   {"VBFHToTauTau_M125"        , 0.237},
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
-  {"ZHToTauTau_M125_13TeV"    , 0.0477},
+  {"ZHToTauTau_M125"          , 0.0477},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
@@ -376,7 +376,7 @@ const map<TString, double> xsec_map_2016 = {
   {"VBFHToTauTau_M125"        , 0.237},
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
-  {"ZHToTauTau_M125_13TeV"    , 0.0477},
+  {"ZHToTauTau_M125"          , 0.0477},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"HWminusJ_HToWW_M125"      , 0.114},
@@ -410,10 +410,10 @@ const map<TString, vector<TString> > map_sample = {
   {"EmbeddedTauTau_2016_pre", EmbeddedTauTau_2016_pre},
   {"EmbeddedTauTau_2016_post", EmbeddedTauTau_2016_post},
 
-  {"DYJets_incl_2018",DYJets_amcatnlo_incl},
-  {"DYJets_incl_2017",DYJets_amcatnlo_incl},
-  {"DYJets_incl_2016_pre",DYJets_amcatnlo_incl},
-  {"DYJets_incl_2016_post",DYJets_amcatnlo_incl},
+  {"DrellYanJets_2018",DYJets_amcatnlo_incl},
+  {"DrellYanJets_2017",DYJets_amcatnlo_incl},
+  {"DrellYanJets_2016_pre",DYJets_amcatnlo_incl},
+  {"DrellYanJets_2016_post",DYJets_amcatnlo_incl},
   
   {"DYJets_2018",DYJets},
   {"DYJets_2017",DYJets},
@@ -433,7 +433,7 @@ const map<TString, vector<TString> > map_sample = {
   {"TTbar_2018",TTbar},
   {"TTbar_2017",TTbar},
   {"TTbar_2016_pre",TTbar},
-  {"TTbar_2018_post",TTbar},
+  {"TTbar_2016_post",TTbar},
 
   {"SingleTop_2018",SingleTop},
   {"SingleTop_2017",SingleTop},
@@ -540,7 +540,6 @@ double getNEventsProcessed(TString filename)
     exit(-1);
   }
   double nevents = nWeightedEvents->GetSumOfWeights();
-  std::cout<<"nevents= "<<nevents<<std::endl;
   file -> Close();
   delete file;
   return nevents;

@@ -488,6 +488,7 @@ int main(int argc, char * argv[]){
   RooWorkspace *wEmb = (RooWorkspace*)f_workspace_emb->Get("w");
 
   //  TString ggHWeightsFile("higgs_pt_v0.root");
+  /*
   TString ggHWeightsFile("higgs_pt_v2.root");
   if (era==2016)
     //    ggHWeightsFile = "higgs_pt_2016_v0.root";
@@ -497,8 +498,8 @@ int main(int argc, char * argv[]){
     std::cout << "Cannot open file " << ggHWeightsFile << std::endl;
     exit(-1);
   }
-
-  RooWorkspace * higgsPt_ws = (RooWorkspace*)f_ggHWeights->Get("w");
+  */
+  //  RooWorkspace * higgsPt_ws = (RooWorkspace*)f_ggHWeights->Get("w");
 
   // Zpt reweighting for LO DY samples 
   TFile *f_zptweight = new TFile(TString(cmsswBase) + "/src/" + ZptweightFile, "read");
@@ -1353,9 +1354,9 @@ int main(int argc, char * argv[]){
 	otree->weightEMu = 1.0;
       }
 
-      if (isGGH) {
-	getHiggsPtWeight(&analysisTree,otree,higgsPt_ws,HiggsMass);
-      }
+      //      if (isGGH) {
+      //	getHiggsPtWeight(&analysisTree,otree,higgsPt_ws,HiggsMass);
+      //      }
 
 
       ////////////////////////////////////////////////////////////

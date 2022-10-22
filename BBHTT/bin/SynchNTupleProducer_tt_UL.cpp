@@ -781,7 +781,7 @@ int main(int argc, char * argv[]){
     if (_inittree!=NULL) {
         Float_t genweight;
         if (!isData)
-            _inittree->SetBranchAddress("genweight",&genweight);
+	  _inittree->SetBranchAddress("genweight",&genweight);
         Long64_t numberOfEntriesInitTree = _inittree->GetEntries();
         std::cout << "      number of entries in Init Tree = " << numberOfEntriesInitTree << std::endl;
         for (Long64_t iEntry=0; iEntry<numberOfEntriesInitTree; iEntry++) {

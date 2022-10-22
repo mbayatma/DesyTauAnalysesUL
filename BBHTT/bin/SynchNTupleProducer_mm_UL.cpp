@@ -360,7 +360,7 @@ int main(int argc, char * argv[]) {
   // *****************************
   // ****** b-tagging ************
   // *****************************
-  const bool applyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
+  bool applyBTagScaling = cfg.get<bool>("ApplyBTagScaling");
   const bool applyBTagReshape = cfg.get<bool>("ApplyBTagReshape");
   const string btagAlgorithm = cfg.get<string>("BTagAlgorithm");
   const string btagDiscriminator1 = cfg.get<string>("BTagDiscriminator1");
@@ -378,6 +378,9 @@ int main(int argc, char * argv[]) {
   BTagCalibrationReader reader_B;
   BTagCalibrationReader reader_C;
   BTagCalibrationReader reader_Light;
+
+  if (applyBTagReshape)
+    applyBTagScaling = false;
 
   BTagReshape * btagReshape;
 
@@ -547,7 +550,19 @@ int main(int argc, char * argv[]) {
   TH2D * dimuonMassPtBSelH = new TH2D("dimuonMassPtBSelH","",100,0,1000,100,0,1000);
   TH2D * dimuonPtMassBSelH = new TH2D("dimuonPtMassBSelH","",100,0,1000,100,0,1000);
 
-  
+  // Z mass window + 1 btag 
+
+  TH1D * puppimetBZSelH = new TH1D("puppimetBZSelH","",1000,0,1000);
+  TH1D * mjjBZSelH = new TH1D("mjjBZSelH","",200,0,2000);
+  TH1D * nJets30BZSelH = new TH1D("nJets30BZSelH","",10,-0.5,9.5);
+  TH1D * leadingJetPtBZSelH = new TH1D("leadingJetPtBZSelH","",400,0.,400.);
+  TH1D * trailingJetPtBZSelH = new TH1D("trailingJetPtBZSelH","",400,0.,400.);
+
+  // 2 btags
+  TH1D * massBBH = new TH1D("massBBH","",100,0,1000);
+  TH1D * detaBBH = new TH1D("detaBBH","",120,0.,6.);
+  TH1D * dphiBBH = new TH1D("dphiBBH","",100,0.,TMath::Pi());
+  TH1D * dRBBH = new TH1D("dRBBH","",120,0.,6.);
 
   // Z mass window --->
 
@@ -585,6 +600,9 @@ int main(int argc, char * argv[]) {
   TH1D * leadingJetEtaH = new TH1D("leadingJetEtaH","",100,-5,5);
   TH1D * leadingJetPhiH = new TH1D("leadingJetPhiH","",100,-TMath::Pi(),TMath::Pi());
   
+  // At least one b-jet + 
+
+
   TString scales[21] = {"M10","M9","M8","M7","M6","M5","M4","M3","M2","M1","0",
 			"P1","P2","P3","P4","P5","P6","P7","P8","P9","P10"};
   
@@ -1030,8 +1048,10 @@ int main(int argc, char * argv[]) {
   }
 
   // need for btag reshaping
-  TH1D * sumOfWeightsH  = new TH1D("sumOfWeightsH","",2,0.,2.);
-  TH1D * sumOfWeightsBTagH = new TH1D("sumOfWeightsBTagH","",2,0.,2.);
+  TH1D * sumOfWeightsH  = new TH1D("sumOfWeightsH","",1,0.,2.);
+  TH1D * sumOfWeightsBTagH = new TH1D("sumOfWeightsBTagH","",1,0.,2.);
+  TH1D * btagWeightH = new TH1D("btagWeightH","",500,0.,5.);
+  TH1D * btagWeightBH = new TH1D("btagWeightBH","",500,0.,5.);
 
   // *****************************************
   // ******** end of histograms **************
@@ -1118,6 +1138,7 @@ int main(int argc, char * argv[]) {
       float dyweight = 1.;
       float dyweightB = 1.;
       float btagWeight = 1.; // btag reshaping weight
+      float weightNoBtag = 1.; //
 
       //------------------------------------------------
 
@@ -1743,7 +1764,6 @@ int main(int argc, char * argv[]) {
 		bdiscr += analysisTree.pfjet_btag[jet][nBTagDiscriminant3];
 
 	      //	      std::cout << "bdiscr = " << bdiscr << "   cut = " << btagCut << std::endl;
-	      
 
 	      bool tagged = bdiscr>btagCut;
 
@@ -1975,12 +1995,20 @@ int main(int argc, char * argv[]) {
 	// *************************
 	// After all weights ->
 	// *************************
-	sumOfWeightsH->Fill(1.,weight);
-	sumOfWeightsBTagH->Fill(1.,weight*btagWeight);
-	weight *= btagWeight;
+
+
 
 	// selection on mass
 	if (massSel>dimuonMassCut) {
+
+	  sumOfWeightsH->Fill(1.0,weight);
+	  sumOfWeightsBTagH->Fill(1.0,weight*btagWeight);
+	  weight *= btagWeight;
+
+	  btagWeightH->Fill(btagWeight,1.0);
+
+	  //	  std::cout << "Overall btag weight = " << btagWeight << std::endl;
+	  //	  std::cout << std::endl;
 
 	  numberOfVerticesH->Fill(double(analysisTree.primvertex_count),weight);
 
@@ -2045,7 +2073,6 @@ int main(int argc, char * argv[]) {
 	  dimuonEtaSelH->Fill(dimuonEta,weight);
 
 	  if (nJets20BTagMedium>=1) {
-
 	    massBSelH->Fill(massSel,weight);
 	    massExtendedBSelH->Fill(massSel,weight);
 	    ptLeadingMuBSelH->Fill(analysisTree.muon_pt[indx1],weight);
@@ -2602,6 +2629,13 @@ int main(int argc, char * argv[]) {
 	    //	    nJets20BTagLooseZSelH->Fill(double(nJets20BTagLoose),weight);
 	    nJets20BTagMediumZSelH->Fill(double(nJets20BTagMedium),weight);
 	    if (indexLeadingBJet>=0) { 
+	      // variables
+	      btagWeightBH->Fill(btagWeight,1.0);
+	      puppimetBZSelH->Fill(puppimet,weight);
+	      mjjBZSelH->Fill(mjj,weight);
+	      nJets30BZSelH->Fill(nJets30,weight);
+	      leadingJetPtBZSelH->Fill(ptLeadingJet,weight);
+	      trailingJetPtBZSelH->Fill(ptSubLeadingJet,weight);
 	      leadingBJetPtZSelH->Fill(ptLeadingBJet,weight);
 	      double eta = analysisTree.pfjet_eta[indexLeadingBJet];
 	      leadingBJetEtaZSelH->Fill(eta,weight);
@@ -2613,7 +2647,31 @@ int main(int argc, char * argv[]) {
 	      subleadingBJetEtaZSelH->Fill(eta,weight);
 	      subleadingBJetScoreZSelH->Fill(scoreSubLeadingBJet,weight);
 	    }
+	  
+	    if (indexSubLeadingBJet>=0&&indexLeadingBJet>=0) {
 
+	      TLorentzVector bjet1; bjet1.SetXYZT(analysisTree.pfjet_px[indexLeadingBJet],
+						  analysisTree.pfjet_py[indexLeadingBJet],
+						  analysisTree.pfjet_pz[indexLeadingBJet],
+						  analysisTree.pfjet_e[indexLeadingBJet]);
+
+	      TLorentzVector bjet2; bjet2.SetXYZT(analysisTree.pfjet_px[indexSubLeadingBJet],
+						  analysisTree.pfjet_py[indexSubLeadingBJet],
+						  analysisTree.pfjet_pz[indexSubLeadingBJet],
+						  analysisTree.pfjet_e[indexSubLeadingBJet]);
+	      
+	      TLorentzVector dibjets = bjet1+bjet2;
+	      double mbb = dibjets.M();
+	      double detabb = TMath::Sqrt(bjet1.Eta()-bjet2.Eta());
+	      double dRbb = deltaR(bjet1.Eta(),bjet1.Phi(),
+				   bjet2.Eta(),bjet2.Phi());
+	      double dphibb = dPhiFrom2P(bjet1.Px(), bjet1.Py(), bjet2.Px(),bjet2.Py());
+	      massBBH->Fill(mbb,weight);
+	      detaBBH->Fill(detabb,weight);
+	      dRBBH->Fill(dRbb,weight);
+	      dphiBBH->Fill(dphibb,weight);
+	    }
+	    
 	    nJets30ZSelH->Fill(double(nJets30),weight);
 	    nJets20ZSelH->Fill(double(nJets20),weight);
 	    nJets30etaCutZSelH->Fill(double(nJets30etaCut),weight);

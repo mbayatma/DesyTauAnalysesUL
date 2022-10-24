@@ -114,7 +114,7 @@
  <use name="HiggsCPinTauDecays/IpCorrection"/>
 </bin>
 
-<bin name="CreateCards_emu" file="CreateCards_emu.cpp">
+<bin name="CreateCards" file="CreateCards.cpp">
   <use name="PhysicsTools/Utilities"/>
   <use name="rootgraphics"/>
   <use name="root"/>

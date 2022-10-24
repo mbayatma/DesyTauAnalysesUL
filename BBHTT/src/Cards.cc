@@ -19,17 +19,10 @@ Cards::Cards(TString Sample,
 
   era = Era;
   channel = Channel;
-  input_dir = InputDir;
-  /*
-  input_friend_dir = "/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/2/5cb31f2f24b84f27bf28ae05b44b2793/artifacts/pred/";
-  if (era=="2017")
-    input_friend_dir = "/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/2/cafd0046bd7f4dc0a2ba4e37cd3aa0e3/artifacts/pred/";
-  if (era=="2018")
-    input_friend_dir = "/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/2/1f14e963a7d14425909831c02fd49617/artifacts/pred/";
-  */
-  input_friend_dir = PredDir;
+  input_dir = InputDir + "/" + era;
+  input_friend_dir = PredDir + "/" + era;
   runWithShapeSystematics = false;
-  output_filename = OutputDir+"/"+Sample+"_"+Category+".root";
+  output_filename = OutputDir+"/"+era+"/"+Sample+"_"+Category+".root";
   sampleToProcess = Sample;
   category = channel+"_"+Category;
   variable = Variable;
@@ -37,49 +30,17 @@ Cards::Cards(TString Sample,
   runOnEmbedded = RunOnEmbedded;
 
   _usefriend=true;
-  if(PredDir=="")_usefriend=false;
-
-  if(era=="2016"){
-    lumi = 59740;
-    sampleXSecMap = xsecs_2016;
-  }else if(era=="2017"){
-    lumi = 41500;
-    sampleXSecMap = xsecs_2017;
-  }else{
-    lumi = 35890;
-    sampleXSecMap = xsecs_2018;
-  }
+  if(PredDir==""||PredDir=="None"||PredDir=="NONE"||PredDir=="none") _usefriend=false;
 
   if(channel=="em"){
     commonCuts=baselineEM;
     mcNotTauTau=mcNotTauTau_EM;
     mcTauTau=mcTauTau_EM;
-    if(era=="2016"){
-      Embedded=EmbeddedElMu_2016;
-      Data = DataElMu_2016;
-    }else if(era=="2017"){
-      Embedded=EmbeddedElMu_2017;
-      Data = DataElMu_2017;
-    }else{
-      Embedded=EmbeddedElMu_2018;
-      Data = DataElMu_2018;
-    }
   }else{
     commonCuts=baselineTT;
     mcNotTauTau=mcNotTauTau_TT;
     mcTauTau=mcTauTau_TT;
-    if(era=="2016"){
-      Embedded=EmbeddedTauTau_2016;
-      Data = DataTauTau_2016;
-    }else if(era=="2017"){
-      Embedded=EmbeddedTauTau_2017;
-      Data = DataTauTau_2017;
-    }else{
-      Embedded=EmbeddedTauTau_2018;
-      Data = DataTauTau_2018;
-    }
   }
-
 
   block = false;
 
@@ -95,42 +56,37 @@ Cards::Cards(TString Sample,
   for (int iB=0; iB<=nBins; ++iB)
     Bins[iB] = xmin + double(iB)*binWidth;
 
-
-  if (sampleToProcess!="Data"&&
-      sampleToProcess!="EWK"&&
-      sampleToProcess!="TTbar"&&
-      sampleToProcess!="TTbarToTT"&&
-      sampleToProcess!="EWKToTT"&&
-      sampleToProcess!="WJets"&&
-      sampleToProcess!="DYJets"&&
-      sampleToProcess!="EMB"&&
-      sampleToProcess!="ggH"&&
-      sampleToProcess!="ggHbb"&&
-      sampleToProcess!="qqH"&&
-      sampleToProcess!="VH"&&
-      sampleToProcess!="bbHybyt"&&
-      sampleToProcess!="bbH") {
+  bool sampleExist = false;
+  for (auto availSample : availableSamplesToProcess) {
+    if (sampleToProcess==availSample) {
+      sampleExist = true;
+      break;
+    }
+  }
+  if (!sampleExist) {
     std::cout << "Unknown sample specified : " << sampleToProcess << std::endl;
+    std::cout << "Available samples -> " << std::endl;
+    for (auto availSample : availableSamplesToProcess) {
+      std::cout << availSample << " -> " << mapAvailableSamples[availSample] << std::endl;
+    }
     std::cout << "Nothing will be done" << std::endl;
     block = true;
     return;
   }  
 
-  if (category!=channel+"_inclusive"&&
-      category!=channel+"_Nbtag0"&&
-      category!=channel+"_Nbtag1"&&
-      category!=channel+"_Nbtag2"&&
-      category!=channel+"_NbtagGe2"&&
-      category!=channel+"_NbtagGe1"&&
-      category!=channel+"_cat0"&&
-      category!=channel+"_cat1"&&
-      category!=channel+"_cat2"&&
-      category!=channel+"_cat3"&& 
-      category!=channel+"_cat0_NbtagGt1"&&
-      category!=channel+"_cat1_NbtagGt1"&&
-      category!=channel+"_cat2_NbtagGt1"&&
-      category!=channel+"_cat3_NbtagGt1") {
-    std::cout << "Unknown category specified : " << category << std::endl;
+  bool catExist = false;
+  for (auto availCat : availableCategories) {
+    if (Category == availCat) {
+      catExist = true;
+      break;
+    }
+  }
+  if (!catExist) {
+    std::cout << "Unknown category specified : " << Category << std::endl;
+    std::cout << "Available categories -> " << std::endl;
+    for (auto availCat : availableCategories ) {
+      std::cout << availCat << std::endl;
+    }
     std::cout << "nothing will be done" << std::endl;
     block = true;
     return;
@@ -139,25 +95,23 @@ Cards::Cards(TString Sample,
   std::map<TString,TString> categoryCuts = {
     {channel+"_inclusive",""},
     {channel+"_Nbtag0",   "&&nbtag==0"},
-    {channel+"_Nbtag1",   "&&nbtag==1"},
-    {channel+"_Nbtag2",   "&&nbtag==2"},
-    {channel+"_NbtagGe1", "&&nbtag>=1"},
-    {channel+"_NbtagGe2", "&&nbtag>=2"},
+    {channel+"_NbtagGe1",   "&&nbtag==1"},
     {channel+"_cat0", "&&pred_class==0"},
     {channel+"_cat1", "&&pred_class==1"},
     {channel+"_cat2", "&&pred_class==2"},
     {channel+"_cat3", "&&pred_class==3"},
-    {channel+"_cat0_NbtagGt1", "&&pred_class==0&&nbtag>0"},
-    {channel+"_cat1_NbtagGt1", "&&pred_class==1&&nbtag>0"},
-    {channel+"_cat2_NbtagGt1", "&&pred_class==2&&nbtag>0"},
-    {channel+"_cat3_NbtagGt1", "&&pred_class==3&&nbtag>0"},
+    {channel+"_cat0_Nbtag0", "&&pred_class==0&&nbtag==0"},
+    {channel+"_cat1_Nbtag0", "&&pred_class==1&&nbtag==0"},
+    {channel+"_cat2_Nbtag0", "&&pred_class==2&&nbtag==0"},
+    {channel+"_cat3_Nbtag0", "&&pred_class==3&&nbtag==0"},
+    {channel+"_cat0_NbtagGe1", "&&pred_class==0&&nbtag>0"},
+    {channel+"_cat1_NbtagGe1", "&&pred_class==1&&nbtag>0"},
+    {channel+"_cat2_NbtagGe1", "&&pred_class==2&&nbtag>0"},
+    {channel+"_cat3_NbtagGe1", "&&pred_class==3&&nbtag>0"},
   };
 
   TH1::SetDefaultSumw2(true);
   TH2::SetDefaultSumw2(true);
-  isEquidistantBinning = true;
-  if (variable=="mt_tot")
-    isEquidistantBinning = false;
 
   isBTag = false;
   if (Category.Contains("_Nbtag1")||Category.Contains("_Nbtag2")||Category.Contains("_NbtagGe1")||Category.Contains("_NbtagGe2"))
@@ -172,13 +126,14 @@ Cards::Cards(TString Sample,
   }
   outputFile->mkdir(category);
 
+  if (channel=="em") {
+    if (category=="em_ttbar") 
+      commonCuts += "&&pzeta<-35.0&&nbtag>=1";
+    else
+      commonCuts += "&&pzeta>-35.0";
+  }
 
   commonCuts += categoryCuts[category];
-
-  // btagCorrection
-  //  btagCorr["2016"][channel+"_Nbtag0"] = 1.0;
-  //  btagCorr_Cat["2016"][channel+"_Nbtag1"] = 0.9;
-  //  btagCorr_Cat["2016"][channel+"_Nbtag2"] = 0.8;
 
   regionCut.clear();
   if(channel=="tt"){
@@ -190,7 +145,6 @@ Cards::Cards(TString Sample,
     regionCut.push_back(commonCuts+sameSignRegion); // same sign
   }
 
-  globalWeight = "weightEMu*";
   regionWeight.clear();
   regionWeight.push_back(globalWeight);
 
@@ -198,93 +152,88 @@ Cards::Cards(TString Sample,
   if(channel=="em")
     QCDFFWeight=qcdWeight;
   else
-    QCDFFWeight = FFWeight + FF_pt2_era[era] + FF_btg_era[era];
+    QCDFFWeight = FFWeight;
  
   regionWeight.push_back(globalWeight+QCDFFWeight);
   if(channel=="tt") regionWeight.push_back(globalWeight);
 
-
-  nameSampleMap["Data"] = Data; nameHistoMap["Data"] = "data_obs";
-  nameSampleMap["DYJetsToLL"] = DYJetsToLL; nameHistoMap["DYJetsToLL"] = "ZL"; 
-  nameSampleMap["DYJetsToTT"] = DYJetsToTT; nameHistoMap["DYJetsToTT"] = "ZTT";
-  nameSampleMap["DYJetsLowToLL"] = DYJets_Low; nameHistoMap["DYJetsLowToLL"] = "ZL"; 
-  nameSampleMap["DYJetsLowToTT"] = DYJets_Low; nameHistoMap["DYJetsLowToTT"] = "ZTT";
+  if (channel=="tt") {
+    nameSampleMap["Data"] = Tau; nameHistoMap["Data"] = "data_obs";
+  }
+  else {
+    nameSampleMap["Data"] = MuonEG; nameHistoMap["Data"] = "data_obs";
+  }
+  nameSampleMap["DYJets"] = DYJets; nameHistoMap["DYJets"] = "DYJets";
+  nameSampleMap["DYJetsToLL"] = DYJets; nameHistoMap["DYJetsToLL"] = "ZL"; 
+  nameSampleMap["DYJetsToTT"] = DYJets; nameHistoMap["DYJetsToTT"] = "ZTT";
   nameSampleMap["WJets"] = WJets; nameHistoMap["WJets"] = "W";
-  nameSampleMap["TTbar"] = TT; nameHistoMap["TTbar"] = "TTL";
-  nameSampleMap["TTbarToTT"] = TTToTT; nameHistoMap["TTbarToTT"] = "TTT";
-  nameSampleMap["EWK"] = EWK; nameHistoMap["EWK"] = "VVL";
-  nameSampleMap["EWKToTT"] = EWKToTT; nameHistoMap["EWKToTT"] = "VVT";
-  nameSampleMap["EMB"] = Embedded; nameHistoMap["EMB"] = "EMB";
-  nameSampleMap["ggHWW125"] = GluGluHToWW; nameHistoMap["ggHWW125"] = "ggHWW125";
-  nameSampleMap["qqHWW125"] = VBFHToWW; nameHistoMap["qqHWW125"] = "qqHWW125";
-  nameSampleMap["WHWW125"] = WHToWW; nameHistoMap["WHWW125"] = "WHWW125";
-  nameSampleMap["ZHWW125"] = ZHToWW; nameHistoMap["ZHWW125"] = "ZHWW125";
-  nameSampleMap["ggHTT125"] = GluGluHToTauTau; nameHistoMap["ggHTT125"] = "ggH125";
-  nameSampleMap["ggHbbTT125"] = GluGluHToTauTau; nameHistoMap["ggHbbTT125"] = "ggHbb125";
-  nameSampleMap["qqHTT125"] = VBFHToTauTau; nameHistoMap["qqHTT125"] = "qqH125";
-  nameSampleMap["WHTT125"] = WHToTauTau; nameHistoMap["WHTT125"] = "WH125";
-  nameSampleMap["ZHTT125"] = ZHToTauTau; nameHistoMap["ZHTT125"] = "ZH125";
-  nameSampleMap["bbHTTybyt125"] = bbHybytToTauTau; nameHistoMap["bbHybytTT125"] = "bbHybyt125";
-  nameSampleMap["bbHTT125"] = bbHToTauTau; nameHistoMap["bbHTT125"] = "bbH125";
+  nameSampleMap["TTbar"] = TTbar; nameHistoMap["TTbar"] = "TT";
+  nameSampleMap["TTbarToL"] = TTbar; nameHistoMap["TTbar"] = "TTL";
+  nameSampleMap["TTbarToTT"] = TTbar; nameHistoMap["TTbarToTT"] = "TTT";
+  nameSampleMap["VV"] = VV; nameHistoMap["VV"] = "VV";
+  nameSampleMap["VVToL"] = VV; nameHistoMap["VVToL"] = "VVL"; 
+  nameSampleMap["VVToTT"] = VV; nameHistoMap["VVToTT"] = "VVT";
+  nameSampleMap["ST"] = VV; nameHistoMap["ST"] = "ST";
+  nameSampleMap["STToL"] = VV; nameHistoMap["STToL"] = "STL"; 
+  nameSampleMap["STToTT"] = VV; nameHistoMap["STToTT"] = "STT";
+  //  nameSampleMap["EMB"] = Embedded; nameHistoMap["EMB"] = "EMB";
+  nameSampleMap["ggHWW"] = ggHWW; nameHistoMap["ggHWW"] = "ggHWW125";
+  nameSampleMap["qqHWW"] = qqHWW; nameHistoMap["qqHWW"] = "qqHWW125";
+  nameSampleMap["WHWW"] = WHWW; nameHistoMap["WHWW"] = "WHWW125";
+  nameSampleMap["ZHWW"] = ZHWW; nameHistoMap["ZHWW"] = "ZHWW125";
+  nameSampleMap["ggHTT"] = ggH; nameHistoMap["ggHTT"] = "ggH125";
+  nameSampleMap["qqHTT"] = qqH; nameHistoMap["qqHTT"] = "qqH125";
+  nameSampleMap["WHTT"] = WH; nameHistoMap["WHTT"] = "WH125";
+  nameSampleMap["ZHTT"] = ZH; nameHistoMap["ZHTT"] = "ZH125";
+  nameSampleMap["bbHTTybyt"] = bbH_ybyt; nameHistoMap["bbHTTybyt"] = "bbH125_ybyt";
+  nameSampleMap["bbHTTyt2"] = bbH_yt2; nameHistoMap["bbHTTyt2"] = "bbH125_yt2";
+  nameSampleMap["bbHTTyb2"] = bbH_yb2; nameHistoMap["bbHTTyb2"] = "bbH125_yb2";
+  nameSampleMap["bbHTTybyt_nobb"] = bbH_ybyt; nameHistoMap["bbHTTybyt_nobb"] = "bbH125_ybyt_nobb";
+  nameSampleMap["bbHTTyb2_nobb"] = bbH_yb2; nameHistoMap["bbHTTyb2_nobb"] = "bbH125_yb2_nobb";
+  nameSampleMap["bbHTT"] = bbH; nameHistoMap["bbHTT"] = "bbH125";
 
   samplesContainer.clear();
   if (sampleToProcess=="Data") {
     InitializeSample("Data");
-    if (runOnEmbedded) {
-      samplesContainer.push_back("EMB");
-    }
-    else{ 
-      samplesContainer.push_back("EWKToTT");
-      samplesContainer.push_back("DYJetsToTT");
-      samplesContainer.push_back("TTbarToTT");
-    }
     samplesContainer.push_back("WJets");
-    samplesContainer.push_back("EWK");
+    samplesContainer.push_back("VV");
+    samplesContainer.push_back("ST");
     samplesContainer.push_back("TTbar");
+    samplesContainer.push_back("DYJets");
+  }
+  else if (sampleToProcess=="DYJets") {
+    samplesContainer.push_back("DYJetsToTT");
     samplesContainer.push_back("DYJetsToLL");
   }
-  if (sampleToProcess=="TTbar") {
+  else if (sampleToProcess=="EWK") {
+    samplesContainer.push_back("WJets");
+    samplesContainer.push_back("VV");
+  }
+  else if (sampleToProcess=="Top") {
     samplesContainer.push_back("TTbar");
+    samplesContainer.push_back("ST");
   }
-  if (sampleToProcess=="TTbarToTT") {
-    samplesContainer.push_back("TTbarToTT");
+  else if (sampleToProcess=="HTT") {
+    samplesContainer.push_back("ggHTT");
+    samplesContainer.push_back("qqHTT");
+    samplesContainer.push_back("WHTT");
+    samplesContainer.push_back("ZHTT");
   }
-  if (sampleToProcess=="EMB") {
-    samplesContainer.push_back("EMB");
-    InitializeSample("TTbarToTT");
+  else if (sampleToProcess=="HWW") {
+    samplesContainer.push_back("ggHWW");
+    samplesContainer.push_back("qqHWW");
+    samplesContainer.push_back("WHWW");
+    samplesContainer.push_back("ZHWW");
   }
-  if (sampleToProcess=="DYJets") {
-    samplesContainer.push_back("DYJetsToLL");
-    if (!runOnEmbedded) 
-      samplesContainer.push_back("DYJetsToTT");
+  else if (sampleToProcess=="bbHTT_nobb") {
+    samplesContainer.push_back("bbHTTybyt_nobb");
+    samplesContainer.push_back("bbHTTyb2_nobb");
   }
-  if (sampleToProcess=="EWK") {
-    samplesContainer.push_back("EWK");
-  }
-  if (sampleToProcess=="EWKToTT") {
-    samplesContainer.push_back("EWKToTT");
-  }
-  if (sampleToProcess=="WJets") {
-    samplesContainer.push_back("WJets");    
-  }
-  if (sampleToProcess=="ggH") {
-    samplesContainer.push_back("ggHTT125");
-  }
-  if (sampleToProcess=="ggHbb") {
-    samplesContainer.push_back("ggHbbTT125");
-  }
-  if (sampleToProcess=="qqH") {
-    samplesContainer.push_back("qqHTT125");
-  }
-  if (sampleToProcess=="VH") {
-    samplesContainer.push_back("WHTT125");
-    samplesContainer.push_back("ZHTT125");
-  }
-  if (sampleToProcess=="bbH") {
-    samplesContainer.push_back("bbHTT125");
-  }
-  if (sampleToProcess=="bbHybyt") {
-    samplesContainer.push_back("bbHTTybyt125");
+  else if (sampleToProcess=="bbHTT") {
+    samplesContainer.push_back("bbHTTybyt");
+    samplesContainer.push_back("bbHTTyb2");
+    samplesContainer.push_back("bbHTTyt2");
+    samplesContainer.push_back("bbHTT");
   }
 
   InitializeSamples();
@@ -300,62 +249,38 @@ std::vector<TString> Cards::SampleSpecificCutTT(TString name, TString sampleName
   TString mcSF("");
   TString ngenPartonsCut("");
 
-  if (name=="ggHbbTT125") {
-    ngenPartonsCut = "&&gen_nbjets>=1";
+  if (name=="ggHTT"||name=="ggHWW") {
+    ngenPartonsCut = "&&gen_nbjets_cut==0";
   }
   
-  if (name=="ggHTT125") {
-    ngenPartonsCut = "&&gen_nbjets==0";
+  if (name=="bbHTTybyt_nobb"||name=="bbHTTyb2_nobb") {
+    ngenPartonsCut = "&&gen_nbjets_cut==0";
   }
 
+  if (name=="bbHTTybyt"||name=="bbHTTyt2"||name=="bbHTTyb2"||name=="bbHTT") {
+    ngenPartonsCut = "&&gen_nbjets_cut>0";
+  }
 
   if (name=="EMB") {
     mcSR = mcTauTau;
     mcSB = mcSideBand;
     mcSF = mcSingleFake;
   }
-
-  if ((name=="TTbar"||name=="EWK"||name=="WJets")) {
-    mcSR = mcNotTauTau + mcNotFakes;
+  if ((name=="TTbar"||name=="VV"||name=="WJets"||name=="ST"||name=="DYJets")) {
+    mcSR = mcNotFakes;
     mcSB = mcSideBand;
     mcSF = mcSingleFake;
   }
-  if (name=="TTbarToTT"||name=="EWKToTT"||name=="DYJetsToTT") {
+  if (name=="TTbarToTT"||name=="VVToTT"||name=="STToTT"||name=="DYJetsToTT") {
     mcSR = mcTauTau;
     mcSB = mcSideBand;
     mcSF = mcSingleFake;
   }
-  if (name=="DYJetsToLL") {
+  if (name=="DYJetsToLL"||name=="VVToL"||name=="STToL"||name=="TTbarToL") {
     mcSR = mcNotTauTau + mcNotFakes;
     mcSB = mcSideBand + mcNotTauTau;
     mcSF = mcSingleFake + mcNotTauTau;
   }
-
-  if (sampleName.Contains("WJetsToLNu_0")||
-      sampleName.Contains("DYJetsToLL_M-50_0")||
-      sampleName.Contains("DYJetsToTT_M-50_0"))
-    ngenPartonsCut = "&&(gen_noutgoing==0||gen_noutgoing>4)";
-
-  if (sampleName.Contains("WJetsToLNu_1")||
-      sampleName.Contains("DYJetsToLL_M-50_1")||
-      sampleName.Contains("DYJetsToTT_M-50_1"))
-    ngenPartonsCut = "&&gen_noutgoing==1";
-
-  if (sampleName.Contains("WJetsToLNu_2")||
-      sampleName.Contains("DYJetsToLL_M-50_2")||
-      sampleName.Contains("DYJetsToTT_M-50_2"))
-    ngenPartonsCut = "&&gen_noutgoing==2";
-
-  if (sampleName.Contains("WJetsToLNu_3")||
-      sampleName.Contains("DYJetsToLL_M-50_3")||
-      sampleName.Contains("DYJetsToTT_M-50_3"))
-    ngenPartonsCut = "&&gen_noutgoing==3";
-
-  if (sampleName.Contains("WJetsToLNu_4")||
-      sampleName.Contains("DYJetsToLL_M-50_4")||
-      sampleName.Contains("DYJetsToTT_M-50_4"))
-    ngenPartonsCut = "&&gen_noutgoing==4";
-
 
   std::vector<TString> Cuts; Cuts.clear();
   Cuts.push_back(mcSR+ngenPartonsCut);
@@ -371,242 +296,71 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
   TString mcSS("");
   TString ngenPartonsCut("");
 
-  if (name=="ggHbbTT125") {
-    ngenPartonsCut = "&&gen_nbjets>=1";
+  if (name=="ggHTT"||name=="ggHWW") {
+    ngenPartonsCut = "&&gen_nbjets_cut==0";
   }
   
-  if (name=="ggHTT125") {
-    ngenPartonsCut = "&&gen_nbjets==0";
-  }
 
-
-  if (name=="EMB") {
-    mcOS = mcTauTau;
-    mcSS = mcTauTau;
-  }
-
-  if ((name=="TTbar"||name=="EWK"||name=="WJets")) {
+  if (name=="TTbarToL"||name=="VVToL"||name=="STToLL"||name=="DYJetsToLL") {
     mcOS = mcNotTauTau;
     mcSS = mcNotTauTau;
   }
-  if (name=="TTbarToTT"||name=="EWKToTT"||name=="DYJetsToTT") {
+  if (name=="TTbarToTT"||name=="VVToTT"||name=="STToTT"||name=="DYJetsToTT") {
     mcOS = mcTauTau;
     mcSS = mcTauTau;
   }
-  if (name=="DYJetsToLL") {
-    mcOS = mcNotTauTau;
-    mcSS = mcNotTauTau;
-  }
-
-  if (sampleName.Contains("WJetsToLNu_0")||
-      sampleName.Contains("DYJetsToLL_M-50_0")||
-      sampleName.Contains("DYJetsToTT_M-50_0"))
-    ngenPartonsCut = "&&(gen_noutgoing==0||gen_noutgoing>4)";
-
-  if (sampleName.Contains("WJetsToLNu_1")||
-      sampleName.Contains("DYJetsToLL_M-50_1")||
-      sampleName.Contains("DYJetsToTT_M-50_1"))
-    ngenPartonsCut = "&&gen_noutgoing==1";
-
-  if (sampleName.Contains("WJetsToLNu_2")||
-      sampleName.Contains("DYJetsToLL_M-50_2")||
-      sampleName.Contains("DYJetsToTT_M-50_2"))
-    ngenPartonsCut = "&&gen_noutgoing==2";
-
-  if (sampleName.Contains("WJetsToLNu_3")||
-      sampleName.Contains("DYJetsToLL_M-50_3")||
-      sampleName.Contains("DYJetsToTT_M-50_3"))
-    ngenPartonsCut = "&&gen_noutgoing==3";
-
-  if (sampleName.Contains("WJetsToLNu_4")||
-      sampleName.Contains("DYJetsToLL_M-50_4")||
-      sampleName.Contains("DYJetsToTT_M-50_4"))
-    ngenPartonsCut = "&&gen_noutgoing==4";
-
 
   std::vector<TString> Cuts; Cuts.clear();
   Cuts.push_back(mcOS+ngenPartonsCut);
   Cuts.push_back(mcSS+ngenPartonsCut);
 
   return Cuts;
+
 }
 
 void Cards::InitializeSample(TString name) {
 
   std::vector<TString> sampleNames = nameSampleMap[name];
   for (auto sampleName : sampleNames) {
-    TString baseFileName = sampleName;
-    cout << name << " ----" << baseFileName << endl;
-    if (name=="DYJetsToLL") 
-      baseFileName = DYJetsLLFiles[sampleName];
-      //baseFileName = "DYJetsToLL_M-50";
-    if (name=="DYJetsToTT") 
-      baseFileName = DYJetsTTFiles[sampleName];
-    //baseFileName = "DYJetsToLL_M-50";
-    if (name=="EWKToTT") 
-      baseFileName.ReplaceAll("ToTT","");
-    if (name=="TTbarToTT") 
-      baseFileName.ReplaceAll("ToTT","");
-    if (name=="WJets") 
-      baseFileName = WJetsFiles[sampleName];
+    TString baseFileName = channel + "-NOMINAL_ntuple_" + sampleName + "_" + era;
+
     TString fullPathName = input_dir + "/" + baseFileName +".root";//+ "_"+era+".root";
     std::cout << "file " << fullPathName << std::endl;
     TFile * file = new TFile(fullPathName);
 
-    if (file->IsZombie()) {
+    if (file->IsZombie()||file==NULL) {
       std::cout << "cannot open file " << fullPathName << std::endl;
       std::cout << "nothing will be done " << std::endl;
       block = true;
       return;
     }
 
-    TTree * tree = (TTree*)file->Get("TauCheck");
+    //    TTree * tree = (TTree*)file->Get("TauCheck");
     TFile * filePred=NULL;
-    TTree * treeF=NULL;
+    //    TTree * treeF=NULL;
     TString friendName = "";
     if(_usefriend){
       if(channel=="tt")
-	friendName=input_friend_dir+baseFileName+"_pred.root";
+	friendName=input_friend_dir+"/"+baseFileName+"_pred.root";
       else
-	friendName=input_friend_dir+baseFileName+"_pred.root";
+	friendName=input_friend_dir+"/"+baseFileName+"_pred.root";
       //friendName=input_friend_dir+channel+"-"+baseFileName+".root";
       filePred = new TFile(friendName);
-      treeF=(TTree*)filePred->Get("TauCheck");
-      treeF->SetTreeIndex(0);
-      tree->AddFriend(treeF);
+      if (filePred->IsZombie()||filePred==NULL) {
+	std::cout << "cannot open friend file " << friendName << std::endl;
+	std::cout << "nothing will be done " << std::endl;
+	block = true;
+	return;
+      }
+      //      treeF=(TTree*)filePred->Get("TauCheck");
+      //      treeF->SetTreeIndex(0);
+      //      tree->AddFriend(treeF);
     }
 
     sampleFileMap[sampleName] = file;
-    TH1D * histEvents = (TH1D*)file->Get("nWeightedEvents");
-    sampleNeventsMap[sampleName] = histEvents->GetSumOfWeights();
-    if(channel=="em")sampleSpecificCutMap[sampleName] = SampleSpecificCutEM(name,sampleName);
+    samplePredFileMap[sampleName] = filePred;
+    if(channel=="em") sampleSpecificCutMap[sampleName] = SampleSpecificCutEM(name,sampleName);
     else sampleSpecificCutMap[sampleName] = SampleSpecificCutTT(name,sampleName);
-
-
-    if(!(name.Contains("DYJets")||name.Contains("WJets"))){
- 
-       if (name=="Data"||name=="EMB")
-	 sampleNormMap[sampleName] = 1.0;
-       else {
-	 cout << "lumi-" << lumi << "    sampleXSecMap[sampleName]-" << sampleXSecMap[sampleName]  << "    sampleNeventsMap[sampleName]-" << sampleNeventsMap[sampleName] << endl;
-	 sampleNormMap[sampleName] = lumi*sampleXSecMap[baseFileName]/sampleNeventsMap[sampleName];
-	 if(sampleToProcess=="ggHbb") sampleNormMap[sampleName] *= ggHbb_scale;
-       }
-    }
-  }
-
-
-  
-  if (name.Contains("DYJetsToLL")) {
-
-    float nIncl = sampleNeventsMap["DYJetsToLL_M-50_0"];
-    //float nIncl = sampleNeventsMap["DYJetsToLL_M-50"];
-    float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
-
-    float n1Jet = sampleNeventsMap["DY1JetsToLL_M-50"];
-    float xsec1Jet = sampleXSecMap["DY1JetsToLL_M-50"];
-
-    float n2Jet = sampleNeventsMap["DY2JetsToLL_M-50"];
-    float xsec2Jet = sampleXSecMap["DY2JetsToLL_M-50"];
-
-    float n3Jet = sampleNeventsMap["DY3JetsToLL_M-50"];
-    float xsec3Jet = sampleXSecMap["DY3JetsToLL_M-50"];
-
-    float n4Jet = sampleNeventsMap["DY4JetsToLL_M-50"];
-    float xsec4Jet = sampleXSecMap["DY4JetsToLL_M-50"];
-
-    sampleNormMap["DYJetsToLL_M-50"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["DYJetsToLL_M-50_0"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["DYJetsToLL_M-50_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["DYJetsToLL_M-50_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["DYJetsToLL_M-50_3"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["DYJetsToLL_M-50_4"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
-
-    sampleNormMap["DY1JetsToLL_M-50"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["DY2JetsToLL_M-50"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["DY3JetsToLL_M-50"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["DY4JetsToLL_M-50"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
-
-  }
-  else if (name.Contains("DYJetsToTT")) {
-
-    float nIncl = sampleNeventsMap["DYJetsToTT_M-50_0"];
-    //float nIncl = sampleNeventsMap["DYJetsToTT_M-50"];
-    float xsecIncl = sampleXSecMap["DYJetsToLL_M-50"];
-
-    float n1Jet = sampleNeventsMap["DY1JetsToTT_M-50"];
-    float xsec1Jet = sampleXSecMap["DY1JetsToLL_M-50"];
-
-    float n2Jet = sampleNeventsMap["DY2JetsToTT_M-50"];
-    float xsec2Jet = sampleXSecMap["DY2JetsToLL_M-50"];
-
-    float n3Jet = sampleNeventsMap["DY3JetsToTT_M-50"];
-    float xsec3Jet = sampleXSecMap["DY3JetsToLL_M-50"];
-
-    float n4Jet = sampleNeventsMap["DY4JetsToTT_M-50"];
-    float xsec4Jet = sampleXSecMap["DY4JetsToLL_M-50"];
-
-    std::cout << std::endl;
-    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-    std::cout << "nIncl = " << nIncl << "   xsecIncl = " << xsecIncl << std::endl;
-    std::cout << "n1Jet = " << n1Jet << "   xsec1Jet = " << xsec1Jet << std::endl;
-    std::cout << "n2Jet = " << n2Jet << "   xsec2Jet = " << xsec2Jet << std::endl;
-    std::cout << "n3Jet = " << n3Jet << "   xsec3Jet = " << xsec3Jet << std::endl;
-    std::cout << "n4Jet = " << n4Jet << "   xsec4Jet = " << xsec4Jet << std::endl;
-    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
-    std::cout << std::endl;
-
-    sampleNormMap["DYJetsToTT_M-50"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["DYJetsToTT_M-50_0"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["DYJetsToTT_M-50_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["DYJetsToTT_M-50_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["DYJetsToTT_M-50_3"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["DYJetsToTT_M-50_4"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
-
-    sampleNormMap["DY1JetsToTT_M-50"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["DY2JetsToTT_M-50"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["DY3JetsToTT_M-50"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["DY4JetsToTT_M-50"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
-
-  }
-  else if (name.Contains("WJets")) {
-
-    float nIncl = sampleNeventsMap["WJetsToLNu_0"];
-    //float nIncl = sampleNeventsMap["WJetsToLNu"];
-    float xsecIncl = sampleXSecMap["WJetsToLNu"];
-
-    float n1Jet = sampleNeventsMap["W1JetsToLNu"];
-    float xsec1Jet = sampleXSecMap["W1JetsToLNu"];
-
-    float n2Jet = sampleNeventsMap["W2JetsToLNu"];
-    float xsec2Jet = sampleXSecMap["W2JetsToLNu"];
-
-    float n3Jet = sampleNeventsMap["W3JetsToLNu"];
-    float xsec3Jet = sampleXSecMap["W3JetsToLNu"];
-
-    float n4Jet = sampleNeventsMap["W4JetsToLNu"];
-    float xsec4Jet = sampleXSecMap["W4JetsToLNu"];
-
-    std::cout << std::endl;
-    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl;
-    std::cout << "nIncl = " << nIncl << "   xsecIncl = " << xsecIncl << std::endl;
-    std::cout << "n1Jet = " << n1Jet << "   xsec1Jet = " << xsec1Jet << std::endl;
-    std::cout << "n2Jet = " << n2Jet << "   xsec2Jet = " << xsec2Jet << std::endl;
-    std::cout << "n3Jet = " << n3Jet << "   xsec3Jet = " << xsec3Jet << std::endl;
-    std::cout << "n4Jet = " << n4Jet << "   xsec4Jet = " << xsec4Jet << std::endl;
-    std::cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << std::endl; 
-
-    sampleNormMap["WJetsToLNu"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["WJetsToLNu_0"] = lumi*xsecIncl/nIncl;
-    sampleNormMap["WJetsToLNu_1"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["WJetsToLNu_2"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["WJetsToLNu_3"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["WJetsToLNu_4"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
-
-    sampleNormMap["W1JetsToLNu"] = lumi/(nIncl/xsecIncl+n1Jet/xsec1Jet);
-    sampleNormMap["W2JetsToLNu"] = lumi/(nIncl/xsecIncl+n2Jet/xsec2Jet);
-    sampleNormMap["W3JetsToLNu"] = lumi/(nIncl/xsecIncl+n3Jet/xsec3Jet);
-    sampleNormMap["W4JetsToLNu"] = lumi/(nIncl/xsecIncl+n4Jet/xsec4Jet);
 
   }
 
@@ -619,9 +373,9 @@ void Cards::InitializeSamples() {
 }
 
 TH1D * Cards::ProcessSample(TString name,
-				  TString sysName,
-				  unsigned int region,
-				  bool weightSys) {
+			    TString sysName,
+			    unsigned int region,
+			    bool weightSys) {
 
   bool is2D = variable.Contains(":");
 
@@ -685,14 +439,20 @@ TH1D * Cards::ProcessSample(TString name,
       return NULL;
     }
     std::cout << "      " << sampleName << "  :  entries in tree = " << tree->GetEntries() << std::endl;
-    
+
+    TTree * treeF = NULL;
+    if (_usefriend) {
+      TFile * fileF = sampleFileMap[sampleName];
+      treeF = (TTree*)fileF->Get(treeName);
+      treeF->SetTreeIndex(0);
+      tree->AddFriend(treeF);
+    }
+
     //    tree->AddFriend(treeName,friendName);
     TString cut = regionCut[region] + sampleSpecificCutMap[sampleName].at(region);
-    double norm = sampleNormMap[sampleName];
     TString HistName = sampleName+suffix;
     if(sysName!="")
       HistName+="_"+sysName;
-
 
     TH1D * histSample=NULL;
     TH2D * hist2DSample=NULL; 
@@ -703,7 +463,7 @@ TH1D * Cards::ProcessSample(TString name,
       hist2DSample = create2DHisto(HistName);
     else
       histSample = createHisto(HistName);
-    TString Cuts = weight + norm+"*(" + cut + ")";
+    TString Cuts = weight + "*(" + cut + ")";
     std::cout << HistName << "       cuts = " << Cuts << std::endl;
     tree->Draw(variable+">>"+HistName,Cuts);
     //cout<< histSample->GetEntries() << "  integral " << histSample->Integral() << endl;
@@ -892,7 +652,7 @@ int Cards::CreateShapeSystematicsMap() {
 
   if (sampleToProcess=="Data")
     return numberOfShapeSystematics;
-
+  /*
   if (sampleToProcess=="EMB") {
     for (auto mapIter : EmbeddedShapeSystematics) {
       TString sysName = mapIter.first;
@@ -901,17 +661,15 @@ int Cards::CreateShapeSystematicsMap() {
       shapeSystematicsMap[sysName+"_"+era+"Down"] = treeName+"Down";
       numberOfShapeSystematics += 2;
     }
-    /*
     for (auto mapIter : EmbeddedMetShapeSystematics) {
       TString sysName = mapIter.first;
       TString treeName = mapIter.second;
       shapeSystematicsMap[sysName] = treeName;
       numberOfShapeSystematics += 1;
     }
-    */
     return numberOfShapeSystematics;
   }
-  
+
   std::map<TString, TString> yearSysMap = ShapeSystematics_2016;
   if (era=="2016")
     yearSysMap = ShapeSystematics_2016;
@@ -935,7 +693,7 @@ int Cards::CreateShapeSystematicsMap() {
     shapeSystematicsMap[sysName+"Down"] = treeName+"Down";
     numberOfShapeSystematics += 2;
   }
-
+*/
   return numberOfShapeSystematics;
 
 }
@@ -943,6 +701,7 @@ int Cards::CreateShapeSystematicsMap() {
 int Cards::CreateWeightSystematicsMap() {
    
   int numberOfWeightSystematics = 0; 
+  /*
   if (sampleToProcess=="EMB") {
     for (auto mapIter : EmbeddedWeightSystematics) {
       TString sysName = mapIter.first;
@@ -953,41 +712,48 @@ int Cards::CreateWeightSystematicsMap() {
     }
     return numberOfWeightSystematics;
   }
-
+  */
   // Data ---->
   if (sampleToProcess=="Data") {
-        
-    std::vector<TString> jetBins = {"0","1","2"};
-    std::vector<TString> dmBins = {"0","1","10"};
-    std::vector<TString> uncs = {"1","2"};
-    for (auto jetBin : jetBins) {
-      for (auto dmBin : dmBins) {
-	for (auto unc : uncs) {
-	  TString weightName = "ff_qcd_stat_unc"+unc+"_njet"+jetBin+"_dm"+dmBin;
-	  TString weightNameUp = weightName + "*";
-	  TString weightNameDown = "(1/"+weightName+")*";
-	  TString sysName = "CMS_ff_total_qcd_stat_unc"+unc+"_njets"+jetBin+"_dm"+dmBin+"_tt_"+era;
-	  TString sysNameUp = sysName + "Up";
-	  TString sysNameDown = sysName + "Down";
-	  weightSystematicsMap[sysNameUp] = weightNameUp;
-	  weightSystematicsMap[sysNameDown] = weightNameDown;
-	  numberOfWeightSystematics += 2;
-	}
+
+    if (channel=="em") {
+      for (auto mapIter : QCDSystematics) {
+	TString sysName = mapIter.first + "_" + era;
+	TString weightName = mapIter.second;
+	TString weightNameUp = weightName + "Up*";
+	TString weightNameDown = weightName + "Down*";
+	TString sysNameUp = sysName + "Up";
+	TString sysNameDown = sysName + "Down";
+	weightSystematicsMap[sysNameUp] = weightNameUp;
+	weightSystematicsMap[sysNameDown] = weightNameDown;
+      }
+      for (auto mapIter : QCDIsoSystematics) {
+	TString sysName = mapIter.first + "_" + era;
+        TString weightName = mapIter.second;
+        TString weightNameUp = weightName + "*";
+        TString weightNameDown = "(1.0/"+weightName + ")*";
+	TString sysNameUp = sysName + "Up";
+        TString sysNameDown = sysName + "Down";
+	weightSystematicsMap[sysNameUp] = weightNameUp;
+        weightSystematicsMap[sysNameDown] = weightNameDown;
+	numberOfWeightSystematics += 2;
       }
     }
 
-    for (auto mapIter : FakeFactorSystematics) {
-      TString sysName = mapIter.first + "_" + era;
-      TString weightName = mapIter.second;
-      TString weightNameUp = weightName + "*";
-      TString weightNameDown = "(1/"+weightName+")*";
-      TString sysNameUp = sysName + "Up";
-      TString sysNameDown = sysName + "Down";
-      weightSystematicsMap[sysNameUp] = weightNameUp;
-      weightSystematicsMap[sysNameDown] = weightNameDown;    
-      numberOfWeightSystematics += 2;
+    if (channel=="tt") {
+      for (auto mapIter : FakeFactorSystematics) {
+	TString sysName = mapIter.first + "_" + era;
+	TString weightName = mapIter.second;
+	TString weightNameUp = weightName + "*";
+	TString weightNameDown = "(1.0/"+weightName+")*";
+	TString sysNameUp = sysName + "Up";
+	TString sysNameDown = sysName + "Down";
+	weightSystematicsMap[sysNameUp] = weightNameUp;
+	weightSystematicsMap[sysNameDown] = weightNameDown;    
+	numberOfWeightSystematics += 2;
+      }
     }
-
+    
     return numberOfWeightSystematics;
 
   }
@@ -1000,16 +766,18 @@ int Cards::CreateWeightSystematicsMap() {
     numberOfWeightSystematics++;
   }
 
-  // tau id and trigger and l->tau fakes
-  for (auto mapIter : WeightSystematics) {
-    TString sysName = mapIter.first;
-    TString weightName = mapIter.second;
-    weightSystematicsMap[sysName+"_"+era+"Up"] = weightName + "Up*";
-    weightSystematicsMap[sysName+"_"+era+"Down"] = weightName + "Down*";
-    numberOfWeightSystematics += 2;
+  if (channel=="tt") {
+    // tau id and trigger and l->tau fakes
+    for (auto mapIter : WeightSystematicsTT) {
+      TString sysName = mapIter.first;
+      TString weightName = mapIter.second;
+      weightSystematicsMap[sysName+"_"+era+"Up"] = weightName + "Up*";
+      weightSystematicsMap[sysName+"_"+era+"Down"] = weightName + "Down*";
+      numberOfWeightSystematics += 2;
+    }
   }
 
-  if (sampleToProcess=="ggH") {
+  if (sampleToProcess=="Higgs") {
     for (auto mapIter : SignalSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
@@ -1066,19 +834,19 @@ bool Cards::RunData() {
     cout << ">>> processing sample " << name << endl;
     TH1D * hist = ProcessSample(name,"",1,false);
     QCD->Add(QCD,hist,1.,-1.);
-    QCD_Up->Add(QCD_Up,hist,1.,-0.9);
-    QCD_Down->Add(QCD_Down,hist,1.,-1.1);
+    QCD_Up->Add(QCD_Up,hist,1.,-0.8);
+    QCD_Down->Add(QCD_Down,hist,1.,-1.2);
     delete hist;
   }
   
   if(channel=="em"){
     nameTH1DMap["QCD"] = QCD;
-    nameTH1DMap["QCD_CMS_total_subtr_syst_tt_"+era+"Up"] = QCD_Up;
-    nameTH1DMap["QCD_CMS_total_subtr_syst_tt_"+era+"Down"] = QCD_Down;
+    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Up"] = QCD_Up;
+    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Down"] = QCD_Down;
   }else{
     nameTH1DMap["jetFakes"] = QCD;
-    nameTH1DMap["jetFakes_CMS_ff_total_subtr_syst_tt_"+era+"Up"] = QCD_Up;
-    nameTH1DMap["jetFakes_CMS_ff_total_subtr_syst_tt_"+era+"Down"] = QCD_Down;
+    nameTH1DMap["jetFakes_CMS_fakes_subtr_syst_tt_"+era+"Up"] = QCD_Up;
+    nameTH1DMap["jetFakes_CMS_fakes_subtr_syst_tt_"+era+"Down"] = QCD_Down;
   }
 
   bool first = true;
@@ -1112,8 +880,7 @@ bool Cards::RunData() {
       QCD_sys->Add(QCD_sys,hist,1.,-1.);
       delete hist;
     }
-    if(channel=="em")
-      nameTH1DMap["QCD_"+sysName] = QCD_sys;
+    if(channel=="em") nameTH1DMap["QCD_"+sysName] = QCD_sys;
     else nameTH1DMap["jetFakes_"+sysName] = QCD_sys;
   }
 
@@ -1220,7 +987,6 @@ void Cards::PrintSamples() {
     vector<TString> sampleNames = nameSampleMap["Data"];
     std::cout << "Data -> " << nameHistoMap["Data"] << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << std::endl;
     for (auto sampleName : sampleNames) {
-      std::cout << "    " << sampleName << " : norm = " << sampleNormMap[sampleName] << std::endl;
       std::cout << "      cut(SR/OS) : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
       std::cout << "      cut(SB/SS) : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
       if(channel=="tt")std::cout << "      cut(SF) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;
@@ -1232,7 +998,6 @@ void Cards::PrintSamples() {
     std::cout << name << " -> " << nameHistoMap[name] << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << std::endl;
     vector<TString> sampleNames = nameSampleMap[name];
     for (auto sampleName : sampleNames) {
-      std::cout << "    " << sampleName << " : norm = " << sampleNormMap[sampleName] << std::endl;
       std::cout << "      cut(SR/OS) : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
       std::cout << "      cut(SB/SS) : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
       if(channel=="tt")std::cout << "      cut(SF) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;

@@ -13,22 +13,25 @@
 #include <algorithm>
 
 // Samples :
-// Data - data_obs
+// Data - data_obs (Tau or MuonEG)
 // DYJetsToLL - ZL
-// WJets - W
-// TTbar - TTL
-// EWK - VVL
-// EMB - EMB 
-// ggHWW125, 
-// qqHWW125, 
-// WHWW125,
-// ZHWW125,
-// ggH125, 
-// qqH125 
+// DYJetsToTT - ZTT
+// WJets    - W
+// TTbarToL - TTL
+// TTbar    - TT
+// EWKToL   - VVL
+// EWK      - VV
+// ggHWW - ggHWW125 
+// qqHWW - qqHWW125 
+// WHWW  - WHWW125
+// ZHWW  - ZHWW125
+// ggH   - ggH125
+// qqH   - 
 // WH125,
 // ZH125,  
-// bbH125
-// ttH125 
+// bbHyt2
+// bbHyb2
+//  
 
 // sampleToProcess = Data (Data and QCD)
 //                 = DYJetsToLL
@@ -89,528 +92,11 @@ class Cards {
 
  private:
 
-  const map<TString, double> xsecs_2016 = {
-    {"WJetsToLNu"  , 61526.7}, // NNLO (1)
-    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
-    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
-    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
-    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
-    {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
-    {"DY1JetsToLL_M-50"      , 1253.1}, // NNLO (20a)
-    {"DY2JetsToLL_M-50"      , 409.4}, // NNLO (20b)
-    {"DY3JetsToLL_M-50"      , 124.8}, // NNLO (20c)
-    {"DY4JetsToLL_M-50"      , 67.33}, // NNLO (20d)
-    {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-    {"TTToHadronic"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f"      , 136.02}, 
-    {"ST_t-channel_antitop_4f"  , 80.95}, 
-    {"ST_tW_top_5f"             , 35.85}, 
-    {"ST_tW_antitop_5f"         , 35.85}, 
-    {"VVTo2L2Nu"                , 13.84},
-    {"WWToLNuQQ"                , 49.997},
-    {"WZTo2L2Q"                 , 5.52},
-    {"WZTo1L1Nu2Q"              , 10.71},
-    {"WZTo1L3Nu"                , 3.05},
-    {"WZJToLLLNu"               , 4.708},
-    {"WZTo3LNu"                 , 4.43},
-    {"ZZTo4L"                   , 1.26},
-    {"ZZTo2L2Q"                 , 3.38},
-    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
-    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
-    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
-    {"ST_tW_top_5f_corrMET"             , 35.85}, 
-    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
-    {"VVTo2L2Nu_corrMET"                , 13.84},
-    {"WWToLNuQQ_corrMET"                , 49.997},
-    {"WZTo2L2Q_corrMET"                 , 5.52},
-    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
-    {"WZTo1L3Nu_corrMET"                , 3.05},
-    {"WZJToLLLNu_corrMET"               , 4.708},
-    {"WZTo3LNu_corrMET"                 , 4.43},
-    {"ZZTo4L_corrMET"                   , 1.26},
-    {"ZZTo2L2Q_corrMET"                 , 3.38},
-    {"GluGluHToTauTau_M125"     , 3.00},
-    {"VBFHToTauTau_M125"        , 0.237},
-    {"VBFHToTauTau_M95"         , 1.00},
-    {"WplusHToTauTau_M125"      , 0.0527},
-    {"WminusHToTauTau_M125"     , 0.0334},
-    {"ZHToTauTau_M125_13TeV"    , 0.0477},
-    {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
-    {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
-    {"HWminusJ_HToWW_M125"      , 0.114},
-    {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
-  {"BBHToTauTau_M125_13TeV",  0.0972},
-  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
-  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
-  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
-  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
-  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
-  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307},  
-  };
-
-  const map<TString, double> xsecs_2017 = {
-    {"WJetsToLNu"  , 61526.7}, // NNLO (1)
-    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
-    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
-    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
-    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
-    {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
-    {"DY1JetsToLL_M-50"      , 977.1}, // NNLO (20a)
-    {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
-    {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
-    {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
-    {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-    {"TTToHadronic"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f"      , 136.02}, 
-    {"ST_t-channel_antitop_4f"  , 80.95}, 
-    {"ST_tW_top_5f"             , 35.85}, 
-    {"ST_tW_antitop_5f"         , 35.85}, 
-    {"VVTo2L2Nu"                , 13.84},
-    {"WWToLNuQQ"                , 49.997},
-    {"WZTo2L2Q"                 , 5.52},
-    {"WZTo1L1Nu2Q"              , 10.71},
-    {"WZTo1L3Nu"                , 3.05},
-    {"WZJToLLLNu"               , 4.708},
-    {"WZTo3LNu"                 , 4.43},
-    {"ZZTo4L"                   , 1.26},
-    {"ZZTo2L2Q"                 , 3.38},
-    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
-    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
-    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
-    {"ST_tW_top_5f_corrMET"             , 35.85}, 
-    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
-    {"VVTo2L2Nu_corrMET"                , 13.84},
-    {"WWToLNuQQ_corrMET"                , 49.997},
-    {"WZTo2L2Q_corrMET"                 , 5.52},
-    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
-    {"WZTo1L3Nu_corrMET"                , 3.05},
-    {"WZJToLLLNu_corrMET"               , 4.708},
-    {"WZTo3LNu_corrMET"                 , 4.43},
-    {"ZZTo4L_corrMET"                   , 1.26},
-    {"ZZTo2L2Q_corrMET"                 , 3.38},
-    {"GluGluHToTauTau_M125"     , 3.00},
-    {"VBFHToTauTau_M125"        , 0.237},
-    {"VBFHToTauTau_M95"         , 1.00},
-    {"WplusHToTauTau_M125"      , 0.0527},
-    {"WminusHToTauTau_M125"     , 0.0334},
-    {"ZHToTauTau_M125_13TeV"    , 0.0477},
-    {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
-    {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
-    {"HWminusJ_HToWW_M125"      , 0.114},
-    {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
-  {"BBHToTauTau_M125_13TeV",  0.0972},
-  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
-  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
-  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
-  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
-  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
-  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307}, 
-  };
-
-  const map<TString, double> xsecs_2018 = {
-    {"WJetsToLNu"  , 61526.7}, // NNLO (1)
-    {"W1JetsToLNu" , 9370.5}, // NNLO (2)
-    {"W2JetsToLNu" , 3170.9}, // NNLO (3)
-    {"W3JetsToLNu" , 1132.5}, // NNLO (4)
-    {"W4JetsToLNu" , 631.5 }, // NNLO (5)
-    {"DYJetsToLL_M-10to50",  21658.0}, // NNLO 
-    {"DYJetsToTT_M-50"       , 6077.22},  // NNLO (20)
-    {"DYJetsToLL_M-50"       , 6077.22},  // NNLO (20)
-    {"DY1JetsToLL_M-50"      , 1007.6}, // NNLO (20a)
-    {"DY2JetsToLL_M-50"      , 344.3}, // NNLO (20b)
-    {"DY3JetsToLL_M-50"      , 125.3}, // NNLO (20c)
-    {"DY4JetsToLL_M-50"      , 71.20}, // NNLO (20d)
-    {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-    {"TTToHadronic"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f"      , 136.02}, 
-    {"ST_t-channel_antitop_4f"  , 80.95}, 
-    {"ST_tW_top_5f"             , 35.85}, 
-    {"ST_tW_antitop_5f"         , 35.85}, 
-    {"VVTo2L2Nu"                , 13.84},
-    {"WWToLNuQQ"                , 49.997},
-    {"WZTo2L2Q"                 , 5.52},
-    {"WZTo1L1Nu2Q"              , 10.71},
-    {"WZTo1L3Nu"                , 3.05},
-    {"WZJToLLLNu"               , 4.708},
-    {"WZTo3LNu"                 , 4.43},
-    {"ZZTo4L"                   , 1.26},
-    {"ZZTo2L2Q"                 , 3.38},
-    {"TTTo2L2NuToTT"        , 88.29},  // NNLO (21)
-    {"TTToHadronicToTT"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonicToTT" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4fToTT"      , 136.02}, 
-    {"ST_t-channel_antitop_4fToTT"  , 80.95}, 
-    {"ST_tW_top_5fToTT"             , 35.85}, 
-    {"ST_tW_antitop_5fToTT"         , 35.85}, 
-    {"VVTo2L2NuToTT"                , 13.84},
-    {"WWToLNuQQToTT"                , 49.997},
-    {"WZTo2L2QToTT"                 , 5.52},
-    {"WZTo1L1Nu2QToTT"              , 10.71},
-    {"WZTo1L3NuToTT"                , 3.05},
-    {"WZJToLLLNuToTT"               , 4.708},
-    {"WZTo3LNuToTT"                 , 4.43},
-    {"ZZTo4LToTT"                   , 1.26},
-    {"ZZTo2L2QToTT"                 , 3.38},
-    {"TTTo2L2Nu_corrMET"        , 88.29},  // NNLO (21)
-    {"TTToHadronic_corrMET"     , 377.96}, // NNLO (22)
-    {"TTToSemiLeptonic_corrMET" , 365.35}, // NNLO (23)
-    {"ST_t-channel_top_4f_corrMET"      , 136.02}, 
-    {"ST_t-channel_antitop_4f_corrMET"  , 80.95}, 
-    {"ST_tW_top_5f_corrMET"             , 35.85}, 
-    {"ST_tW_antitop_5f_corrMET"         , 35.85}, 
-    {"VVTo2L2Nu_corrMET"                , 13.84},
-    {"WWToLNuQQ_corrMET"                , 49.997},
-    {"WZTo2L2Q_corrMET"                 , 5.52},
-    {"WZTo1L1Nu2Q_corrMET"              , 10.71},
-    {"WZTo1L3Nu_corrMET"                , 3.05},
-    {"WZJToLLLNu_corrMET"               , 4.708},
-    {"WZTo3LNu_corrMET"                 , 4.43},
-    {"ZZTo4L_corrMET"                   , 1.26},
-    {"ZZTo2L2Q_corrMET"                 , 3.38},
-    {"GluGluHToTauTau_M125"     , 3.00},
-    {"VBFHToTauTau_M125"        , 0.237},
-    {"VBFHToTauTau_M95"         , 1.00},
-    {"WplusHToTauTau_M125"      , 0.0527},
-    {"WminusHToTauTau_M125"     , 0.0334},
-    {"ZHToTauTau_M125_13TeV"    , 0.0477},
-    {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
-    {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
-    {"HWminusJ_HToWW_M125"      , 0.114},
-    {"HWplusJ_HToWW_M125"       , 0.18},
-    {"ZHJ_HToWW_M125"           , 0.163},
-    {"SUSYGluGluToBBHToTauTau_powheg_M125", 0.405*6.208E-02},
-  {"BBHToTauTau_M125_13TeV",  0.0972},
-  {"BBHToTauTauYbYt_M125_13TeV",  0.0157},
-  {"GluGluToBBHToTauTau_M125_13TeV",  0.307},
-  {"bbHToTauTau_yb2_M125_MiniAOD", 0.0972},
-  {"bbHToTauTau_yb2_M125_MiniAODv2",0.0972},
-  {"bbHToTauTau_yt2_M125_MiniAOD", 0.307},
-  {"bbHToTauTau_yt2_M125_MiniAODv2", 0.307}, 
-  };
-
-  const double ggHbb_scale = 0.54;
-
-  map<TString,double> xsecs;
-
-  vector<TString> Embedded;
-  vector<TString> Data;
-
-
-  // Data TauTau
-  // ******* 2018 ******
-
-  const vector<TString> DataTauTau_2018 = {
-    "Tau_Run2018A",
-    "Tau_Run2018B",
-    "Tau_Run2018C",
-    "Tau_Run2018D"
-  };
-    // ******* 2017 ******
-
-  const vector<TString> DataTauTau_2017 = {
-    "Tau_Run2017B",
-    "Tau_Run2017C",
-    "Tau_Run2017D",
-    "Tau_Run2017E",
-    "Tau_Run2017F"
-  };
-  
-  // ******* 2016 ******
-
-  const vector<TString> DataTauTau_2016 = {
-    "Tau_Run2016B",
-    "Tau_Run2016C",
-    "Tau_Run2016D",
-    "Tau_Run2016E",
-    "Tau_Run2016F",
-    "Tau_Run2016G",
-    "Tau_Run2016H"
-  };
-    // Data ElMu
-
-  // ******* 2018 ******
-
-  const vector<TString> DataElMu_2018 = {
-    "MuonEG_Run2018A",
-    "MuonEG_Run2018B",
-    "MuonEG_Run2018C",
-    "MuonEG_Run2018D"
-  };
-  // ******* 2017 ******
-
-  const vector<TString> DataElMu_2017 = {
-    "MuonEG_Run2017B",
-    "MuonEG_Run2017C",
-    "MuonEG_Run2017D",
-    "MuonEG_Run2017E",
-    "MuonEG_Run2017F"
-  };
-  
-  // ******* 2016 ******
-
-  const vector<TString> DataElMu_2016 = {
-    "MuonEG_Run2016B",
-    "MuonEG_Run2016C",
-    "MuonEG_Run2016D",
-    "MuonEG_Run2016E",
-    "MuonEG_Run2016F",
-    "MuonEG_Run2016G",
-    "MuonEG_Run2016H"
-  };
-  
-  // ****** embedded samples *************
-
-
-  const vector<TString> EmbeddedTauTau_2016 = {
-    "EmbeddedTauTau_Run2016B",
-    "EmbeddedTauTau_Run2016C",
-    "EmbeddedTauTau_Run2016D",
-    "EmbeddedTauTau_Run2016E",
-    "EmbeddedTauTau_Run2016F",
-    "EmbeddedTauTau_Run2016G",
-    "EmbeddedTauTau_Run2016H"
-  };
-  
-  const vector<TString> EmbeddedTauTau_2017 = {
-    "EmbeddedTauTau_Run2017B",
-    "EmbeddedTauTau_Run2017C",
-    "EmbeddedTauTau_Run2017D",
-    "EmbeddedTauTau_Run2017E",
-    "EmbeddedTauTau_Run2017F",
-  };
-
-  const vector<TString> EmbeddedTauTau_2018 = {
-    "EmbeddedTauTau_Run2018A",
-    "EmbeddedTauTau_Run2018B",
-    "EmbeddedTauTau_Run2018C",
-    "EmbeddedTauTau_Run2018D"
-  };
-
-  const vector<TString> EmbeddedElMu_2016 = {
-    "EmbeddedElMu_Run2016B",
-    "EmbeddedElMu_Run2016C",
-    "EmbeddedElMu_Run2016D",
-    "EmbeddedElMu_Run2016E",
-    "EmbeddedElMu_Run2016F",
-    "EmbeddedElMu_Run2016G",
-    "EmbeddedElMu_Run2016H"
-  };
-  
-  const vector<TString> EmbeddedElMu_2017 = {
-    "EmbeddedElMu_Run2017B",
-    "EmbeddedElMu_Run2017C",
-    "EmbeddedElMu_Run2017D",
-    "EmbeddedElMu_Run2017E",
-    "EmbeddedElMu_Run2017F",
-  };
-
-  const vector<TString> EmbeddedElMu_2018 = {
-    "EmbeddedElMu_Run2018A",
-    "EmbeddedElMu_Run2018B",
-    "EmbeddedElMu_Run2018C",
-    "EmbeddedElMu_Run2018D"
-  };
-
-  // ******** MC samples *************
-
-  const vector<TString> WJets = {
-    //"WJetsToLNu"/*
-    "WJetsToLNu_0",
-    "WJetsToLNu_1",
-    "WJetsToLNu_2",
-    "WJetsToLNu_3",
-    "WJetsToLNu_4",
-    "W1JetsToLNu",
-    "W2JetsToLNu",
-    "W3JetsToLNu",
-    "W4JetsToLNu"
-  };
-  
-  vector<TString> DYJetsToLL = {
-    //"DYJetsToLL_M-50"
-    "DYJetsToLL_M-50_0",
-    "DYJetsToLL_M-50_1",
-    "DYJetsToLL_M-50_2",
-    "DYJetsToLL_M-50_3",
-    "DYJetsToLL_M-50_4",
-    "DY1JetsToLL_M-50",
-    "DY2JetsToLL_M-50",
-    "DY3JetsToLL_M-50",
-    "DY4JetsToLL_M-50" 
-  };
-
-  vector<TString> DYJetsToTT = {
-    //"DYJetsToTT_M-50",
-    "DYJetsToTT_M-50_0",
-    "DYJetsToTT_M-50_1",
-    "DYJetsToTT_M-50_2",
-    "DYJetsToTT_M-50_3",
-    "DYJetsToTT_M-50_4",
-    "DY1JetsToTT_M-50",
-    "DY2JetsToTT_M-50",
-    "DY3JetsToTT_M-50",
-    "DY4JetsToTT_M-50"  
-  };
-  
-  /*
-    vector<TString> DYJets = {
-    "DYJetsToLL_M-50",
-    "DY1JetsToLL_M-50",
-    "DY2JetsToLL_M-50",
-    "DY3JetsToLL_M-50",
-    "DY4JetsToLL_M-50"  
-    };
-  */
-  
-  // needed for stitching 
-  map<TString,TString> WJetsFiles = {
-    {"WJetsToLNu","WJetsToLNu"},
-    {"WJetsToLNu_0","WJetsToLNu"},
-    {"WJetsToLNu_1","WJetsToLNu"},
-    {"WJetsToLNu_2","WJetsToLNu"},
-    {"WJetsToLNu_3","WJetsToLNu"},
-    {"WJetsToLNu_4","WJetsToLNu"},
-    {"W1JetsToLNu","W1JetsToLNu"},
-    {"W2JetsToLNu","W2JetsToLNu"},
-    {"W3JetsToLNu","W3JetsToLNu"},
-    {"W4JetsToLNu","W4JetsToLNu"}
-  };
-
-  map<TString,TString> DYJetsLLFiles = {
-    {"DYJetsToLL_M-50","DYJetsToLL_M-50"},
-    {"DYJetsToLL_M-50_0","DYJetsToLL_M-50"},
-    {"DYJetsToLL_M-50_1","DYJetsToLL_M-50"},
-    {"DYJetsToLL_M-50_2","DYJetsToLL_M-50"},
-    {"DYJetsToLL_M-50_3","DYJetsToLL_M-50"},
-    {"DYJetsToLL_M-50_4","DYJetsToLL_M-50"},
-    {"DY1JetsToLL_M-50","DY1JetsToLL_M-50"},
-    {"DY2JetsToLL_M-50","DY2JetsToLL_M-50"},
-    {"DY3JetsToLL_M-50","DY3JetsToLL_M-50"},
-    {"DY4JetsToLL_M-50","DY4JetsToLL_M-50"},
-  };
-
-  map<TString,TString> DYJetsTTFiles = {
-    {"DYJetsToTT_M-50","DYJetsToLL_M-50"},
-    {"DYJetsToTT_M-50_0","DYJetsToLL_M-50"},
-    {"DYJetsToTT_M-50_1","DYJetsToLL_M-50"},
-    {"DYJetsToTT_M-50_2","DYJetsToLL_M-50"},
-    {"DYJetsToTT_M-50_3","DYJetsToLL_M-50"},
-    {"DYJetsToTT_M-50_4","DYJetsToLL_M-50"},
-    {"DY1JetsToTT_M-50","DY1JetsToLL_M-50"},
-    {"DY2JetsToTT_M-50","DY2JetsToLL_M-50"},
-    {"DY3JetsToTT_M-50","DY3JetsToLL_M-50"},
-    {"DY4JetsToTT_M-50","DY4JetsToLL_M-50"},
-  };
-  
-  vector<TString> EWK = {
-    "ST_t-channel_top_4f",
-    "ST_t-channel_antitop_4f",
-    "ST_tW_top_5f",
-    "ST_tW_antitop_5f",
-    "VVTo2L2Nu",
-    "WZTo2L2Q",
-    "WZTo3LNu",
-    "ZZTo2L2Q",
-    "ZZTo4L"
-  };
-
-  vector<TString> EWKToTT = {
-    "ST_t-channel_top_4fToTT",
-    "ST_t-channel_antitop_4fToTT",
-    "ST_tW_top_5fToTT",
-    "ST_tW_antitop_5fToTT",
-    "VVTo2L2NuToTT",
-    "WZTo2L2QToTT",
-    "WZTo3LNuToTT",
-    "ZZTo2L2QToTT",
-    "ZZTo4LToTT"
-  };
-
-  vector<TString> TT = {
-    "TTTo2L2Nu",
-    "TTToHadronic",
-    "TTToSemiLeptonic"
-  };
-
-  vector<TString> TTToTT = {
-    "TTTo2L2NuToTT",
-    "TTToHadronicToTT",
-    "TTToSemiLeptonicToTT"
-  };
-
-  map<TString,TString> TTToTTFiles = {
-    {"TTTo2L2NuToTT","TTTo2L2Nu"},
-    {"TTToHadronicToTT","TTToHadronic"},
-    {"TTToSemiLeptonicToTT","TTToSemiLeptonic"}
-  };
-
-  vector<TString> DYJets_Low = {
-    "DYJetsToLL_M-10to50"
-  };
-  
-  vector<TString> GluGluHToTauTau = {
-    "GluGluHToTauTau_M125",
-    "bbHToTauTau_yt2_M125_MiniAODv2",
-    //"GluGluToBBHToTauTau_M125_13TeV"
-  };
-  
-  vector<TString> VBFHToTauTau = {
-    "VBFHToTauTau_M125"
-  };
-
-  vector<TString> WHToTauTau = {
-    "WplusHToTauTau_M125",
-    "WminusHToTauTau_M125"
-  };
-
-  vector<TString> ZHToTauTau = {
-    "ZHToTauTau_M125_13TeV"
-  };
-
-  vector<TString> bbHToTauTau = {
-    //    "BBHToTauTau_M125_13TeV"
-"bbHToTauTau_yb2_M125_MiniAODv2"
-  };
-
-  vector<TString> bbHybytToTauTau = {
-    "BBHToTauTauYbYt_M125_13TeV"
-  };
-
-  vector<TString> GluGluHToWW = {
-    "GluGluHToWWTo2L2Nu_M125"
-  };
-  
-  vector<TString> VBFHToWW = {
-    "VBFHToWWTo2L2Nu_M125"
-  };
-
-  vector<TString> WHToWW = {
-    "HWminusJ_HToWW_M125",
-    "HWplusJ_HToWW_M125"
-  };
-
-  vector<TString> ZHToWW = {
-    "ZHJ_HToWW_M125"
-  };
-  
   TString mcNotTauTau;
   TString mcTauTau;
   const TString BaseTreeName = "TauCheck"; 
   TString baselineTT="trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5";
-  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>10.&&pt_2>10.&&extraelec_veto < 0.5&&extramuon_veto<0.5";
+  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&extraelec_veto < 0.5&&extramuon_veto<0.5";
   TString category;
   const TString mcNotTauTau_TT = "&&!(gen_match_1==5&&gen_match_2==5)";
   const TString mcTauTau_TT = "&&(gen_match_1==5&&gen_match_2==5)";
@@ -627,27 +113,6 @@ class Cards {
 
   vector<TString> regionCut;    // three regions defined (SR, fake AR, single fake region)
   vector<TString> regionWeight; // three regions defined 
-
-
-
-  // ************************
-  // ***** Fake Factors *****
-  // ************************
-
-
-  std::map<TString,TString> FF_pt2_era = {
-    {"2016","1.05*(1.0*(pt_2<=120.)+0.80*(pt_2>120.))*"},
-    {"2017","1.06*(1.0*(pt_2<=80.)+0.90*(pt_2>80.))*"},
-    {"2018","1.06*(1.0*(pt_2<=80.)+0.85*(pt_2>80.&&pt_2<=95.)+0.6*(pt_2>95.))*"},
-  }; 
-  std::map<TString,TString> FF_btg_era = {
-    {"2016","(1.0*(nbtag==0)+0.93*(nbtag==1)+1.00*(nbtag>=2))*"},
-    {"2017","(1.0*(nbtag<=1)+0.60*(nbtag==2)+0.50*(nbtag>=3))*"},
-    {"2018","(1.0*(nbtag==0)+0.93*(nbtag==1)+0.52*(nbtag>=2))*"},
-  };
-
-
-
 
   // *****************************
   // ***** Shape systematics *****
@@ -751,7 +216,7 @@ class Cards {
     {"CMS_htt_ttbarShapeDown","(1/topptweight)"},
   };
 
-  const map<TString,TString> WeightSystematics = {
+  const map<TString,TString> WeightSystematicsTT = {
     {"CMS_eff_xtrigger_t_tt_dm0","weight_CMS_eff_tau_trig_DM0"},
     {"CMS_eff_xtrigger_t_tt_dm1","weight_CMS_eff_tau_trig_DM1"},
     {"CMS_eff_xtrigger_t_tt_dm10","weight_CMS_eff_tau_trig_DM10"},
@@ -764,7 +229,7 @@ class Cards {
     {"CMS_htt_fake_m_tt","weight_CMS_mutaufake"}
   };
 
-  const map<TString,TString> EmbeddedWeightSystematics = {
+  const map<TString,TString> EmbeddedWeightSystematicsTT = {
     {"CMS_eff_xtrigger_t_emb_tt_dm0","weight_CMS_eff_tau_trig_DM0"},
     {"CMS_eff_xtrigger_t_emb_tt_dm1","weight_CMS_eff_tau_trig_DM1"},
     {"CMS_eff_xtrigger_t_emb_tt_dm10","weight_CMS_eff_tau_trig_DM10"},
@@ -783,16 +248,38 @@ class Cards {
     {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
   };
 
+  const map<TString,TString> QCDSystematics = {
+    {"CMS_htt_em_qcd_0jet_rate","qcdweight_deltaR_0jet_Par0"},
+    {"CMS_htt_em_qcd_0jet_shape","qcdweight_deltaR_0jet_Par1"},
+    {"CMS_htt_em_qcd_0jet_shape2","qcdweight_deltaR_0jet_Par2"},
+    {"CMS_htt_em_qcd_1jet_rate","qcdweight_deltaR_1jet_Par0"},
+    {"CMS_htt_em_qcd_1jet_shape","qcdweight_deltaR_1jet_Par1"},
+    {"CMS_htt_em_qcd_1jet_shape2","qcdweight_deltaR_1jet_Par2"},
+    {"CMS_htt_em_qcd_2jet_rate","qcdweight_deltaR_2jet_Par0"},
+    {"CMS_htt_em_qcd_2jet_shape","qcdweight_deltaR_2jet_Par1"},
+    {"CMS_htt_em)qcd_2jet_shape2","qcdweight_deltaR_0jet_Par2"},
+  };
+
   const map<TString,TString> FakeFactorSystematics = {
-    {"CMS_ff_total_qcd_met_closure_syst_tt","ff_qcd_met"},
-    {"CMS_ff_total_qcd_pt2_closure_syst_tt","ff_qcd_pt2"},
-    {"CMS_ff_total_qcd_osss_extrap_syst_tt","ff_qcd_syst"}
+    {"CMS_htt_tt_qcd_stat_dR_unc1","ff_qcd_stat_dR_unc1"},
+    {"CMS_htt_tt_qcd_stat_dR_unc2","ff_qcd_stat_dR_unc2"},    
+    {"CMS_htt_tt_qcd_stat_pt_unc1","ff_qcd_stat_pt_unc1"},
+    {"CMS_htt_tt_qcd_stat_pt_unc2","ff_qcd_stat_pt_unc2"},
+    {"CMS_htt_tt_qcd_syst","ff_qcd_syst"},
+    {"CMS_htt_tt_qcd_syst_dr_closure","ff_qcd_syst_dr_closure"},
+    {"CMS_htt_tt_qcd_syst_pt_2_closure","ff_qcd_syst_pt_2_closure"},
+    {"CMS_htt_tt_qcd_syst_met_closur","ff_qcd_syst_met_closure"},
+  };
+
+  const map<TString,TString> QCDIsoSystematics = {
+    {"CMS_htt_em_qcd_iso","qcdweight_isolationcorrection"},
+    {"CMS_htt_em_qcd_nonClosure","qcdweight_nonclosure"},
   };
 
   const map<TString,TString> SignalSystematics = {
     {"CMS_QCDscale","weight_CMS_scale_gg_13TeV"},
-    {"CMS_PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
-    {"CMS_PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"},
+    //    {"CMS_PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
+    //    {"CMS_PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"},
   };
 
   // ******************************************************* 
@@ -801,18 +288,14 @@ class Cards {
 
   map<TString, TString> weightSystematicsMap;
   map<TString, TString> shapeSystematicsMap;
-  map<TString, double> sampleNormMap; // sample-norm map
   map<TString, TFile*> sampleFileMap; // sample-file map
-  map<TString, TString> baseNameMap; // sample-baseName map
+  map<TString, TFile*> samplePredFileMap; // sample-friend map
+  //  map<TString, TString> baseNameMap; // sample-baseName map
   map<TString, vector<TString> > nameSampleMap; // sample map
   map<TString, vector<TString> > sampleSpecificCutMap; // sample-specific-cut map
-  map<TString, double> sampleXSecMap;
-  map<TString, double> sampleNeventsMap;
   map<TString, TString> nameHistoMap;
   map<TString, TH1D*> nameTH1DMap;
   vector<TString> samplesContainer;
-
-  map<TString, map<TString,double> > btagCorr_Cat;
 
   int numberOfShapeSystematics;
   int numberOfWeightSystematics;
@@ -832,9 +315,51 @@ class Cards {
   TString output_filename; // outputdir + era / sampleToProcess + Category;
   TFile * outputFile; 
 
-  TString globalWeight="weight*";
+  const std::vector<TString> Tau = {"Tau"};
+  const std::vector<TString> MuonEG = {"MuonEG"};
+  const std::vector<TString> DYJets = {"DYJets_amcatnlo"};
+  const std::vector<TString> WJets  = {"WJets"};
+  const std::vector<TString> VV = {"Diboson"};
+  const std::vector<TString> ST = {"SingleTop"};
+  const std::vector<TString> TTbar = {"TTbar"};
+  const std::vector<TString> ggH = {"GluGluHToTauTau"};
+  const std::vector<TString> qqH = {"VBFHToTauTau"};
+  const std::vector<TString> WH = {"WHToTauTau"};
+  const std::vector<TString> ZH = {"ZHToTauTau"};
+  const std::vector<TString> ggHWW = {"GluGluHToWW"};
+  const std::vector<TString> qqHWW = {"VBFHToToWW"};
+  const std::vector<TString> WHWW  = {"WHToWW"};
+  const std::vector<TString> ZHWW  = {"ZHToWW"};
+  const std::vector<TString> bbH_yt2 = {"BBHToTauTau_YT2"};
+  const std::vector<TString> bbH_yb2 = {"BBHToTauTau_YB2"};
+  const std::vector<TString> bbH_ybyt = {"BBHToTauTau_YBYT"};
+  const std::vector<TString> bbH = {"BBHToTauTau_YT2","BBHToTauTau_YB2","BBHToTauTau_YBYT"};
+
+  const std::vector<TString> availableSamplesToProcess = 
+    {"Data","DYJets","EWK","Top","HTT","HWW","bbHTT","bbHTT_nobb"};
+
+  map<TString,TString> mapAvailableSamples = 
+    {
+      {"Data","data and QCD (fakes) background templates"},
+      {"EWK","diboson and WJets MC templates"},
+      {"Top","ttbar and single-top templates"},
+      {"DYJets","ZTT and ZL templates"},
+      {"HTT","ggHTT, qqHTT, WHTT and ZHTT templates"},
+      {"HWW","ggHWW, qqHWW, WHWW and ZHWW templates"},
+      {"bbHTT","bbHTT_yb2, bbHTT_yt2, bbHTT_ybyt and sum"},
+      {"bbHTT_nobb","bbHTT_yb2, bbHTT_ybyt with no b-quarks"},
+    };
+
+  const std::vector<TString> availableCategories = {
+    "inclusive","Nbtag0","NbtagGe1",
+    "cat0"       ,  "cat1",         "cat2",         "cat3",
+    "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",
+    "cat0_NBtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1"
+  };
+
+  TString globalWeight="xsec_lumi_weight*";
   TString qcdWeight="qcdweight*";
-  TString FFWeight="ff_nom*ff_qcd_pt2*";
+  TString FFWeight="ff_total*";
   TString commonCuts;
   TString era;
   TString channel;
@@ -846,7 +371,6 @@ class Cards {
   bool runWithShapeSystematics;
   bool runOnEmbedded;
   bool _usefriend;
-
 
   TString variable;
   double lumi;

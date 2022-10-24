@@ -174,10 +174,6 @@ const vector<TString> Diboson  = {
   "WWTo2L2Nu"                                                 
 };
 
-const vector<TString> GluGluHToTauTau = {
-  "GluGluHToTauTau_M125" 
-};
-
 const vector<TString> BBHToTauTau =  {
    "bbHToTauTau_yb2_M125",
    "bbHToTauTau_yt2_M125", 
@@ -196,17 +192,12 @@ const vector<TString> BBHToTauTau_YBYT =  {
   "bbHToTauTau_ybyt_M125"
 };
 
-
-
 const vector<TString> VBFHToTauTau = { 
   "VBFHToTauTau_M125"
 };
 
 const vector<TString> ZHToTauTau = { 
   "ZHToTauTau_M125" 
-  //"ggZH_HToTauTau_ZToQQ_M125_13TeV_powheg_pythia8",
-  //"ggZH_HToTauTau_ZToNuNu_M125_13TeV_powheg_pythia8",
-  //"ggZH_HToTauTau_ZToLL_M125_13TeV_powheg_pythia8" 
 };
 
 const vector<TString> WHToTauTau = { 
@@ -214,9 +205,12 @@ const vector<TString> WHToTauTau = {
   "WminusHToTauTau_M125" 
 };
 
-const vector<TString> ggHToWW = { 
+const vector<TString> GluGluHToTauTau = {
+  "GluGluHToTauTau_M125" 
+};
+
+const vector<TString> GluGluHToWW = { 
   "GluGluHToWWTo2L2Nu_M125",
-  //"GluGluZH_HToWW_M125_13TeV_powheg_pythia8_TuneCP5_PSweights"
 };
 
 const vector<TString> VBFHToWW = { 
@@ -230,6 +224,14 @@ const vector<TString> ZHToWW = {
 const vector<TString> WHToWW = {
   "WminusHToWWTo2L2Nu_M125",
   "WplusHToWWTo2L2Nu_M125"
+};
+
+const vector<TString> BBHToWW_YB2 = {
+  "bbHToWWTo2L2Nu_yb2_M125"
+};
+
+const vector<TString> BBHToWW_YBYT = {
+  "bbHToWWTo2L2Nu_ybyt_M125"
 };
 
 // **************************************************************************************************
@@ -270,12 +272,12 @@ const map<TString, double> xsec_map_2018 = {
   {"ZZTo4L"                   , 1.26},
   {"ZZTo2L2Q"                 , 3.38},
   {"GluGluHToTauTau_M125"     , 3.00},
-  {"VBFHToTauTau_M125"        , 0.237},
+  {"VBFHToTauTau_M125"        , 0.234},
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
-  {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
+  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
+  {"VBFHToWWTo2L2Nu_M125"     , 0.087},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
@@ -284,6 +286,9 @@ const map<TString, double> xsec_map_2018 = {
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  // cross sections for the H->WW
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
 
 };
 
@@ -322,11 +327,11 @@ const map<TString, double> xsec_map_2017 = {
   {"ZZTo2L2Q"                 , 3.38},
   {"ZZTo2L2Nu"                , 2.01},
   {"GluGluHToTauTau_M125"     , 3.00},
-  {"VBFHToTauTau_M125"        , 0.237},
+  {"VBFHToTauTau_M125"        , 0.234},
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
+  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
@@ -336,6 +341,9 @@ const map<TString, double> xsec_map_2017 = {
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  // cross sections for the H->WW
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
 };
 
 // 2016 (taken from AN-19-177)
@@ -373,11 +381,11 @@ const map<TString, double> xsec_map_2016 = {
   {"ZZTo4L"                   , 1.26},
   {"ZZTo2L2Q"                 , 3.38},
   {"GluGluHToTauTau_M125"     , 3.00},
-  {"VBFHToTauTau_M125"        , 0.237},
+  {"VBFHToTauTau_M125"        , 0.234},
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.09},
+  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"HWminusJ_HToWW_M125"      , 0.114},
   {"HWplusJ_HToWW_M125"       , 0.18},
@@ -387,6 +395,9 @@ const map<TString, double> xsec_map_2016 = {
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  // cross sections for the H->WW
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
 };
 
 const map<TString, vector<TString> > map_sample = {
@@ -484,6 +495,36 @@ const map<TString, vector<TString> > map_sample = {
   {"BBHToTauTau_YBYT_2017",BBHToTauTau_YBYT},
   {"BBHToTauTau_YBYT_2016_pre",BBHToTauTau_YBYT},
   {"BBHToTauTau_YBYT_2016_post",BBHToTauTau_YBYT},
+
+  {"GluGluHToWW_2018",GluGluHToWW},
+  {"GluGluHToWW_2017",GluGluHToWW},
+  {"GluGluHToWW_2016_pre",GluGluHToWW},
+  {"GluGluHToWW_2016_post",GluGluHToWW},
+
+  {"VBFHToWW_2018",VBFHToWW},
+  {"VBFHToWW_2017",VBFHToWW},
+  {"VBFHToWW_2016_pre",VBFHToWW},
+  {"VBFHToWW_2016_post",VBFHToWW},
+
+  {"WHToWW_2018",WHToWW},
+  {"WHToWW_2017",WHToWW},
+  {"WHToWW_2016_pre",WHToWW},
+  {"WHToWW_2016_post",WHToWW},
+
+  {"ZHToWW_2018",ZHToWW},
+  {"ZHToWW_2017",ZHToWW},
+  {"ZHToWW_2016_pre",ZHToWW},
+  {"ZHToWW_2016_post",ZHToWW},
+
+  {"BBHToWW_YB2_2018",BBHToWW_YB2},
+  {"BBHToWW_YB2_2017",BBHToWW_YB2},
+  {"BBHToWW_YB2_2016_pre",BBHToWW_YB2},
+  {"BBHToWW_YB2_2016_post",BBHToWW_YB2},
+
+  {"BBHToWW_YBYT_2018",BBHToWW_YBYT},
+  {"BBHToWW_YBYT_2017",BBHToWW_YBYT},
+  {"BBHToWW_YBYT_2016_pre",BBHToWW_YBYT},
+  {"BBHToWW_YBYT_2016_post",BBHToWW_YBYT},
 
 };
 

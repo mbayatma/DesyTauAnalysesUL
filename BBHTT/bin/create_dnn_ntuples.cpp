@@ -11,15 +11,18 @@
 #include "DesyTauAnalyses/BBHTT/interface/settings_for_eras.h"
 #include "RooWorkspace.h"
 #include "RooRealVar.h"
+#include "DesyTauAnalyses/Common/interface/Config.h"
 
-bool applyPreselection = true;
-
-//define the main function to make this code executable. argc gives the number of arguments and argv contains those arguments. 
+// define the main function to make this code executable. 
+// argc gives the number of arguments and argv contains those arguments. 
 
 int main(int argc, char * argv[]) {
 
-  bool useFriend=false;
-  bool TEST = false;
+  //  bool TEST = false;
+  if (argc!=4) {
+    cout << "Usage of the program : create_dnn sample era channel" << endl;
+    exit(EXIT_FAILURE);
+  }
   
   TString process(argv[1]);
   TString era(argv[2]);
@@ -33,11 +36,8 @@ int main(int argc, char * argv[]) {
   TString Sample = process + "_" + era ;
 
   string cmsswBase = (getenv("CMSSW_BASE"));
-
-  if (argc!=4) {
-    cout << "Usage of the program : CreateDNN sample era channel" << endl;
-    exit(EXIT_FAILURE);
-  }
+  string config_file = cmsswBase + "/src/DesyTauAnalyses/BBHTT/test/dnn_production/dnn_production_"+string(argv[3])+".conf"; 
+  Config cfg(config_file.c_str());
 
   if (era!="2018"&&era!="2017"&&era!="2016_post"&&era!="2016_pre") {
     cout << "ERROR : specified era " << era << " is unknown " << endl;
@@ -65,9 +65,6 @@ int main(int argc, char * argv[]) {
   }
 
   double luminosity = LUMI[era];
-  TString input_dir;
-  TString output_dir;
-  TString friend_dir;
 
   // Mapping of subsamples to output root-file
   map< TString , vector<TString> > samples_map;
@@ -84,15 +81,16 @@ int main(int argc, char * argv[]) {
   float scaleFake_btag = 1.0;
   //TString output_dir = "";
   samples_map[channel + "-NOMINAL_ntuple_"+Sample     ] = map_sample.at(Sample);
-  if(channel=="em") {
-    input_dir = "/nfs/dust/cms/user/rasp/Run/emu_UL/"+era; 
-    friend_dir="/nfs/dust/cms/user/makou/predict_BDT_friendtrees/";
-    output_dir= "/nfs/dust/cms/user/rasp/Run/emu_dnn_UL/" + era;
+  bool useFriend = cfg.get<bool>("UseFriend");
+  bool applyPreselection = cfg.get<bool>("ApplyPreselection");
+  TString input_dir  = TString(cfg.get<string>("InputDir"))+"/"+era; 
+  TString friend_dir = TString(cfg.get<string>("FriendDir"))+"/"+era;
+  TString output_dir = TString(cfg.get<string>("OutputDir"))+"/"+ era;
+  if (channel=="em") {
+    cout << "Running dnn for em channel " << endl;
   }
   else if (channel=="tt") {
-    input_dir ="/nfs/dust/cms/user/rasp/Run/tautau_UL/" + era ;
-    friend_dir="/nfs/dust/cms/user/filatovo/ML/ml-framework/mlruns/4/2e465ee969674198839ed7c981ecf8fd/artifacts/pred/";
-    output_dir="/nfs/dust/cms/user/rasp/Run/tautau_dnn_UL/" + era;
+    cout << "Running dnn for tt channel " << endl;
     TString ff_filename = TString(cmsswBase)+"/src/DesyTauAnalyses/Common/data/fakefactors_ws_tt_mssm_"+Era+"_v3.root";
     ff_file = new TFile(ff_filename);
     w_fakefactors = (RooWorkspace*)ff_file->Get("w");
@@ -234,7 +232,10 @@ int main(int argc, char * argv[]) {
       if(!subsample.Contains("MuonEG_Run") && !subsample.Contains("Embedded") && !subsample.Contains("Tau_Run")) xsec = xsec_map->at(subsample);
       double nevents = getNEventsProcessed( input_dir + "/" + subsample + ".root" );
       
-      std::cout << "xsec = " << xsec << " ; nevents = " << nevents << " ; lumi = " << luminosity << " -> norm = " << xsec*luminosity/nevents << std::endl;
+      if(subsample.Contains("MuonEG_Run")||subsample.Contains("Tau_Run"))
+	std::cout << "  nevents = " << nevents << std::endl;
+      else
+	std::cout << "xsec = " << xsec << " ; nevents = " << nevents << " ; lumi = " << luminosity << " -> norm = " << xsec*luminosity/nevents << std::endl;
 
       // SetBranchAddress for variables that need are needed for preselection or stitching
       int gen_noutgoing;
@@ -458,30 +459,32 @@ int main(int argc, char * argv[]) {
 	    std::cout << "met    = " << puppimet << std::endl;
 	    std::cout << "jetpt  = " << jleppt_1 << std::endl;
 	    */
-	    w_fakefactors->var("pt")->setVal(pt_1);
-	    w_fakefactors->var("njets")->setVal(njets);
-	    w_fakefactors->var("nbjets")->setVal(nbtag);
-	    w_fakefactors->var("os")->setVal(os);
-	    w_fakefactors->var("dR")->setVal(dr_tt);
-	    w_fakefactors->var("pt_2")->setVal(pt_2);
-	    w_fakefactors->var("met")->setVal(puppimet);
-	    w_fakefactors->var("jetpt")->setVal(jleppt_1);
-	    double ff_central = w_fakefactors->function("ff_total")->getVal();
-	    if (nbtag>=1) {
-	      ff_tt =  ff_nom * scaleFake_btag;
-	    }
-	    else {
-	      ff_tt =  ff_nom * scaleFake;
-	    }
-	    //	    std::cout << "ff_total = " << ff_tt << std::endl;
-	    for (unsigned int isys = 0; isys < ff_sysnames.size(); ++isys) {
-	      ff_sys[isys] = w_fakefactors->function(("ff_total_"+ff_sysnames[isys]+"_up").c_str())->getVal()/ff_central;
-	      //	      std::cout << ff_sysnames[isys] << " : " << ff_sys[isys] << std::endl;
-	    }
-	    //	    std::cout << std::endl;
 	  }
 	}
-
+	// Fake background tt channel
+	if (channel=="tt") {
+	  w_fakefactors->var("pt")->setVal(pt_1);
+	  w_fakefactors->var("njets")->setVal(njets);
+	  w_fakefactors->var("nbjets")->setVal(nbtag);
+	  w_fakefactors->var("os")->setVal(os);
+	  w_fakefactors->var("dR")->setVal(dr_tt);
+	  w_fakefactors->var("pt_2")->setVal(pt_2);
+	  w_fakefactors->var("met")->setVal(puppimet);
+	  w_fakefactors->var("jetpt")->setVal(jleppt_1);
+	  double ff_central = w_fakefactors->function("ff_total")->getVal();
+	  if (nbtag>=1) {
+	    ff_tt =  ff_nom * scaleFake_btag;
+	  }
+	  else {
+	    ff_tt =  ff_nom * scaleFake;
+	  }
+	  //	    std::cout << "ff_total = " << ff_tt << std::endl;
+	  for (unsigned int isys = 0; isys < ff_sysnames.size(); ++isys) {
+	    ff_sys[isys] = w_fakefactors->function(("ff_total_"+ff_sysnames[isys]+"_up").c_str())->getVal()/ff_central;
+	    //	      std::cout << ff_sysnames[isys] << " : " << ff_sys[isys] << std::endl;
+	  }
+	  //	    std::cout << std::endl;
+	}
 
 	// Replace jet variables to have an effectie cut of jetpt > 30 GeV
 	if(njets < 2){

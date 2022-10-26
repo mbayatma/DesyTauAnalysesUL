@@ -217,8 +217,16 @@ int main(int argc, char * argv[]) {
       TTree *friendTree= NULL;
 
       if(useFriend){
-	friendFile= new TFile(friend_dir + "/" + subsample + "_" + era+ ".root","READ" );
-	//	friendFile= new TFile(friend_dir + "/" + subsample + "_pred.root","READ" );
+	if (channel=="em")
+	  friendFile= new TFile(friend_dir + "/" + subsample + ".root","READ" );
+	else 
+	  friendFile= new TFile(friend_dir + "/" + subsample + "_pred.root","READ" );
+	if (friendFile->IsZombie()||friendFile==NULL) {
+	  std::cout << "unable to open file " << friend_dir << "/" << subsample << "_pred.root" << std::endl;
+	  std::cout << "quitting..." << std::endl;
+	  exit(-1);
+	}
+	  
 	friendTree=(TTree *)friendFile->Get("TauCheck");
 	friendTree->SetTreeIndex(0);
 	inTree->AddFriend(friendTree);
@@ -270,7 +278,8 @@ int main(int argc, char * argv[]) {
       float dRbb;
       int nbtag;
       int pred_class;
-      float prob_0,prob_1,prob_2,prob_3;
+      float prob_0,prob_1,prob_2,prob_3,prob_4;
+      double prob_tt_0, prob_tt_1, prob_tt_2, prob_tt_3;
       float pred_proba;
       float weight;
       bool trg_doubletau;
@@ -337,12 +346,23 @@ int main(int argc, char * argv[]) {
 
       // Check for tt channel !!!
       if(useFriend){
-	inTree->SetBranchAddress("pred_class",&pred_class);
-	inTree->SetBranchAddress("pred_proba",&pred_proba);
-	inTree->SetBranchAddress("prob_0",&prob_0);
-	inTree->SetBranchAddress("prob_1",&prob_1);
-	inTree->SetBranchAddress("prob_2",&prob_2);
-	inTree->SetBranchAddress("prob_3",&prob_3);
+	if (channel=="em") { // em	
+	  inTree->SetBranchAddress("pred_class",&pred_class);
+	  inTree->SetBranchAddress("pred_proba",&pred_proba);
+	  inTree->SetBranchAddress("prob_0",&prob_0);
+	  inTree->SetBranchAddress("prob_1",&prob_1);
+	  inTree->SetBranchAddress("prob_2",&prob_2);
+	  inTree->SetBranchAddress("prob_3",&prob_3);
+	  inTree->SetBranchAddress("prob_4",&prob_4);
+	}
+	else { // tt
+	  inTree->SetBranchAddress("pred_class",&pred_class);
+          inTree->SetBranchAddress("pred_class_proba",&pred_proba);
+          inTree->SetBranchAddress("pred_class_0_proba",&prob_tt_0);
+          inTree->SetBranchAddress("pred_class_1_proba",&prob_tt_1);
+          inTree->SetBranchAddress("pred_class_2_proba",&prob_tt_2);
+          inTree->SetBranchAddress("pred_class_3_proba",&prob_tt_3);
+	}
       }
 
       outFile->cd();
@@ -381,6 +401,7 @@ int main(int argc, char * argv[]) {
 	  outTree->Branch("pred_class_1_proba",&prob_1,"pred_class_1_proba/F");
 	  outTree->Branch("pred_class_2_proba",&prob_2,"pred_class_2_proba/F");
 	  outTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
+	  if (channel=="em") outTree->Branch("pred_class_4_proba",&prob_4,"pred_class_4_proba/F");
 	}
 	firstTree  = false;
       }
@@ -399,6 +420,7 @@ int main(int argc, char * argv[]) {
 	currentTree->Branch("pred_class_1_proba",&prob_1,"pred_class_1_proba/F");
 	currentTree->Branch("pred_class_2_proba",&prob_2,"pred_class_2_proba/F");
 	currentTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
+	if (channel=="em") outTree->Branch("pred_class_4_proba",&prob_4,"pred_class_4_proba/F");
       }
       // lumi-xsec-weight added
 
@@ -412,10 +434,10 @@ int main(int argc, char * argv[]) {
 	    if( iso_2 > 0.5 )                continue;
 	    if( extraelec_veto > 0.5 )       continue;
 	    if( extramuon_veto > 0.5 )       continue;
-	    
-	    if( pt_1 < 10 )                  continue;
-	    if( pt_2 < 10 )                  continue;
-	    if( TMath::Max(pt_1,pt_2) < 20 ) continue;
+	    if( dr_tt < 0.3)                 continue;
+	    if( pt_1 < 15 )                  continue;
+	    if( pt_2 < 15 )                  continue;
+	    //	    if( TMath::Max(pt_1,pt_2) < 24 ) continue;
 	    //if( pzeta< -50 )                 continue;
 	    //if( mTdileptonMET > 90 )         continue;
 	    //if( passedAllMetFilters < 0.5 )           continue;
@@ -472,6 +494,10 @@ int main(int argc, char * argv[]) {
 	  w_fakefactors->var("met")->setVal(puppimet);
 	  w_fakefactors->var("jetpt")->setVal(jleppt_1);
 	  double ff_central = w_fakefactors->function("ff_total")->getVal();
+	  prob_0 = float(prob_tt_0);
+	  prob_1 = float(prob_tt_1);
+	  prob_2 = float(prob_tt_2);
+	  prob_3 = float(prob_tt_3);
 	  if (nbtag>=1) {
 	    ff_tt =  ff_nom * scaleFake_btag;
 	  }

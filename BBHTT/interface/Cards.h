@@ -225,7 +225,7 @@ class Cards {
     {"CMS_eff_t_dm1","weight_CMS_eff_tauid_DM1"},
     {"CMS_eff_t_dm10","weight_CMS_eff_tauid_DM10"},
     {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
-    {"CMS_htt_fake_e_tt","weight_CMS_etaufake"},
+    //    {"CMS_htt_fake_e_tt","weight_CMS_etaufake"},
     {"CMS_htt_fake_m_tt","weight_CMS_mutaufake"}
   };
 
@@ -257,7 +257,7 @@ class Cards {
     {"CMS_htt_em_qcd_1jet_shape2","qcdweight_deltaR_1jet_Par2"},
     {"CMS_htt_em_qcd_2jet_rate","qcdweight_deltaR_2jet_Par0"},
     {"CMS_htt_em_qcd_2jet_shape","qcdweight_deltaR_2jet_Par1"},
-    {"CMS_htt_em)qcd_2jet_shape2","qcdweight_deltaR_0jet_Par2"},
+    {"CMS_htt_em_qcd_2jet_shape2","qcdweight_deltaR_0jet_Par2"},
   };
 
   const map<TString,TString> FakeFactorSystematics = {
@@ -333,28 +333,44 @@ class Cards {
   const std::vector<TString> bbH_yt2 = {"BBHToTauTau_YT2"};
   const std::vector<TString> bbH_yb2 = {"BBHToTauTau_YB2"};
   const std::vector<TString> bbH_ybyt = {"BBHToTauTau_YBYT"};
-  const std::vector<TString> bbH = {"BBHToTauTau_YT2","BBHToTauTau_YB2","BBHToTauTau_YBYT"};
+  const std::vector<TString> bbHWW_yb2 = {"BBHToWW_YB2"};
+  const std::vector<TString> bbHWW_ybyt = {"BBHToWW_YBYT"};
 
   const std::vector<TString> availableSamplesToProcess = 
-    {"Data","DYJets","EWK","Top","HTT","HWW","bbHTT","bbHTT_nobb"};
+    {"Data",
+     "DYToTT",
+     "DYToLL",
+     "EWK",
+     "TT",
+     "ST",
+     "HTT",
+     "HWW",
+     "bbHTT",
+     "bbHTT_nobb",
+     "bbHWW",
+     "bbHWW_nobb"};
 
   map<TString,TString> mapAvailableSamples = 
     {
       {"Data","data and QCD (fakes) background templates"},
       {"EWK","diboson and WJets MC templates"},
-      {"Top","ttbar and single-top templates"},
-      {"DYJets","ZTT and ZL templates"},
+      {"TT","ttbar template"},
+      {"ST","single-top template"},
+      {"DYToTT","ZTT template"},
+      {"DYToLL","ZL template"},
       {"HTT","ggHTT, qqHTT, WHTT and ZHTT templates"},
       {"HWW","ggHWW, qqHWW, WHWW and ZHWW templates"},
-      {"bbHTT","bbHTT_yb2, bbHTT_yt2, bbHTT_ybyt and sum"},
-      {"bbHTT_nobb","bbHTT_yb2, bbHTT_ybyt with no b-quarks"},
+      {"bbHTT","bbHTT_yb2, bbHTT_yt2, bbHTT_ybyt templates"},
+      {"bbHTT_nobb","bbHTT_yb2, bbHTT_ybyt without b-quarks"},
+      {"bbHWW","bbHWW_yb2, bbHWW_yt2, bbHWW_ybyt templates"},
+      {"bbHWW_nobb","bbHWW_yb2, bbHWW_ybyt without b-quarks"},
     };
 
   const std::vector<TString> availableCategories = {
     "inclusive","Nbtag0","NbtagGe1",
     "cat0"       ,  "cat1",         "cat2",         "cat3",
     "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",
-    "cat0_NBtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1"
+    "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1"
   };
 
   TString globalWeight="xsec_lumi_weight*";

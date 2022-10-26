@@ -285,10 +285,10 @@ const map<TString, double> xsec_map_2018 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
   {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
 
 };
 
@@ -340,10 +340,10 @@ const map<TString, double> xsec_map_2017 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
   {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
 };
 
 // 2016 (taken from AN-19-177)
@@ -397,7 +397,7 @@ const map<TString, double> xsec_map_2016 = {
   {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
   // cross sections for the H->WW
   {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , 0.033*0.0231},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
 };
 
 const map<TString, vector<TString> > map_sample = {

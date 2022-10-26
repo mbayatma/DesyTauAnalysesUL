@@ -606,7 +606,7 @@ namespace jets{
      else if (BTagAlgorithm == "DeepCSV")
        otree->bcsv_1  = analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexLeadingBJet][nBTagDiscriminant2];       
      else 
-       otree->bcsv_1  = -100.;
+       otree->bcsv_1  = -10;
    }
    else {
      otree->bpt_1   = -10;
@@ -625,7 +625,7 @@ namespace jets{
      else if (BTagAlgorithm == "DeepCSV")
        otree->bcsv_2  = analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexSubLeadingBJet][nBTagDiscriminant2];
      else 
-       otree->bcsv_2  = -100.;
+       otree->bcsv_2  = -10;
      
    }
    else {
@@ -645,7 +645,7 @@ namespace jets{
      if (BTagAlgorithm == "DeepFlavour")
        otree->jcsv_1 = analysisTree->pfjet_btag[indexLeadingJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexLeadingJet][nBTagDiscriminant1]+analysisTree->pfjet_btag[indexLeadingJet][nBTagDiscriminant3];
      else
-       otree->jcsv_1 = -100.;
+       otree->jcsv_1 = -10;
    }
    else {
      otree->jpt_1 = -10;
@@ -662,7 +662,7 @@ namespace jets{
      if (BTagAlgorithm == "DeepFlavour") 
        otree->jcsv_2 = analysisTree->pfjet_btag[indexSubLeadingJet][nBTagDiscriminant1] + analysisTree->pfjet_btag[indexSubLeadingJet][nBTagDiscriminant2] + analysisTree->pfjet_btag[indexSubLeadingJet][nBTagDiscriminant3];
      else 
-       otree->jcsv_2 = -100.;
+       otree->jcsv_2 = -10;
    }	 
    else {
      otree->jpt_2 = -10;
@@ -678,11 +678,20 @@ namespace jets{
      jet1.SetPtEtaPhiE(otree->bpt_1, otree->beta_1, otree->bphi_1, get_jetE(analysisTree, indexLeadingBJet, JESname, direction, jecUncertainties));
      jet2.SetPtEtaPhiE(otree->bpt_2, otree->beta_2, otree->bphi_2, get_jetE(analysisTree, indexSubLeadingBJet, JESname, direction, jecUncertainties));
 
-     otree->mbb = (jet1+jet2).M();
+     float mbb = (jet1+jet2).M();
+     if (std::isnan(mbb)) mbb = -10.;
+     otree->mbb = mbb;
 
-     otree->dRbb = deltaR(otree->beta_1,otree->bphi_1,
-			  otree->beta_2,otree->bphi_2);
+     float dRbb = deltaR(otree->beta_1,otree->bphi_1,
+			 otree->beta_2,otree->bphi_2);
 
+     if (std::isnan(dRbb)) dRbb = -10;
+     otree->dRbb = dRbb;
+
+   }
+   else {
+     otree->mbb = -10.0;
+     otree->dRbb = -10.0;
    }
 
    // dijet variables

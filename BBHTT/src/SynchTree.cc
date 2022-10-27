@@ -867,6 +867,8 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     
     fChain->Branch("weight_CMS_mutaufakeUp",&weight_CMS_mutaufakeUp,"weight_CMS_mutaufakeUp/F");
     fChain->Branch("weight_CMS_mutaufakeDown",&weight_CMS_mutaufakeDown,"weight_CMS_mutaufakeDown/F");
+    fChain->Branch("weight_CMS_etaufakeUp",&weight_CMS_etaufakeUp,"weight_CMS_etaufakeUp/F");
+    fChain->Branch("weight_CMS_etaufakeDown",&weight_CMS_etaufakeDown,"weight_CMS_etaufakeDown/F");
 
     for (unsigned int i=0; i<ff_sysnames.size(); ++i) {
       fChain->Branch("ff_"+TString(ff_sysnames[i]),&ff_sys[i],"ff_"+TString(ff_sysnames[i])+"/F");

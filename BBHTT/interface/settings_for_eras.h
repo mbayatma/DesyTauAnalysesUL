@@ -394,7 +394,7 @@ const map<TString, double> xsec_map_2016 = {
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
-  {"bbHToTauTau_ybyt_M125"    , 0.033*0.06208},
+  {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
   {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
   {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},

@@ -420,7 +420,7 @@ int main(int argc, char * argv[]) {
 	currentTree->Branch("pred_class_1_proba",&prob_1,"pred_class_1_proba/F");
 	currentTree->Branch("pred_class_2_proba",&prob_2,"pred_class_2_proba/F");
 	currentTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
-	if (channel=="em") outTree->Branch("pred_class_4_proba",&prob_4,"pred_class_4_proba/F");
+	if (channel=="em") currentTree->Branch("pred_class_4_proba",&prob_4,"pred_class_4_proba/F");
       }
       // lumi-xsec-weight added
 

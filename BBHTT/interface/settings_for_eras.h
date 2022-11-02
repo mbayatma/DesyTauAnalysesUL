@@ -387,9 +387,9 @@ const map<TString, double> xsec_map_2016 = {
   {"ZHToTauTau_M125"          , 0.0477},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
-  {"HWminusJ_HToWW_M125"      , 0.114},
-  {"HWplusJ_HToWW_M125"       , 0.18},
-  {"ZHJ_HToWW_M125"           , 0.163},
+  {"WminusHToWWTo2L2Nu_M125"  , 0.114},
+  {"WplusHToWWTo2L2Nu_M125"   , 0.18},
+  {"ZHToWWTo2L2Nu_M125"       , 0.163},
   // from Pascal (AN-2021-090)
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},

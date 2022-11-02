@@ -96,7 +96,7 @@ class Cards {
   TString mcTauTau;
   const TString BaseTreeName = "TauCheck"; 
   TString baselineTT="trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5";
-  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&extraelec_veto < 0.5&&extramuon_veto<0.5";
+  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&extraelec_veto<0.5&&extramuon_veto<0.5";
   TString category;
   const TString mcNotTauTau_TT = "&&!(gen_match_1==5&&gen_match_2==5)";
   const TString mcTauTau_TT = "&&(gen_match_1==5&&gen_match_2==5)";
@@ -268,7 +268,7 @@ class Cards {
     {"CMS_htt_tt_qcd_syst","ff_qcd_syst"},
     {"CMS_htt_tt_qcd_syst_dr_closure","ff_qcd_syst_dr_closure"},
     {"CMS_htt_tt_qcd_syst_pt_2_closure","ff_qcd_syst_pt_2_closure"},
-    {"CMS_htt_tt_qcd_syst_met_closur","ff_qcd_syst_met_closure"},
+    {"CMS_htt_tt_qcd_syst_met_closure","ff_qcd_syst_met_closure"},
   };
 
   const map<TString,TString> QCDIsoSystematics = {
@@ -327,7 +327,7 @@ class Cards {
   const std::vector<TString> WH = {"WHToTauTau"};
   const std::vector<TString> ZH = {"ZHToTauTau"};
   const std::vector<TString> ggHWW = {"GluGluHToWW"};
-  const std::vector<TString> qqHWW = {"VBFHToToWW"};
+  const std::vector<TString> qqHWW = {"VBFHToWW"};
   const std::vector<TString> WHWW  = {"WHToWW"};
   const std::vector<TString> ZHWW  = {"ZHToWW"};
   const std::vector<TString> bbH_yt2 = {"BBHToTauTau_YT2"};
@@ -368,9 +368,14 @@ class Cards {
 
   const std::vector<TString> availableCategories = {
     "inclusive","Nbtag0","NbtagGe1",
-    "cat0"       ,  "cat1",         "cat2",         "cat3",
-    "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",
-    "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1"
+    "Nbtag0_lowPzeta","NbtagGe1_lowPzeta",
+    "Nbtag0_highPzeta","NbtagGe1_highPzeta",
+    "Nbtag0_Pzeta1","NbtagGe1_Pzeta1",
+    "Nbtag0_Pzeta2","NbtagGe1_Pzeta2",
+    "Nbtag0_Pzeta3","NbtagGe1_Pzeta3",
+    "cat0"       ,  "cat1",         "cat2",         "cat3",          "cat4",
+    "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",   "cat4_Nbtag0",
+    "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1", "cat4_NbtagGe1"
   };
 
   TString globalWeight="xsec_lumi_weight*";

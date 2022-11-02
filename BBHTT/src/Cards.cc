@@ -96,18 +96,31 @@ Cards::Cards(TString Sample,
     {channel+"_inclusive",""},
     {channel+"_Nbtag0",   "&&nbtag==0"},
     {channel+"_NbtagGe1",   "&&nbtag>0"},
+    {channel+"_Nbtag0_lowPzeta", "&&nbtag==0&&pzeta<-35"},
+    {channel+"_NbtagGe1_lowPzeta", "&&nbtag>0&&pzeta<-35"},
+    {channel+"_Nbtag0_highPzeta", "&&nbtag==0&&pzeta>-35"},
+    {channel+"_NbtagGe1_highPzeta", "&&nbtag>0&&pzeta>-35"},
+    {channel+"_Nbtag0_Pzeta1", "&&nbtag==0&&pzeta>-35&&pzeta<-10"},
+    {channel+"_NbtagGe1_Pzeta1", "&&nbtag>0&&pzeta>-35&&pzeta<-10"},
+    {channel+"_Nbtag0_Pzeta2", "&&nbtag==0&&pzeta>-10&&pzeta<30"},
+    {channel+"_NbtagGe1_Pzeta2", "&&nbtag>0&&pzeta>-10&&pzeta<30"},
+    {channel+"_Nbtag0_Pzeta3", "&&nbtag==0&&pzeta>30"},
+    {channel+"_NbtagGe1_Pzeta3", "&&nbtag>0&&pzeta>30"},
     {channel+"_cat0", "&&pred_class==0"},
     {channel+"_cat1", "&&pred_class==1"},
     {channel+"_cat2", "&&pred_class==2"},
     {channel+"_cat3", "&&pred_class==3"},
+    {channel+"_cat4", "&&pred_class==4"},
     {channel+"_cat0_Nbtag0", "&&pred_class==0&&nbtag==0"},
     {channel+"_cat1_Nbtag0", "&&pred_class==1&&nbtag==0"},
     {channel+"_cat2_Nbtag0", "&&pred_class==2&&nbtag==0"},
     {channel+"_cat3_Nbtag0", "&&pred_class==3&&nbtag==0"},
+    {channel+"_cat4_Nbtag0", "&&pred_class==4&&nbtag==0"},
     {channel+"_cat0_NbtagGe1", "&&pred_class==0&&nbtag>0"},
     {channel+"_cat1_NbtagGe1", "&&pred_class==1&&nbtag>0"},
     {channel+"_cat2_NbtagGe1", "&&pred_class==2&&nbtag>0"},
     {channel+"_cat3_NbtagGe1", "&&pred_class==3&&nbtag>0"},
+    {channel+"_cat4_NbtagGe1", "&&pred_class==4&&nbtag>0"},
   };
 
   TH1::SetDefaultSumw2(true);
@@ -126,13 +139,14 @@ Cards::Cards(TString Sample,
   }
   outputFile->mkdir(category);
 
+  /*
   if (channel=="em") {
     if (category=="em_ttbar") 
       commonCuts += "&&pzeta<-35.0&&nbtag>=1";
     else
       commonCuts += "&&pzeta>-35.0";
   }
-
+  */
   commonCuts += categoryCuts[category];
 
   regionCut.clear();
@@ -150,10 +164,24 @@ Cards::Cards(TString Sample,
 
   TString QCDFFWeight = "";
   if(channel=="em")
-    QCDFFWeight=qcdWeight;
+    QCDFFWeight=qcdWeight;  
   else
     QCDFFWeight = FFWeight;
  
+  map<TString, TString> btag_scale = 
+    {
+      {"2016_post","0.67*"},
+      {"2016_pre","0.67*"},
+      {"2016","0.67*"},
+      {"2017","0.69*"},
+      {"2018","0.71*"}
+    };
+  
+  
+  if (channel=="em"&&isBTag) {
+    QCDFFWeight += btag_scale[era];
+  }
+
   regionWeight.push_back(globalWeight+QCDFFWeight);
   if(channel=="tt") regionWeight.push_back(globalWeight);
 
@@ -177,27 +205,28 @@ Cards::Cards(TString Sample,
   nameSampleMap["STToL"] = ST; nameHistoMap["STToL"] = "STL"; 
   nameSampleMap["STToTT"] = ST; nameHistoMap["STToTT"] = "STT";
   //  nameSampleMap["EMB"] = Embedded; nameHistoMap["EMB"] = "EMB";
-  nameSampleMap["ggHWW"] = ggHWW; nameHistoMap["ggHWW"] = "ggHWW125";
+
+  nameSampleMap["ggHWW"] = ggHWW; nameHistoMap["ggHWW"] = "ggH_hww";
   nameSampleMap["qqHWW"] = qqHWW; nameHistoMap["qqHWW"] = "qqHWW125";
   nameSampleMap["WHWW"] = WHWW; nameHistoMap["WHWW"] = "WHWW125";
   nameSampleMap["ZHWW"] = ZHWW; nameHistoMap["ZHWW"] = "ZHWW125";
-  nameSampleMap["ggHTT"] = ggH; nameHistoMap["ggHTT"] = "ggH125";
+
+  nameSampleMap["ggHTT"] = ggH; nameHistoMap["ggHTT"] = "ggH_htt";
   nameSampleMap["qqHTT"] = qqH; nameHistoMap["qqHTT"] = "qqH125";
   nameSampleMap["WHTT"] = WH; nameHistoMap["WHTT"] = "WH125";
   nameSampleMap["ZHTT"] = ZH; nameHistoMap["ZHTT"] = "ZH125";
 
-  nameSampleMap["bbHTTybyt"] = bbH_ybyt; nameHistoMap["bbHTTybyt"] = "bbH125_ybyt";
-  nameSampleMap["bbHTTyt2"] = bbH_yt2; nameHistoMap["bbHTTyt2"] = "bbH125_yt2";
-  nameSampleMap["bbHTTyb2"] = bbH_yb2; nameHistoMap["bbHTTyb2"] = "bbH125_yb2";
-  nameSampleMap["bbHTTybyt_nobb"] = bbH_ybyt; nameHistoMap["bbHTTybyt_nobb"] = "bbH125_ybyt_nobb";
-  nameSampleMap["bbHTTyb2_nobb"] = bbH_yb2; nameHistoMap["bbHTTyb2_nobb"] = "bbH125_yb2_nobb";
+  nameSampleMap["bbHTTybyt"] = bbH_ybyt; nameHistoMap["bbHTTybyt"] = "intH_bb_htt";
+  nameSampleMap["bbHTTyt2"] = bbH_yt2; nameHistoMap["bbHTTyt2"] = "ggH_bb_htt";
+  nameSampleMap["bbHTTyb2"] = bbH_yb2; nameHistoMap["bbHTTyb2"] = "bbH_htt";
+  nameSampleMap["bbHTTybyt_nobb"] = bbH_ybyt; nameHistoMap["bbHTTybyt_nobb"] = "intH_htt";
+  nameSampleMap["bbHTTyb2_nobb"] = bbH_yb2; nameHistoMap["bbHTTyb2_nobb"] = "bbH_nobb_htt";
 
-  nameSampleMap["bbHWWybyt"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt"] = "bbHWW125_ybyt";
-  nameSampleMap["bbHWWyt2"] = ggHWW; nameHistoMap["bbHWWyt2"] = "bbHWW125_yt2";
-  nameSampleMap["bbHWWyb2"] = bbHWW_yb2; nameHistoMap["bbHWWyb2"] = "bbHWW125_yb2";
-  nameSampleMap["bbHWWybyt_nobb"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt_nobb"] = "bbHWW125_ybyt_nobb";
-  nameSampleMap["bbHWWyb2_nobb"] = bbHWW_yb2; nameHistoMap["bbHWWyb2_nobb"] = "bbHWW125_yb2_nobb";
-  //  nameSampleMap["bbHTT"] = bbH; nameHistoMap["bbHTT"] = "bbH125";
+  nameSampleMap["bbHWWybyt"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt"] = "intH_bb_hww";
+  nameSampleMap["bbHWWyt2"] = ggHWW; nameHistoMap["bbHWWyt2"] = "ggH_bb_hww";
+  nameSampleMap["bbHWWyb2"] = bbHWW_yb2; nameHistoMap["bbHWWyb2"] = "bbH_hww";
+  nameSampleMap["bbHWWybyt_nobb"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt_nobb"] = "intH_hww";
+  nameSampleMap["bbHWWyb2_nobb"] = bbHWW_yb2; nameHistoMap["bbHWWyb2_nobb"] = "bbH_nobb_hww";
 
   samplesContainer.clear();
   if (sampleToProcess=="Data") {
@@ -277,7 +306,7 @@ std::vector<TString> Cards::SampleSpecificCutTT(TString name, TString sampleName
   TString mcSB("");
   TString mcSF("");
   TString ngenPartonsCut("");
-
+  
   if (name=="ggHTT"||name=="ggHWW") {
     ngenPartonsCut = "&&gen_nbjets_cut==0";
   }
@@ -297,7 +326,7 @@ std::vector<TString> Cards::SampleSpecificCutTT(TString name, TString sampleName
   if (name=="bbHWWybyt"||name=="bbHWWyt2"||name=="bbHWWyb2") {
     ngenPartonsCut = "&&gen_nbjets_cut>0";
   }
-
+  
   if (name=="EMB") {
     mcSR = mcTauTau;
     mcSB = mcSideBand;
@@ -334,6 +363,9 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
   TString mcOS("");
   TString mcSS("");
   TString ngenPartonsCut("");
+
+  if (name=="W")
+    ngenPartonsCut = "&&xsec_lumi_weight<1000.";
 
   if (name=="ggHTT"||name=="ggHWW") {
     ngenPartonsCut = "&&gen_nbjets_cut==0";
@@ -537,9 +569,11 @@ TH1D * Cards::ProcessSample(TString name,
     hist = unroll(hist2D,histName);
     delete hist2D;
   }
-  if (!name.Contains("ybyt"))
+  if (name.Contains("ybyt"))
+    hist->Scale(-1.0);
+  else 
     zeroBins(hist);
-  //  cout << "Integral " << hist->Integral() << endl;
+
   return hist;
 
 

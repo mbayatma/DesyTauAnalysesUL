@@ -21,7 +21,7 @@ cd -
 create_dnn $1 $2 $3
 EOF1
 
-cat > ${dir}/jobs/${jobname}.submit <<EOF
+cat > ${dir}/${jobname}.submit <<EOF
 +RequestRuntime=4000
 
 RequestMemory = 4000

@@ -1,0 +1,140 @@
+Starting --->
+
+em_cat2
+OK
+
+processing era/category : 2018/em_cat2
+
+Top     : 30255.5
+EWK     : 18100.1
+ZTT     : 19958.5
+QCD     : 14591.2
+Higgs  : 493.197
+Total  : 83398.5
+Data   : 81355
+ratio  = 0.975497
+
+
+ggH   : 306.181
+qqH   : 26.3123
+WH    : 12.4115
+ZH    : 4.74112
+ggHWW : 110.433
+qqHWW : 10.862
+WHWW  : 18.404
+ZHWW  : 3.85145
+
+bbH_yt2       : 8.96515
+bbH_yb2       : 3.33907
+bbH_ybyt      : 0.253522
+bbH_yb2_nobb  : 1.557
+bbH_ybyt_nobb : 0.0980813
+bbHWW_yt2     : 5.5719
+bbHWW_yb2     : 1.93884
+bbHWW_ybyt    : 0.140127
+
+
+bbH_bb   = 12.0507
+bbH_nobb = 1.45892
+bbH_tot  = 13.5096
+
+bbHWW_tot = 7.37061
+
+Chi2/ndof = 29.0527/40
+Prob = 0.899947
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat2_Nbtag0
+OK
+
+processing era/category : 2018/em_cat2_Nbtag0
+
+Top     : 5007.68
+EWK     : 13649.3
+ZTT     : 14002.4
+QCD     : 10984
+Higgs  : 448.339
+Total  : 44091.7
+Data   : 43865
+ratio  = 0.994858
+
+
+ggH   : 286.146
+qqH   : 22.5276
+WH    : 10.1858
+ZH    : 2.90603
+ggHWW : 99.542
+qqHWW : 8.66899
+WHWW  : 15.8083
+ZHWW  : 2.5541
+
+bbH_yt2       : 1.89614
+bbH_yb2       : 0.996013
+bbH_ybyt      : 0.0679385
+bbH_yb2_nobb  : 1.509
+bbH_ybyt_nobb : 0.0950199
+bbHWW_yt2     : 1.11245
+bbHWW_yb2     : 0.81084
+bbHWW_ybyt    : 0.0374093
+
+
+bbH_bb   = 2.82422
+bbH_nobb = 1.41398
+bbH_tot  = 4.2382
+
+bbHWW_tot = 1.88588
+
+Chi2/ndof = 99.886/40
+Prob = 4.96683e-07
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat2_NbtagGe1
+OK
+
+processing era/category : 2018/em_cat2_NbtagGe1
+
+Top     : 25247.8
+EWK     : 4450.87
+ZTT     : 5957.71
+QCD     : 2557.02
+Higgs  : 44.8575
+Total  : 38258.3
+Data   : 37490
+ratio  = 0.979918
+
+
+ggH   : 20.0352
+qqH   : 3.78466
+WH    : 2.22574
+ZH    : 1.83509
+ggHWW : 10.8909
+qqHWW : 2.19299
+WHWW  : 2.59567
+ZHWW  : 1.29735
+
+bbH_yt2       : 7.08385
+bbH_yb2       : 2.34306
+bbH_ybyt      : 0.185584
+bbH_yb2_nobb  : 0.0742278
+bbH_ybyt_nobb : 0.00306139
+bbHWW_yt2     : 4.45945
+bbHWW_yb2     : 1.16212
+bbHWW_ybyt    : 0.102717
+
+
+bbH_bb   = 9.24133
+bbH_nobb = 0.0711665
+bbH_tot  = 9.31249
+
+bbHWW_tot = 5.51885
+
+Chi2/ndof = 24.4184/40
+Prob = 0.975134
+
+
++++++++++++++++++++++++++++++++++++++++++
+

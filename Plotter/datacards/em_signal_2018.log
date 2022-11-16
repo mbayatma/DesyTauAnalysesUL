@@ -1,0 +1,272 @@
+Starting --->
+
+em_cat2
+
+processing era/category : 2018/em_cat2
+
+Top     : 30255.5
+EWK     : 18098.8
+ZTT     : 19958.5
+QCD     : 14591.2
+Higgs  : 493.196
+Total  : 83397.2
+Data   : 81355
+ratio  = 0.975512
+
+
+ggH   : 306.181
+qqH   : 26.3123
+WH    : 12.4107
+ZH    : 4.74112
+ggHWW : 110.433
+qqHWW : 10.862
+WHWW  : 18.404
+ZHWW  : 3.85145
+
+bbH_yt2       : 8.95344
+bbH_yb2       : 3.33907
+bbH_ybyt      : 0.253522
+bbH_yb2_nobb  : 1.55296
+bbH_ybyt_nobb : 0.0980813
+bbHWW_yt2     : 5.5719
+bbHWW_yb2     : 1.93875
+bbHWW_ybyt    : 0.140127
+
+
+bbH_bb   = 12.039
+bbH_nobb = 1.45487
+bbH_tot  = 13.4939
+
+bbHWW_tot = 7.37053
+
+Chi2/ndof = 12.0814/20
+Prob = 0.913245
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat3
+
+processing era/category : 2018/em_cat3
+
+Top     : 32282.2
+EWK     : 27103.7
+ZTT     : 5588.91
+QCD     : 13796.1
+Higgs  : 2671.83
+Total  : 81442.7
+Data   : 82150
+ratio  = 1.00869
+
+
+ggH   : 15.2285
+qqH   : 0.784604
+WH    : 8.72619
+ZH    : 2.22942
+ggHWW : 2365.89
+qqHWW : 177.494
+WHWW  : 70.9733
+ZHWW  : 30.5028
+
+bbH_yt2       : 0.460059
+bbH_yb2       : 0.169958
+bbH_ybyt      : 0.0133805
+bbH_yb2_nobb  : 0.156756
+bbH_ybyt_nobb : 0.00810186
+bbHWW_yt2     : 44.0795
+bbHWW_yb2     : 22.7528
+bbHWW_ybyt    : 1.53675
+
+
+bbH_bb   = 0.616636
+bbH_nobb = 0.148654
+bbH_tot  = 0.765291
+
+bbHWW_tot = 65.2956
+
+Chi2/ndof = 10.9424/20
+Prob = 0.947703
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat2_Nbtag0
+
+processing era/category : 2018/em_cat2_Nbtag0
+
+Top     : 5007.68
+EWK     : 13648.2
+ZTT     : 14002.4
+QCD     : 10984
+Higgs  : 448.339
+Total  : 44090.7
+Data   : 43865
+ratio  = 0.994881
+
+
+ggH   : 286.146
+qqH   : 22.5276
+WH    : 10.1858
+ZH    : 2.90603
+ggHWW : 99.542
+qqHWW : 8.66899
+WHWW  : 15.8083
+ZHWW  : 2.5541
+
+bbH_yt2       : 1.86986
+bbH_yb2       : 0.996013
+bbH_ybyt      : 0.0679385
+bbH_yb2_nobb  : 1.50135
+bbH_ybyt_nobb : 0.0950199
+bbHWW_yt2     : 1.11245
+bbHWW_yb2     : 0.802605
+bbHWW_ybyt    : 0.0374093
+
+
+bbH_bb   = 2.79794
+bbH_nobb = 1.40633
+bbH_tot  = 4.20427
+
+bbHWW_tot = 1.87765
+
+Chi2/ndof = 70.7267/20
+Prob = 1.38537e-07
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat2_NbtagGe1
+
+processing era/category : 2018/em_cat2_NbtagGe1
+
+Top     : 25247.8
+EWK     : 4450.58
+ZTT     : 5957.71
+QCD     : 2557.98
+Higgs  : 44.8567
+Total  : 38259
+Data   : 37490
+ratio  = 0.979901
+
+
+ggH   : 20.0352
+qqH   : 3.78466
+WH    : 2.22495
+ZH    : 1.83509
+ggHWW : 10.8909
+qqHWW : 2.19299
+WHWW  : 2.59567
+ZHWW  : 1.29735
+
+bbH_yt2       : 7.08385
+bbH_yb2       : 2.34306
+bbH_ybyt      : 0.185584
+bbH_yb2_nobb  : 0.0667472
+bbH_ybyt_nobb : 0.00306139
+bbHWW_yt2     : 4.45945
+bbHWW_yb2     : 1.13692
+bbHWW_ybyt    : 0.102717
+
+
+bbH_bb   = 9.24133
+bbH_nobb = 0.0636858
+bbH_tot  = 9.30501
+
+bbHWW_tot = 5.49365
+
+Chi2/ndof = 7.08612/20
+Prob = 0.996393
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat3_Nbtag0
+
+processing era/category : 2018/em_cat3_Nbtag0
+
+Top     : 9330.64
+EWK     : 22195.5
+ZTT     : 4902.68
+QCD     : 11854.8
+Higgs  : 2594.23
+Total  : 50877.9
+Data   : 52138
+ratio  = 1.02477
+
+
+ggH   : 14.7092
+qqH   : 0.633184
+WH    : 7.84336
+ZH    : 2.0327
+ggHWW : 2310.1
+qqHWW : 167.576
+WHWW  : 65.6356
+ZHWW  : 25.704
+
+bbH_yt2       : 0.14879
+bbH_yb2       : 0.0815174
+bbH_ybyt      : 0.00543241
+bbH_yb2_nobb  : 0.162219
+bbH_ybyt_nobb : 0.0082524
+bbHWW_yt2     : 23.4274
+bbHWW_yb2     : 14.9889
+bbHWW_ybyt    : 0.935477
+
+
+bbH_bb   = 0.224875
+bbH_nobb = 0.153966
+bbH_tot  = 0.378841
+
+bbHWW_tot = 37.4808
+
+Chi2/ndof = 11.2031/20
+Prob = 0.940784
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat3_NbtagGe1
+
+processing era/category : 2018/em_cat3_NbtagGe1
+
+Top     : 22951.5
+EWK     : 4908.75
+ZTT     : 686.235
+QCD     : 1377.13
+Higgs  : 77.5965
+Total  : 30001.2
+Data   : 30012
+ratio  = 1.00036
+
+
+ggH   : 0.519301
+qqH   : 0.15142
+WH    : 0.882836
+ZH    : 0.19672
+ggHWW : 55.7911
+qqHWW : 9.9186
+WHWW  : 5.33774
+ZHWW  : 4.7988
+
+bbH_yt2       : 0.332909
+bbH_yb2       : 0.103358
+bbH_ybyt      : 0.00794808
+bbH_yb2_nobb  : 0.00181454
+bbH_ybyt_nobb : -0.000150536
+bbHWW_yt2     : 20.6521
+bbHWW_yb2     : 7.78291
+bbHWW_ybyt    : 0.601274
+
+
+bbH_bb   = 0.428319
+bbH_nobb = 0.00196508
+bbH_tot  = 0.430284
+
+bbHWW_tot = 27.8338
+
+Chi2/ndof = 10.3502/20
+Prob = 0.961368
+
+
++++++++++++++++++++++++++++++++++++++++++
+

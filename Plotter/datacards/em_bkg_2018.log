@@ -1,0 +1,94 @@
+Starting --->
+
+em_cat0
+OK
+
+processing era/category : 2018/em_cat0
+
+Top     : 409051
+EWK     : 60873.1
+ZTT     : 1424.8
+QCD     : 6677.87
+Higgs  : 148.957
+Total  : 478176
+Data   : 454121
+ratio  = 0.949694
+
+
+ggH   : 8.68072
+qqH   : 2.62598
+WH    : 16.0494
+ZH    : 3.02695
+ggHWW : 40.916
+qqHWW : 11.898
+WHWW  : 55.3099
+ZHWW  : 10.4501
+
+bbH_yt2       : 1.36073
+bbH_yb2       : 0.20229
+bbH_ybyt      : 0.011605
+bbH_yb2_nobb  : 0.0243063
+bbH_ybyt_nobb : 0.000647093
+bbHWW_yt2     : 6.52571
+bbHWW_yb2     : 0.836783
+bbHWW_ybyt    : 0.0420227
+
+
+bbH_bb   = 1.55141
+bbH_nobb = 0.0236592
+bbH_tot  = 1.57507
+
+bbHWW_tot = 7.32047
+
+Chi2/ndof = 20.4635/40
+Prob = 0.995586
+
+
++++++++++++++++++++++++++++++++++++++++++
+
+em_cat1
+OK
+
+processing era/category : 2018/em_cat1
+
+Top     : 6061.04
+EWK     : 17924.6
+ZTT     : 172162
+QCD     : 48653.4
+Higgs  : 1146.92
+Total  : 245948
+Data   : 238908
+ratio  = 0.971375
+
+
+ggH   : 597.788
+qqH   : 39.641
+WH    : 14.26
+ZH    : 5.65306
+ggHWW : 410.784
+qqHWW : 48.3194
+WHWW  : 22.5736
+ZHWW  : 7.9004
+
+bbH_yt2       : 3.25363
+bbH_yb2       : 1.4682
+bbH_ybyt      : 0.100852
+bbH_yb2_nobb  : 3.67113
+bbH_ybyt_nobb : 0.240632
+bbHWW_yt2     : 4.68743
+bbHWW_yb2     : 1.75426
+bbHWW_ybyt    : 0.142973
+
+
+bbH_bb   = 4.62098
+bbH_nobb = 3.4305
+bbH_tot  = 8.05148
+
+bbHWW_tot = 6.29871
+
+Chi2/ndof = 14.6085/40
+Prob = 0.999922
+
+
++++++++++++++++++++++++++++++++++++++++++
+

@@ -55,10 +55,10 @@ int main(int argc, char ** argv) {
   int nBinsPt = 7;
   float binsPt[8] = {20.,30.,40.,50.,60.,70.,100.,200.};
 
-  int nBinsD = 10;
-  float binsD[11];
-  for (int iD=0; iD<=10; ++iD) {
-    binsD[iD] = 0.1*float(iD);
+  int nBinsD = 100;
+  float binsD[101];
+  for (int iD=0; iD<=100; ++iD) {
+    binsD[iD] = 0.01*float(iD);
   }
 
   TFile * file = new TFile("btag_reshape_"+Era+".root","recreate");

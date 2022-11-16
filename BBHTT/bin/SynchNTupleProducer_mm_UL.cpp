@@ -568,7 +568,13 @@ int main(int argc, char * argv[]) {
 
   TH1D * metZSelH  = new TH1D("metZSelH","",200,0,400);
   TH1D * puppimetZSelH = new TH1D("puppimetZSelH","",200,0,400);
-  
+  TH1D * puppimetZSelEnUpH = new TH1D("puppimetZSelEnUpH","",200,0,400);
+  TH1D * puppimetZSelEnDownH = new TH1D("puppimetZSelEnDownH","",200,0,400);
+  TH1D * puppimetZSelUnclEnUpH = new TH1D("puppimetZSelUnclEnUpH","",200,0,400);
+  TH1D * puppimetZSelUnclEnDownH = new TH1D("puppimetZSelUnclEnDownH","",200,0,400);
+  TH1D * puppimetZSelUpH = new TH1D("puppimetZSelUpH","",200,0,400);
+  TH1D * puppimetZSelDownH = new TH1D("puppimetZSelDownH","",200,0,400);
+
   TH1D * metTopSelH  = new TH1D("metTopSelH","",200,0,400);
   TH1D * puppimetTopSelH = new TH1D("puppimetTopSelH","",200,0,400);
   
@@ -1405,7 +1411,20 @@ int main(int argc, char * argv[]) {
       float puppimet_ey = analysisTree.puppimet_ey;
       float puppimet_phi = analysisTree.puppimet_phi;
       float puppimet = TMath::Sqrt(puppimet_ex*puppimet_ex+puppimet_ey*puppimet_ey);
-      
+
+      float d_puppimetEnUp_ex = analysisTree.puppimet_ex_JetEnUp - analysisTree.puppimet_ex;
+      float d_puppimetEnDown_ex = analysisTree.puppimet_ex_JetEnDown - analysisTree.puppimet_ex;
+
+      float d_puppimetEnUp_ey = analysisTree.puppimet_ey_JetEnUp - analysisTree.puppimet_ey;
+      float d_puppimetEnDown_ey = analysisTree.puppimet_ey_JetEnDown - analysisTree.puppimet_ey;
+
+      float d_puppimetUnclEnUp_ex = analysisTree.puppimet_ex_UnclusteredEnUp - analysisTree.puppimet_ex;
+      float d_puppimetUnclEnDown_ex = analysisTree.puppimet_ex_UnclusteredEnDown - analysisTree.puppimet_ex;
+
+      float d_puppimetUnclEnUp_ey = analysisTree.puppimet_ey_UnclusteredEnUp - analysisTree.puppimet_ey;
+      float d_puppimetUnclEnDown_ey = analysisTree.puppimet_ey_UnclusteredEnDown - analysisTree.puppimet_ey;
+
+
       // muon selection
 
       // probe muons

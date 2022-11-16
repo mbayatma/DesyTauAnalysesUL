@@ -208,9 +208,10 @@ int main(int argc, char * argv[]){
     reader_Light = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_B.load(calib, BTagEntry::FLAV_B, "comb");
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
-    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
+    //    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
+    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "comb");
   }
-    
+
   TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
   if (ApplyBTagScaling && gSystem->AccessPathName(pathToTaggingEfficiencies)){
     cout<<pathToTaggingEfficiencies<<" not found. Please check."<<endl;
@@ -470,10 +471,11 @@ int main(int argc, char * argv[]){
     exit(-1);
   }
 
-  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptNLOhist")));
-  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptBNLOhist")));
+  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get("DY_NLO");
+  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get("DY_Btag_NLO");
+  TH2D * h_zptNLOweight_1bsys = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO"); 
   if (h_zptNLOweight == NULL ||
-      h_zptNLOweight_1btag == NULL) {
+      h_zptNLOweight_1btag == NULL || h_zptNLOweight_1bsys == NULL) {
     std::cout << "File " << TString(cmsswBase) << "/src/" << ZptNLOweightFile 
 	      << " is empty. check content" << std::endl;
     exit(-1);
@@ -615,6 +617,7 @@ int main(int argc, char * argv[]){
 
     tauOneProngScaleSys = new TauOneProngScaleSys(otree);
     tauOneProngScaleSys->SetScale(shift_tes_1prong,shift_tes_1prong_e);
+    tauOneProngScaleSys->SetConfig(&cfg);
     tauOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauOneProngScaleSys->SetUseSVFit(ApplySVFit);
     tauOneProngScaleSys->SetUseFastMTT(ApplyFastMTT);
@@ -622,6 +625,7 @@ int main(int argc, char * argv[]){
 
     tauOneProngOnePi0ScaleSys = new TauOneProngOnePi0ScaleSys(otree);
     tauOneProngOnePi0ScaleSys->SetScale(shift_tes_1p1p0,shift_tes_1p1p0_e);
+    tauOneProngOnePi0ScaleSys->SetConfig(&cfg);
     tauOneProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauOneProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     tauOneProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
@@ -629,6 +633,7 @@ int main(int argc, char * argv[]){
 
     tauThreeProngScaleSys = new TauThreeProngScaleSys(otree);
     tauThreeProngScaleSys->SetScale(shift_tes_3prong,shift_tes_3prong_e);
+    tauThreeProngScaleSys->SetConfig(&cfg);
     tauThreeProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauThreeProngScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngScaleSys->SetUseFastMTT(ApplyFastMTT);
@@ -636,11 +641,13 @@ int main(int argc, char * argv[]){
 
     tauThreeProngOnePi0ScaleSys = new TauThreeProngOnePi0ScaleSys(otree);
     tauThreeProngOnePi0ScaleSys->SetScale(shift_tes_3prong1p0,shift_tes_3prong1p0_e);
+    tauThreeProngOnePi0ScaleSys->SetConfig(&cfg);
     tauThreeProngOnePi0ScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
     tauThreeProngOnePi0ScaleSys->SetUseSVFit(ApplySVFit);
     tauThreeProngOnePi0ScaleSys->SetUseFastMTT(ApplyFastMTT);
     tauThreeProngOnePi0ScaleSys->SetUsePuppiMET(usePuppiMET);
 
+    /*
     if (!isEmbedded) {
       lepTauFakeOneProngScaleSys = new LepTauFakeOneProngScaleSys(otree);
       lepTauFakeOneProngScaleSys->SetSvFitVisPtResolution(inputFile_visPtResolution);
@@ -663,7 +670,7 @@ int main(int argc, char * argv[]){
       lepTauFakeOneProngOnePi0ScaleSys->SetScaleBarrelDown(shift_tes_lepfake_1p1p0_barrel, shift_tes_lepfake_1p1p0_barrel_down);
       lepTauFakeOneProngOnePi0ScaleSys->SetScaleEndcapUp(shift_tes_lepfake_1p1p0_endcap, shift_tes_lepfake_1p1p0_endcap_up);
       lepTauFakeOneProngOnePi0ScaleSys->SetScaleEndcapDown(shift_tes_lepfake_1p1p0_endcap, shift_tes_lepfake_1p1p0_endcap_down);
-
+    
       btagSys = new BtagSys(otree,TString("Btag"));
       btagSys->SetConfig(&cfg);
       btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
@@ -671,51 +678,52 @@ int main(int argc, char * argv[]){
       mistagSys = new BtagSys(otree,TString("Mistag"));
       mistagSys->SetConfig(&cfg);
       mistagSys->SetBtagScaling(&inputs_btag_scaling_medium);
+    */
 
-      if (ApplyRecoilCorrections) {
-	if (usePuppiMET) {
-	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
-	    PuppiMETSys * puppiMetRecoilSys = new PuppiMETSys(otree,recoilSysNames[i]);
-	    puppiMetRecoilSys->SetMEtSys(&MetSys);
-	    puppiMetSys.push_back(puppiMetRecoilSys);
-	  }
+    if (ApplyRecoilCorrections) {
+      if (usePuppiMET) {
+	for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
+	  PuppiMETSys * puppiMetRecoilSys = new PuppiMETSys(otree,recoilSysNames[i]);
+	  puppiMetRecoilSys->SetMEtSys(&MetSys);
+	  puppiMetSys.push_back(puppiMetRecoilSys);
 	}
       }
-      else {
-	for (unsigned int i = 0; i<metSysNames.size(); ++i) {
-	  if (usePuppiMET)
-	    puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
-	  else
-	    metSys.push_back(new PFMETSys(otree,metSysNames[i]));
-	}
-      }
-      if (cfg.get<bool>("splitJES")){
-	JESUncertainties *jecUncertainties;
-	jecUncertainties = new JESUncertainties(JESUncertaintyFileName);
-	std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
-	for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
-	for (unsigned int i = 0; i < JESnames.size(); i++){
-	  JetEnergyScaleSys *aJESobject = new JetEnergyScaleSys(otree, TString(JESnames.at(i)));
-	  aJESobject->SetConfig(&cfg);
-	  aJESobject->SetBtagScaling(&inputs_btag_scaling_medium);
-	  aJESobject->SetJESUncertainties(jecUncertainties);
-	  jetEnergyScaleSys.push_back(aJESobject);
-	}	  
-      }
-      else { // use JEC uncertainty from analysis tree
-	JetEnergyScaleSys *singleJES = new JetEnergyScaleSys(otree, TString("JES"));
-	singleJES->SetConfig(&cfg);
-	singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
-	singleJES->SetJESUncertainties(jecUncertainties);
-	jetEnergyScaleSys.push_back(singleJES);
-      }
-      JetEnergyScaleSys * JERsys = new JetEnergyScaleSys(otree, TString("JER"));
-      JERsys->SetConfig(&cfg);
-      JERsys->SetBtagScaling(&inputs_btag_scaling_medium);
-      JERsys->SetJESUncertainties(jecUncertainties);
-      jetEnergyScaleSys.push_back(JERsys);
     }
+    else {
+      for (unsigned int i = 0; i<metSysNames.size(); ++i) {
+	if (usePuppiMET)
+	  puppiMetSys.push_back(new PuppiMETSys(otree,metSysNames[i]));
+	else
+	  metSys.push_back(new PFMETSys(otree,metSysNames[i]));
+      }
+    }
+    if (cfg.get<bool>("splitJES")){
+      JESUncertainties *jecUncertainties;
+      jecUncertainties = new JESUncertainties(JESUncertaintyFileName);
+      std::vector<std::string> JESnames = jecUncertainties->getUncertNames();
+      for (unsigned int i = 0; i < JESnames.size(); i++) std::cout << "i: "<< i << ", JESnames.at(i) : " << JESnames.at(i) << std::endl;
+      for (unsigned int i = 0; i < JESnames.size(); i++){
+	JetEnergyScaleSys *aJESobject = new JetEnergyScaleSys(otree, TString(JESnames.at(i)));
+	aJESobject->SetConfig(&cfg);
+	aJESobject->SetBtagScaling(&inputs_btag_scaling_medium);
+	aJESobject->SetJESUncertainties(jecUncertainties);
+	jetEnergyScaleSys.push_back(aJESobject);
+      }	  
+    }
+    else { // use JEC uncertainty from analysis tree
+      JetEnergyScaleSys *singleJES = new JetEnergyScaleSys(otree, TString("JES"));
+      singleJES->SetConfig(&cfg);
+      singleJES->SetBtagScaling(&inputs_btag_scaling_medium);
+      singleJES->SetJESUncertainties(jecUncertainties);
+      jetEnergyScaleSys.push_back(singleJES);
+    }
+    JetEnergyScaleSys * JERsys = new JetEnergyScaleSys(otree, TString("JER"));
+    JERsys->SetConfig(&cfg);
+    JERsys->SetBtagScaling(&inputs_btag_scaling_medium);
+    JERsys->SetJESUncertainties(jecUncertainties);
+    jetEnergyScaleSys.push_back(JERsys);
   }
+
 
   // list of met filters from config
   std::vector<TString> met_filters_list;
@@ -757,8 +765,8 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree, isData);
     // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
-	btagSys->SetAC1B(&analysisTree);
-	mistagSys->SetAC1B(&analysisTree);
+      //	btagSys->SetAC1B(&analysisTree);
+      //	mistagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < metSys.size(); i++)
@@ -1455,6 +1463,8 @@ int main(int argc, char * argv[]){
       TLorentzVector genV( 0., 0., 0., 0.);
       TLorentzVector genL( 0., 0., 0., 0.);
       otree->zptweight = 1.;
+      otree->zptweight_0btag = 1.;
+      otree->zptweight_1btag = 1.;
       if (!isData && isDY && !isDYamcatnlo){
         genV = genTools::genV(analysisTree); // gen Z boson ?
       	float bosonMass = genV.M();
@@ -1504,6 +1514,27 @@ int main(int argc, char * argv[]){
 	//	std::cout << "amcatnlo -> " << std::endl;
 	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
 	otree->zptweight = zptmassweight;
+	// Pascal's corretion ->
+	if (otree->nbtag>=1) {
+	  histZPt = h_zptNLOweight_1bsys;
+	  bosonMass = genV.M();
+	  bosonPt = genV.Pt();
+	  massBins = histZPt->GetNbinsY();
+	  ptBins = histZPt->GetNbinsX();
+	  MassMin = histZPt->GetYaxis()->GetBinLowEdge(1);
+	  MassMax = histZPt->GetYaxis()->GetBinLowEdge(massBins+1);
+	  ptMin = histZPt->GetXaxis()->GetBinLowEdge(1);
+	  ptMax = histZPt->GetXaxis()->GetBinLowEdge(ptBins+1);	  
+	  if (bosonMass<MassMin) bosonMass = MassMin+0.5;
+	  if (bosonMass>MassMax) bosonMass = MassMax-0.5;
+	  if (bosonPt<ptMin) bosonPt = ptMin+0.5;
+	  if (bosonPt>ptMax) bosonPt = ptMax-0.5;
+	  otree->zptweight_1btag = histZPt->GetBinContent(histZPt->FindBin(bosonPt,bosonMass));
+	}
+	else {
+	  otree->zptweight_0btag = zptmassweight;
+	}
+
       }
       otree->weight *= otree->zptweight;
       
@@ -1787,8 +1818,8 @@ int main(int argc, char * argv[]){
 
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	  btagSys->Eval();
-	  mistagSys->Eval();
+	//	  btagSys->Eval();
+	//	  mistagSys->Eval();
 	  for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
 	    //	  cout << endl;
 	    //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -1816,11 +1847,11 @@ int main(int argc, char * argv[]){
 	tauThreeProngScaleSys->Eval(utils::TAUTAU);
 	tauThreeProngOnePi0ScaleSys->Eval(utils::TAUTAU);
 
-	if (!isEmbedded) {
-	  // tau FES ->
-	  lepTauFakeOneProngScaleSys->Eval(utils::TAUTAU);
-	  lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::TAUTAU);
-	}
+	//	if (!isEmbedded) {
+	// tau FES ->
+	//	  lepTauFakeOneProngScaleSys->Eval(utils::TAUTAU);
+	//	  lepTauFakeOneProngOnePi0ScaleSys->Eval(utils::TAUTAU);
+	//	}
       }
       
       selEvents++;      

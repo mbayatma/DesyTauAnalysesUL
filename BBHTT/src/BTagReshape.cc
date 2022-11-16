@@ -8,15 +8,15 @@ BTagReshape::BTagReshape(const std::string inputFileName) {
   isCSV = false;
 
   TString fileName(inputFileName);
-
   file = new TFile(fileName);
+  std::cout << "File = " << file << std::endl;
 
   for (auto flavor : flavors) {
     for (auto sysname : systematics) {
       TString histName = flavor + "_" + sysname;
       TH3D * histo = (TH3D*)file->Get(histName);
       if (histo==NULL) {
-	std::cout << "histogram " << histo << " is not present in the BTagReshape file... quitting" << std::endl;
+	std::cout << "histogram " << histName << " is not present in the BTagReshape file... quitting" << std::endl;
 	exit(-1);
       }
       map_histo[histName] = histo;
@@ -82,6 +82,35 @@ double BTagReshape::getWeight(double jetPt,
 
   double wgt = hist->GetBinContent(hist->FindBin(absJetEta,jetPtForBTag,jetDiscr));
 
+  return wgt;
+
+}
+
+double BTagReshape::getWeightSys(double jetPt,
+				 double jetEta,
+				 double jetDiscr,
+				 int jetFlavor,
+				 string sysName,
+				 bool direction) {
+
+  //  TString SysName(sysName);
+  TString Direction = "down";
+  if (direction) Direction = "up";
+  int absFlavor = TMath::Abs(jetFlavor);
+  double absJetEta = TMath::Abs(jetEta);
+  double jetPtForBTag = jetPt;
+  if (jetPt>199.) jetPtForBTag = 199.;
+  TString flavorName = "light";
+  if (absFlavor==4)
+    flavorName = "c";
+  if (absFlavor==5)
+    flavorName = "b";
+
+  TString histName = flavorName + "_" + Direction + "_" + TString(sysName);
+  TH3D * hist = map_histo[histName];
+
+  double wgt = hist->GetBinContent(hist->FindBin(absJetEta,jetPtForBTag,jetDiscr));
+  if (wgt<1e-1||wgt>5) wgt = getWeight(jetPt,jetEta,jetDiscr,jetFlavor); 
   return wgt;
 
 }

@@ -96,32 +96,49 @@ Cards::Cards(TString Sample,
     {channel+"_inclusive",""},
     {channel+"_Nbtag0",   "&&nbtag==0"},
     {channel+"_NbtagGe1",   "&&nbtag>0"},
+
     {channel+"_Nbtag0_lowPzeta", "&&nbtag==0&&pzeta<-35"},
     {channel+"_NbtagGe1_lowPzeta", "&&nbtag>0&&pzeta<-35"},
+
     {channel+"_Nbtag0_highPzeta", "&&nbtag==0&&pzeta>-35"},
     {channel+"_NbtagGe1_highPzeta", "&&nbtag>0&&pzeta>-35"},
+
     {channel+"_Nbtag0_Pzeta1", "&&nbtag==0&&pzeta>-35&&pzeta<-10"},
     {channel+"_NbtagGe1_Pzeta1", "&&nbtag>0&&pzeta>-35&&pzeta<-10"},
-    {channel+"_Nbtag0_Pzeta2", "&&nbtag==0&&pzeta>-10&&pzeta<30"},
-    {channel+"_NbtagGe1_Pzeta2", "&&nbtag>0&&pzeta>-10&&pzeta<30"},
-    {channel+"_Nbtag0_Pzeta3", "&&nbtag==0&&pzeta>30"},
-    {channel+"_NbtagGe1_Pzeta3", "&&nbtag>0&&pzeta>30"},
+
+    {channel+"_Nbtag0_Pzeta2", "&&nbtag==0&&pzeta>-10&&pzeta<20"},
+    {channel+"_NbtagGe1_Pzeta2", "&&nbtag>0&&pzeta>-10&&pzeta<20"},
+
     {channel+"_cat0", "&&pred_class==0"},
     {channel+"_cat1", "&&pred_class==1"},
     {channel+"_cat2", "&&pred_class==2"},
     {channel+"_cat3", "&&pred_class==3"},
     {channel+"_cat4", "&&pred_class==4"},
+
     {channel+"_cat0_Nbtag0", "&&pred_class==0&&nbtag==0"},
     {channel+"_cat1_Nbtag0", "&&pred_class==1&&nbtag==0"},
     {channel+"_cat2_Nbtag0", "&&pred_class==2&&nbtag==0"},
     {channel+"_cat3_Nbtag0", "&&pred_class==3&&nbtag==0"},
     {channel+"_cat4_Nbtag0", "&&pred_class==4&&nbtag==0"},
+
+    {channel+"_cat0_Nbtag1", "&&pred_class==0&&nbtag==1"},
+    {channel+"_cat1_Nbtag1", "&&pred_class==1&&nbtag==1"},
+    {channel+"_cat2_Nbtag1", "&&pred_class==2&&nbtag==1"},
+    {channel+"_cat3_Nbtag1", "&&pred_class==3&&nbtag==1"},
+    {channel+"_cat4_Nbtag1", "&&pred_class==4&&nbtag==1"},
+
+    {channel+"_cat0_Nbtag2", "&&pred_class==0&&nbtag==2"},
+    {channel+"_cat1_Nbtag2", "&&pred_class==1&&nbtag==2"},
+    {channel+"_cat2_Nbtag2", "&&pred_class==2&&nbtag==2"},
+    {channel+"_cat3_Nbtag2", "&&pred_class==3&&nbtag==2"},
+    {channel+"_cat4_Nbtag2", "&&pred_class==4&&nbtag==2"},
+
     {channel+"_cat0_NbtagGe1", "&&pred_class==0&&nbtag>0"},
     {channel+"_cat1_NbtagGe1", "&&pred_class==1&&nbtag>0"},
     {channel+"_cat2_NbtagGe1", "&&pred_class==2&&nbtag>0"},
     {channel+"_cat3_NbtagGe1", "&&pred_class==3&&nbtag>0"},
     {channel+"_cat4_NbtagGe1", "&&pred_class==4&&nbtag>0"},
-  };
+  };    
 
   TH1::SetDefaultSumw2(true);
   TH2::SetDefaultSumw2(true);
@@ -139,15 +156,10 @@ Cards::Cards(TString Sample,
   }
   outputFile->mkdir(category);
 
-  /*
-  if (channel=="em") {
-    if (category=="em_ttbar") 
-      commonCuts += "&&pzeta<-35.0&&nbtag>=1";
-    else
-      commonCuts += "&&pzeta>-35.0";
-  }
-  */
   commonCuts += categoryCuts[category];
+
+  if (channel=="em") 
+    commonCuts += "&&pzeta<20&&nbtag<3";
 
   regionCut.clear();
   if(channel=="tt"){

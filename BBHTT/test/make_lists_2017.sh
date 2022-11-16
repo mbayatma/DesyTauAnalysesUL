@@ -34,6 +34,7 @@ else
     ls $dirMC_UL/WplusHToTauTau/*.root > $OUTDIR/WplusHToTauTau_M125
     ls $dirMC_UL/WminusHToTauTau/*.root > $OUTDIR/WminusHToTauTau_M125
     ls $dirMC_UL/ZHToTauTau_M125_CP5_13TeV-powheg-pythia8_ext1/*root > $OUTDIR/ZHToTauTau_M125
+    ls $dirMC_UL/ttHToTauTau/*root > $OUTDIR/ttHToTauTau_M125
 
     ls $dirSignal_UL/BBHToTauTau/*.root > $OUTDIR/bbHToTauTau_yb2_M125
     ls $dirSignal_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125

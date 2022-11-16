@@ -65,6 +65,7 @@ else
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WplusHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WminusHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf ZHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf ttHToTauTau_M125 4
 
     # BBH
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf bbHToTauTau_yb2_M125 5

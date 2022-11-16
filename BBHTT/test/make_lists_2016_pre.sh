@@ -29,12 +29,12 @@ else
     ls $dirMC_UL/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
     ls $dirMC_UL/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
 
-    ls $dirMC_UL/GluGluHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/GluGluHToTauTau_M125
-    ls $dirMC_UL/GluGluHToTauTau_M-125_amcatnlo/*.root > $OUTDIR/GluGluHToTauTau_M125_amcatnlo
+    ls $dirMC_UL/GluGluHToTauTau_M-125_amcatnlo/*.root > $OUTDIR/GluGluHToTauTau_M125
     ls $dirMC_UL/VBFHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*.root > $OUTDIR/VBFHToTauTau_M125
     ls $dirMC_UL/WplusHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*.root > $OUTDIR/WplusHToTauTau_M125
     ls $dirMC_UL/WminusHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*.root > $OUTDIR/WminusHToTauTau_M125
     ls $dirMC_UL/ZHToTauTau_M125_CP5_13TeV-powheg-pythia8_ext1/*root > $OUTDIR/ZHToTauTau_M125
+    ls $dirMC_UL/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ttHToTauTau_M125
 
     ls $dirSignal_UL/bbHToTauTau_yb2_M125_UL16MiniAODAPVv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
     ls $dirSignal_UL/bbHToTauTau_yt2_M125_UL16MiniAODAPVv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125

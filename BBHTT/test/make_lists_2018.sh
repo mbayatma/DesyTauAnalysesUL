@@ -4,7 +4,6 @@ dirMC_2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/mc_2
 dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/data
 dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2018/emb
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2018/mc
-dirMC_UL_v2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples/UL/2018/mc
 
 CHANNEL=$1
 
@@ -17,56 +16,57 @@ fi
 
 if [[ $CHANNEL == "mm" ]]; then
 
-    ls $dirMC_UL_v2/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
+    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
 else
 
-    ls $dirMC_UL_v2/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
-    ls $dirMC_UL_v2/W1JetsToLNu/*root > $OUTDIR/W1JetsToLNu
-    ls $dirMC_UL_v2/W2JetsToLNu/*root > $OUTDIR/W2JetsToLNu
-    ls $dirMC_UL_v2/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
-    ls $dirMC_UL_v2/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
+    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
+    ls $dirMC_UL/W1JetsToLNu/*root > $OUTDIR/W1JetsToLNu
+    ls $dirMC_UL/W2JetsToLNu/*root > $OUTDIR/W2JetsToLNu
+    ls $dirMC_UL/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
+    ls $dirMC_UL/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
 
-    ls $dirMC_UL_v2/GluGluHToTauTau_M125/*root > $OUTDIR/GluGluHToTauTau_M125
-    ls $dirMC_UL_v2/VBFHToTauTau_M125/*.root > $OUTDIR/VBFHToTauTau_M125
-    ls $dirMC_UL_v2/WplusHToTauTau_M125/*.root > $OUTDIR/WplusHToTauTau_M125
-    ls $dirMC_UL_v2/WminusHToTauTau_M125/*.root > $OUTDIR/WminusHToTauTau_M125
-    ls $dirMC_UL_v2/ZHToTauTau_M125/*root > $OUTDIR/ZHToTauTau_M125
+    ls $dirMC_UL/GluGluHToTauTau_amcatnlo_M125_MiniAOD/*root > $OUTDIR/GluGluHToTauTau_M125
+    ls $dirMC_UL/VBFHToTauTau_M125/*.root > $OUTDIR/VBFHToTauTau_M125
+    ls $dirMC_UL/WplusHToTauTau_M125/*.root > $OUTDIR/WplusHToTauTau_M125
+    ls $dirMC_UL/WminusHToTauTau_M125/*.root > $OUTDIR/WminusHToTauTau_M125
+    ls $dirMC_UL/ZHToTauTau_M125/*.root > $OUTDIR/ZHToTauTau_M125
+    ls $dirMC_UL/ttHToTauTau_M125/*.root $OUTDIR/ttHToTauTau_M125
     
-    ls $dirMC_UL_v2/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
-    ls $dirMC_UL_v2/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
-    ls $dirMC_UL_v2/bbHToTauTau_ybyt_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
+    ls $dirMC_UL/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
+    ls $dirMC_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
+    ls $dirMC_UL/bbHToTauTau_ybyt_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
 
 fi
 
 # Huge files -> split them
-ls $dirMC_UL_v2/TTToSemiLeptonic/*0.root > $OUTDIR/TTToSemiLeptonic
-ls $dirMC_UL_v2/DYJetsToLL_M-50_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_M-50_amcatnlo
-ls $dirMC_UL_v2/DYJetsToLL_0J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_0J_amcatnlo
-ls $dirMC_UL_v2/DYJetsToLL_1J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_1J_amcatnlo
-ls $dirMC_UL_v2/DYJetsToLL_2J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_2J_amcatnlo
+ls $dirMC_UL/TTToSemiLeptonic/*0.root > $OUTDIR/TTToSemiLeptonic
+ls $dirMC_UL/DYJetsToLL_M-50_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_M-50_amcatnlo
+ls $dirMC_UL/DYJetsToLL_0J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_0J_amcatnlo
+ls $dirMC_UL/DYJetsToLL_1J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_1J_amcatnlo
+ls $dirMC_UL/DYJetsToLL_2J_amcatnlo/*0.root > $OUTDIR/DYJetsToLL_2J_amcatnlo
 for index in {1..9}
 do
-    ls $dirMC_UL_v2/TTToSemiLeptonic/*${index}.root >> $OUTDIR/TTToSemiLeptonic
-    ls $dirMC_UL_v2/DYJetsToLL_M-50_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_M-50_amcatnlo
-    ls $dirMC_UL_v2/DYJetsToLL_0J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_0J_amcatnlo
-    ls $dirMC_UL_v2/DYJetsToLL_1J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_1J_amcatnlo
-    ls $dirMC_UL_v2/DYJetsToLL_2J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_2J_amcatnlo
+    ls $dirMC_UL/TTToSemiLeptonic/*${index}.root >> $OUTDIR/TTToSemiLeptonic
+    ls $dirMC_UL/DYJetsToLL_M-50_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_M-50_amcatnlo
+    ls $dirMC_UL/DYJetsToLL_0J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_0J_amcatnlo
+    ls $dirMC_UL/DYJetsToLL_1J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_1J_amcatnlo
+    ls $dirMC_UL/DYJetsToLL_2J_amcatnlo/*${index}.root >> $OUTDIR/DYJetsToLL_2J_amcatnlo
 done
 
-ls $dirMC_UL_v2/TTTo2L2Nu/*root > $OUTDIR/TTTo2L2Nu
-ls $dirMC_UL_v2/TTToHadronic/*root > $OUTDIR/TTToHadronic
+ls $dirMC_UL/TTTo2L2Nu/*root > $OUTDIR/TTTo2L2Nu
+ls $dirMC_UL/TTToHadronic/*root > $OUTDIR/TTToHadronic
 
-ls $dirMC_UL_v2/ST_t-channel_antitop_4f/*root > $OUTDIR/ST_t-channel_antitop_4f
-ls $dirMC_UL_v2/ST_t-channel_top_4f/*root > $OUTDIR/ST_t-channel_top_4f
+ls $dirMC_UL/ST_t-channel_antitop_4f/*root > $OUTDIR/ST_t-channel_antitop_4f
+ls $dirMC_UL/ST_t-channel_top_4f/*root > $OUTDIR/ST_t-channel_top_4f
 ls $dirMC_UL/ST_tW_antitop_5f_inclusiveDecays/*root > $OUTDIR/ST_tW_antitop_5f
 ls $dirMC_UL/ST_tW_top_5f_inclusiveDecays/*root > $OUTDIR/ST_tW_top_5f
 
-ls $dirMC_UL_v2/WWTo2L2Nu/*root > $OUTDIR/WWTo2L2Nu
-ls $dirMC_UL_v2/ZZTo2L2Nu/*root > $OUTDIR/ZZTo2L2Nu
-ls $dirMC_UL_v2/WZTo2Q2L/*root > $OUTDIR/WZTo2L2Q
-ls $dirMC_UL_v2/WZTo3LNu/*root > $OUTDIR/WZTo3LNu
-ls $dirMC_UL_v2/ZZTo2Q2L/*root > $OUTDIR/ZZTo2L2Q
-ls $dirMC_UL_v2/ZZTo4L/*root > $OUTDIR/ZZTo4L
+ls $dirMC_UL/WWTo2L2Nu/*root > $OUTDIR/WWTo2L2Nu
+ls $dirMC_UL/ZZTo2L2Nu/*root > $OUTDIR/ZZTo2L2Nu
+ls $dirMC_UL/WZTo2Q2L/*root > $OUTDIR/WZTo2L2Q
+ls $dirMC_UL/WZTo3LNu/*root > $OUTDIR/WZTo3LNu
+ls $dirMC_UL/ZZTo2Q2L/*root > $OUTDIR/ZZTo2L2Q
+ls $dirMC_UL/ZZTo4L/*root > $OUTDIR/ZZTo4L
 
 if [[ $CHANNEL == "em" ]]; then
 

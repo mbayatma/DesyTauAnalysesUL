@@ -48,12 +48,12 @@ else
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W4JetsToLNu 20
 
     # H->tautau
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf GluGluHToTauTau_M125_amcatnlo 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf GluGluHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf VBFHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WplusHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WminusHToTauTau_M125 4
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf ZHToTauTau_M125 4
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf ttHToTauTau_M125 4
 
     # H->tautau+b's
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf bbHToTauTau_yb2_M125 4

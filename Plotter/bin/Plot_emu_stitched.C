@@ -35,7 +35,9 @@ map<TString, TString> xtitles = {
   {"bcsv_1","b-tag discriminant 1"},
   {"bcsv_1","b-tag discriminant 2"},
   {"dr_tt","#DeltaR(e,#mu)"},
-  {"pt_tt","p_{T}(#tau#tau) [GeV]"}
+  {"pt_tt","p_{T}(#tau#tau) [GeV]"},
+  {"pred_class_proba","BDT"},
+  {"mt_tot","m_{T}^{tot} [GeV]"},
 };
 
 // triggerOption = 0 (e+mu), 1 (single-lep), 2 (comb)
@@ -61,7 +63,6 @@ int main(int argc, char * argv[]) {
   float xmax = atof(argv[5]);
   float yLower = 0;
 
-  bool embedded = cfg.get<bool>("Embedded");
   string era_string = cfg.get<string>("Era");
   TString era(era_string);
   string input_dir = cfg.get<string>("InputDir");
@@ -94,10 +95,10 @@ int main(int argc, char * argv[]) {
   string additional_cut = cfg.get<string>("AdditionalCut");
   TString AdditionalCut(additional_cut);
   bool isBTag = cfg.get<bool>("ApplyBTagQCDScale");
-  bool isDYamcatnlo = cfg.get<bool>("IsDYamcatnlo");
-  TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.");
+  TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&xsec_lumi_weight<1000.");
   Selection += AdditionalCut; // additional cut, for example nbtag>=1
   string SelSuffix = cfg.get<string>("FileSuffix");
+  bool plotSignal = cfg.get<bool>("PlotSignal");
   TString sel_suffix(SelSuffix);
   double scaleQCD = 1.0;  
   std::map<TString,double> scaleQCD_btag = 
@@ -111,9 +112,6 @@ int main(int argc, char * argv[]) {
   if (isBTag) 
     scaleQCD = scaleQCD_btag[era];
  
-  TString suffix = "mc";
-  if (embedded) suffix = "embedded";
-
   // ******** end of settings *********
 
   //  std::cout << dir << std::endl;
@@ -150,7 +148,9 @@ int main(int argc, char * argv[]) {
   TString CutsZLL_OS  = CutsOS + TString("&&!(gen_match_1==3&&gen_match_2==4)");
   TString CutsZTT_SS  = CutsSS + TString("&&gen_match_1==3&&gen_match_2==4");
   TString CutsZLL_SS  = CutsSS + TString("&&!(gen_match_1==3&&gen_match_2==4)");
-
+  TString CutsB_OS    = CutsOS + TString("&&gen_nbjets_cut>0");
+  TString CutsnoB_OS  = CutsOS + TString("&&gen_nbjets_cut==0");
+  
   double lumi = LUMI[era];
 
   TH1::SetDefaultSumw2();
@@ -159,12 +159,15 @@ int main(int argc, char * argv[]) {
   TString dnn_prefix("em-NOMINAL_ntuple_");
 
   std::vector<TString> MuonEG = {"MuonEG"};
-  std::vector<TString> EmbedSamples = {"EmbeddedElMu"};
-  std::vector<TString> DYSamples = {"DYJets"};
+  std::vector<TString> DYSamples = {"DYJets_amcatnlo"};
   std::vector<TString> WJetsSamples = {"WJets"};
   std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
   std::vector<TString> TTSamples = {"TTbar"};
-  std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau"};
+  std::vector<TString> HTTSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau","ZHToTauTau"};
+  std::vector<TString> HWWSamples = {"GluGluHToWW","VBFHToWW","WHToWW","ZHToWW"};
+  std::vector<TString> bbHTTSamples = {"BBHToTauTau_YB2","BBHToTauTau_YT2"};
+  std::vector<TString> bbHWWSamples = {"BBHToWW_YB2","GluGluHToWW"};
+  std::vector<TString> bbHTTNoBSamples = {"BBHToTauTau_YB2","BBHToTauTau_YBYT"};
 
   struct SampleAttributes {
     TString name;
@@ -192,14 +195,23 @@ int main(int argc, char * argv[]) {
   TH1D * ewkH   = new TH1D("ewk_os_Hist","",nBins,xmin,xmax);
   TH1D * ewkSSH = new TH1D("ewk_ss_Hist","",nBins,xmin,xmax);
 
-  TH1D * higgsH   = new TH1D("higgs_os_Hist","",nBins,xmin,xmax);
-  TH1D * higgsSSH = new TH1D("higgs_ss_Hist","",nBins,xmin,xmax);
-
   TH1D * ttH   = new TH1D("tt_os_Hist","",nBins,xmin,xmax);
   TH1D * ttSSH = new TH1D("tt_ss_Hist","",nBins,xmin,xmax);
 
-  TH1D * ttSysH   = new TH1D("tt_sys_os_Hist","",nBins,xmin,xmax);
-  TH1D * ttSysSSH = new TH1D("tt_sys_ss_Hist","",nBins,xmin,xmax);
+  TH1D * httH   = new TH1D("htt_os_Hist","",nBins,xmin,xmax);
+  TH1D * httSSH = new TH1D("htt_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * hwwH   = new TH1D("hww_os_Hist","",nBins,xmin,xmax);
+  TH1D * hwwSSH = new TH1D("hww_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * bbhttH   = new TH1D("bbhtt_os_Hist","",nBins,xmin,xmax);
+  TH1D * bbhttSSH = new TH1D("bbhtt_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * bbhttnH   = new TH1D("bbhttn_os_Hist","",nBins,xmin,xmax);
+  TH1D * bbhttnSSH = new TH1D("bbhttn_ss_Hist","",nBins,xmin,xmax);
+
+  TH1D * bbhwwH   = new TH1D("bbhww_os_Hist","",nBins,xmin,xmax);
+  TH1D * bbhwwSSH = new TH1D("bbhww_ss_Hist","",nBins,xmin,xmax);
 
   // data
   SampleAttributes DataEMuAttr;
@@ -215,22 +227,11 @@ int main(int argc, char * argv[]) {
   // ZTT
   SampleAttributes ZttAttr;
   ZttAttr.name = "ZTT";
-  if (embedded) {
-    ZttAttr.name = "EmbeddedZTT";
-    ZttAttr.Weight = Weight;
-    ZttAttr.WeightQCD = WeightQCD;
-    ZttAttr.sampleNames = EmbedSamples;
-    ZttAttr.cuts = CutsOS;
-    ZttAttr.cutsSS = CutsSS;
-  }
-  else {
-    ZttAttr.name = "ZTT";
-    ZttAttr.sampleNames = DYSamples;
-    ZttAttr.Weight = Weight;
-    ZttAttr.WeightQCD = WeightQCD;
-    ZttAttr.cuts = CutsZTT_OS;
-    ZttAttr.cutsSS = CutsZTT_SS;
-  }
+  ZttAttr.sampleNames = DYSamples;
+  ZttAttr.Weight = Weight;
+  ZttAttr.WeightQCD = WeightQCD;
+  ZttAttr.cuts = CutsZTT_OS;
+  ZttAttr.cutsSS = CutsZTT_SS;
   ZttAttr.hist = zttH;
   ZttAttr.histSS = zttSSH;
 
@@ -245,15 +246,55 @@ int main(int argc, char * argv[]) {
   ZllAttr.hist = zllH;
   ZllAttr.histSS = zllSSH;
 
-  // H125
-  SampleAttributes HiggsAttr;
-  HiggsAttr.sampleNames = HiggsSamples;
-  HiggsAttr.cuts = CutsOS;
-  HiggsAttr.Weight = Weight;
-  HiggsAttr.WeightQCD = WeightQCD;
-  HiggsAttr.cutsSS = CutsSS;
-  HiggsAttr.hist = higgsH;
-  HiggsAttr.histSS = higgsSSH;
+  // HTT125
+  SampleAttributes HTTAttr;
+  HTTAttr.sampleNames = HTTSamples;
+  HTTAttr.cuts = CutsOS;
+  HTTAttr.Weight = Weight;
+  HTTAttr.WeightQCD = WeightQCD;
+  HTTAttr.cutsSS = CutsSS;
+  HTTAttr.hist = httH;
+  HTTAttr.histSS = httSSH;
+
+  // HWW125
+  SampleAttributes HWWAttr;
+  HWWAttr.sampleNames = HWWSamples;
+  HWWAttr.cuts = CutsOS;
+  HWWAttr.Weight = Weight;
+  HWWAttr.WeightQCD = WeightQCD;
+  HWWAttr.cutsSS = CutsSS;
+  HWWAttr.hist = hwwH;
+  HWWAttr.histSS = hwwSSH;
+
+  // bbHTT
+  SampleAttributes bbHTTAttr;
+  bbHTTAttr.sampleNames = bbHTTSamples;
+  bbHTTAttr.cuts = CutsB_OS;
+  bbHTTAttr.Weight = Weight;
+  bbHTTAttr.WeightQCD = WeightQCD;
+  bbHTTAttr.cutsSS = CutsSS;
+  bbHTTAttr.hist = bbhttH;
+  bbHTTAttr.histSS = bbhttSSH;
+
+  // bbHTT
+  SampleAttributes bbHWWAttr;
+  bbHWWAttr.sampleNames = bbHWWSamples;
+  bbHWWAttr.cuts = CutsB_OS;
+  bbHWWAttr.Weight = Weight;
+  bbHWWAttr.WeightQCD = WeightQCD;
+  bbHWWAttr.cutsSS = CutsSS;
+  bbHWWAttr.hist = bbhwwH;
+  bbHWWAttr.histSS = bbhwwSSH;
+
+  // bbHTTnobb
+  SampleAttributes bbHTTnobbAttr;
+  bbHTTnobbAttr.sampleNames = bbHTTNoBSamples;
+  bbHTTnobbAttr.cuts = CutsnoB_OS;
+  bbHTTnobbAttr.Weight = Weight;
+  bbHTTnobbAttr.WeightQCD = WeightQCD;
+  bbHTTnobbAttr.cutsSS = CutsSS;
+  bbHTTnobbAttr.hist = bbhttnH;
+  bbHTTnobbAttr.histSS = bbhttnSSH;
 
   // WJets
   SampleAttributes WJetsAttr;
@@ -270,14 +311,8 @@ int main(int argc, char * argv[]) {
   SampleAttributes EWKAttr;
   EWKAttr.name = "EWK";
   EWKAttr.sampleNames = EWKSamples;
-  if (embedded) {
-    EWKAttr.cuts = CutsZLL_OS;
-    EWKAttr.cutsSS = CutsZLL_SS;
-  }
-  else {
-    EWKAttr.cuts = CutsOS;
-    EWKAttr.cutsSS = CutsSS;
-  }
+  EWKAttr.cuts = CutsOS;
+  EWKAttr.cutsSS = CutsSS;
   EWKAttr.Weight = Weight;
   EWKAttr.WeightQCD = WeightQCD;
   EWKAttr.hist = ewkH;
@@ -299,12 +334,12 @@ int main(int argc, char * argv[]) {
   AllSamples.push_back(EWKAttr);
   AllSamples.push_back(TTAttr);
   AllSamples.push_back(DataEMuAttr);
+  AllSamples.push_back(HTTAttr);
+  AllSamples.push_back(HWWAttr);
+  AllSamples.push_back(bbHTTAttr);
+  AllSamples.push_back(bbHWWAttr);
+  AllSamples.push_back(bbHTTnobbAttr);
   
-  //  Weight = "puweight*mcweight*prefiringweight*zptweight*effweightEMu*";
-  //  Weight = "puweight*mcweight*prefiringweight*topptweight*effweightEMu*";
-  //  Weight = "trigweightEMu*";
-  //  Weight = "weightEMu*";
-
   TCanvas * dummy = new TCanvas("dummy","",400,400);
 
   // filling histograms
@@ -373,36 +408,35 @@ int main(int argc, char * argv[]) {
   TH1D * data_SS = (TH1D*)QCD->Clone("data_SS");
   TH1D * data_OS = (TH1D*)histData->Clone("data_OS");
 
-  //  if (!embedded) {
-  //    ZttAttr.hist->Add(ZttAttr.hist,EWKAttr.hist,1.,1.);
-  //    ZttAttr.hist->Add(ZttAttr.hist,TTAttr.hist,1.,1.);
-  //  }
-
   QCD->Add(QCD,ZttAttr.histSS,1,-1);
   QCD->Add(QCD,ZllAttr.histSS,1,-1);
   QCD->Add(QCD,WJetsAttr.histSS,1,-1);
   QCD->Add(QCD,EWKAttr.histSS,1,-1);
   QCD->Add(QCD,TTAttr.histSS,1,-1);
-
   QCD->Scale(scaleQCD);
       
-  TH1D * W        = WJetsAttr.hist;
-  TH1D * TT       = TTAttr.hist;
-  TH1D * EWK      = EWKAttr.hist;
-  TH1D * ZLL      = ZllAttr.hist;
-  TH1D * ZTT      = ZttAttr.hist;
-  TH1D * Higgs    = HiggsAttr.hist;
+  TH1D * W           = WJetsAttr.hist;
+  TH1D * TT          = TTAttr.hist;
+  TH1D * EWK         = EWKAttr.hist;
+  TH1D * ZLL         = ZllAttr.hist;
+  TH1D * ZTT         = ZttAttr.hist;
+  TH1D * HTT         = HTTAttr.hist;
+  TH1D * HWW         = HWWAttr.hist;
+  TH1D * bbHTT       = bbHTTAttr.hist;
+  TH1D * bbHWW       = bbHWWAttr.hist;
+  TH1D * bbHTT_nobb  = bbHTTnobbAttr.hist;
+  TH1D * Higgs       = (TH1D*)HTT->Clone("Higgs");
 
   TH1D * W_SS        = WJetsAttr.histSS;
   TH1D * TT_SS       = TTAttr.histSS;
   TH1D * EWK_SS      = EWKAttr.histSS;
   TH1D * ZLL_SS      = ZllAttr.histSS;
   TH1D * ZTT_SS      = ZttAttr.histSS;
-  TH1D * Higgs_SS    = HiggsAttr.histSS;
 
   std::cout << std::endl;
   std::cout << "Variable : " << Variable << std::endl;
   std::cout << "---------------------------" << std::endl;
+  /*
   std::cout << "Same-sign - > " << std::endl;
   std::cout << "TTL  : " << TT_SS->GetSumOfWeights() << endl;
   std::cout << "VVL  : " << EWK_SS->GetSumOfWeights() << endl;
@@ -411,14 +445,29 @@ int main(int argc, char * argv[]) {
   std::cout << "ZTT  : " << ZTT_SS->GetSumOfWeights() << endl;
   std::cout << "Data : " << data_SS->GetSumOfWeights() << std::endl;
   std::cout << std::endl;
-  std::cout << "Opposite-sign -> " << std::endl;
-  std::cout << "TTL  : " << TT->GetSumOfWeights() << endl;
-  std::cout << "VVL  : " << EWK->GetSumOfWeights() << endl;
-  std::cout << "W    : " << W->GetSumOfWeights() << endl;
-  std::cout << "QCD  : " << QCD->GetSumOfWeights() << endl;
-  std::cout << "ZLL  : " << ZLL->GetSumOfWeights() << endl;
-  std::cout << "ZTT  : " << ZTT->GetSumOfWeights() << endl;
+  */
+  double xTop = TT->GetSumOfWeights();
+  double xEWK = EWK->GetSumOfWeights()+W->GetSumOfWeights()+ZLL->GetSumOfWeights();
+  double xQCD = QCD->GetSumOfWeights();
+  double xZTT = ZTT->GetSumOfWeights();
+  double xHiggs = HTT->GetSumOfWeights()+HWW->GetSumOfWeights();
+  double xData = histData->GetSumOfWeights();
+  double xTotal = xTop+xEWK+xQCD+xZTT+xHiggs;
+  std::cout << "Top   : " << xTop << endl;
+  std::cout << "EWK   : " << xEWK << endl;
+  std::cout << "ZTT   : " << xZTT << endl;
+  std::cout << "QCD   : " << xQCD << endl;
+  std::cout << "Higgs : " << xHiggs << endl;
+  std::cout << "Total : " << xTotal << endl;
+  std::cout << "Data  : " << xData  << endl;
   std::cout << std::endl;
+  std::cout << "HTT   : " << HTT->GetSumOfWeights() << endl;
+  std::cout << "HWW   : " << HWW->GetSumOfWeights() << endl;
+  std::cout << std::endl;
+  double bbHTT_total = bbHTT->GetSumOfWeights() + bbHTT_nobb->GetSumOfWeights();
+  std::cout << "bbHTT_bb    : " << bbHTT->GetSumOfWeights() << endl;
+  std::cout << "bbHTT_nobb  : " << bbHTT_nobb->GetSumOfWeights() << endl;
+  std::cout << "bbHTT_total : " << bbHTT_total << endl;
 
   //  return;
 
@@ -432,15 +481,15 @@ int main(int argc, char * argv[]) {
   }
 
   //  adding normalization systematics
-  double ZTT_norm = 0.04; //  normalization ZTT     :   4% (EMBEDDED)
-  double EWK_norm = 0.05; //  normalization EWK     :   5%
-  double QCD_norm = 0.12; //  normalization Fakes   :  12%
-  double ZLL_mtau = 0.07; //  mu->tau fake rate ZLL :   7%
-  double TT_norm  = 0.06; //  normalization TT      :   6%
-  double W_norm   = 0.07; //  normalization W       :   7%
+  double ZTT_norm = 0.06; //  normalization ZTT     :   4% (EMBEDDED)
+  double EWK_norm = 0.06; //  normalization EWK     :   5%
+  double QCD_norm = 0.15; //  normalization Fakes   :  12%
+  double ZLL_mtau = 0.15; //  mu->tau fake rate ZLL :   7%
+  double TT_norm  = 0.08; //  normalization TT      :   6%
+  double W_norm   = 0.08; //  normalization W       :   7%
 
-  double eff_Emb = 0.04;
-  double eff_MC  = 0.04;
+  double eff_Emb = 0.06;
+  double eff_MC  = 0.06;
   
   bool applyNormSys = cfg.get<bool>("ApplySystematics");
   if (applyNormSys) {
@@ -488,6 +537,7 @@ int main(int argc, char * argv[]) {
     }
   }
 
+  Higgs->Add(Higgs,HWW);
   TT->Add(TT,Higgs);
   EWK->Add(EWK,TT);
   EWK->Add(EWK,W);
@@ -514,6 +564,10 @@ int main(int argc, char * argv[]) {
     ZTT->SetBinError(iB,0);
     QCD->SetBinError(iB,0);
     Higgs->SetBinError(iB,0);
+    HWW->SetBinError(iB,0);
+    HTT->SetBinError(iB,0);
+    bbHWW->SetBinError(iB,0);
+    bbHTT->SetBinError(iB,0);
   }
   InitData(histData);
 
@@ -523,6 +577,17 @@ int main(int argc, char * argv[]) {
   InitHist(Higgs,"","",kCyan,1001);
   InitHist(ZLL,"","",TColor::GetColor("#4496C8"),1001);
   InitHist(ZTT,"","",TColor::GetColor("#FFCC66"),1001);
+
+  InitSignal(bbHWW);
+  InitSignal(bbHTT);
+  bbHWW->SetLineColor(2);
+  bbHTT->SetLineColor(4);
+  bbHWW->SetLineStyle(1);
+  bbHTT->SetLineStyle(1);
+  bbHWW->SetLineWidth(3);
+  bbHTT->SetLineWidth(3);
+  bbHWW->Scale(200);
+  bbHTT->Scale(200);
 
   histData->GetXaxis()->SetTitle(xtitle);
   histData->GetYaxis()->SetTitle(ytitle);
@@ -571,6 +636,10 @@ int main(int argc, char * argv[]) {
   TT->Draw("sameh");
   Higgs->Draw("sameh");
   bkgdErr->Draw("e2same");
+  if (plotSignal) {
+    bbHWW->Draw("hsame");
+    bbHTT->Draw("hsame");
+  }
   histData->Draw("e1same");
   float chi2 = 0;
   for (int iB=1; iB<=nBins; ++iB) {
@@ -594,14 +663,14 @@ int main(int argc, char * argv[]) {
   SetLegendStyle(leg);
   leg->SetTextSize(0.044);
   leg->AddEntry(histData,"Data","lp");
-  if (embedded) 
-    leg->AddEntry(ZTT,"embedded #tau#tau","f");
-  else 
-    leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
+  leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
   leg->AddEntry(QCD,"QCD","f");
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
-  //  leg->AddEntry(Higgs,"H(125)","f");
+  if (plotSignal) {
+    leg->AddEntry(bbHWW,"H#rightarrow WW(x200)","l");
+    leg->AddEntry(bbHTT,"H#rightarrow #tau#tau(x200)","l");
+  }
   if (plotLegend) leg->Draw();
   writeExtraText = true;
   extraText = "Preliminary";
@@ -699,9 +768,7 @@ int main(int argc, char * argv[]) {
   canv1->SetSelected(canv1);
   canv1->Update();
   TString suffixLOGY("");
-  TString suffixDY("");
-  if (isDYamcatnlo) suffixDY = "_DYamcatnlo";
   if (logY) suffixLOGY = "_logY";
-  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+suffix+"_"+sel_suffix+suffixDY+suffixLOGY+".png");
+  canv1->Print(outputGraphics+"/"+Variable+"_"+era+"_"+sel_suffix+suffixLOGY+".png");
 
 }

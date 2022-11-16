@@ -74,7 +74,8 @@ map<TString, TString> xtitles = {
   {"bcsv_1","b-tag discriminant 1"},
   {"bcsv_1","b-tag discriminant 2"},
   {"dr_tt","#DeltaR(#tau_{1},#tau_{2})"},
-  {"pt_tt","p_{T}(#tau#tau) [GeV]"}
+  {"pt_tt","p_{T}(#tau#tau) [GeV]"},
+  {"pred_class_proba","D_{BDT}"}
 };
 int main(int argc, char * argv[]) { 
 
@@ -107,7 +108,7 @@ int main(int argc, char * argv[]) {
     
   SetStyle();
 
-  float yLower =                10;
+  float yLower =                0.5;
   float scaleYUpper =           10;
 
   float ymin_ratio = cfg.get<float>("YMin");
@@ -117,11 +118,15 @@ int main(int argc, char * argv[]) {
   if (Variable=="bcsv_1"||Variable=="bcsv_2") legRight = false;
   bool logY = cfg.get<bool>("logY");
   bool logX = cfg.get<bool>("logX");
+  bool blindData = cfg.get<bool>("BlindData");
+  float xmin_blind = cfg.get<float>("xmin_blind");
+  float xmax_blind = cfg.get<float>("xmax_blind");
   string additional_cut = cfg.get<string>("AdditionalCut");
   TString AdditionalCut(additional_cut);
   string FileSuffix = cfg.get<string>("FileSuffix");
+  float signalScale = cfg.get<float>("SignalScale");
   TString sel_suffix(FileSuffix);
-  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1");
+  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1&&m_sv>30&&m_vis>30");
 
   Selection += AdditionalCut;
 
@@ -151,7 +156,11 @@ int main(int argc, char * argv[]) {
 
   TString mcCutsSB("&&gen_match_1!=6");
   TString mcCutsSingleFake("&&gen_match_1!=6&&gen_match_2==6");
+  TString mcCutsB("&&gen_nbjets_cut>0");
+  TString mcCutsNoB("&&gen_nbjets_cut==0");
 
+  TString genCutsSR_B = CutsSR + mcCutsB;
+  TString genCutsSR_noB = CutsSR + mcCutsNoB;
   TString genCutsSR_L  = CutsSR + mcCutsNotTauTau + mcCutsNotJetFakes;
   TString genCutsSR_TT = CutsSR + mcCutsTauTau;
   TString genCutsSB = CutsSB + mcCutsSB;
@@ -164,10 +173,11 @@ int main(int argc, char * argv[]) {
   std::vector<TString> WJetsSamples = {"WJets"};
   std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
   std::vector<TString> TTSamples = {"TTbar"};
-  std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau"};
+  std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau","ZHToTauTau"};
   std::vector<TString> bbHSamples = {"BBHToTauTau_YT2","BBHToTauTau_YB2","BBHToTauTau_YBYT"};
+  std::vector<TString> bbHSamples_noBB = {"BBHToTauTau_YB2","BBHToTauTau_YBYT"};
 
-  std::vector<TString> names = {"Data","VVL","TTL","W","ZTT","ZL","VVT","TTT","Higgs","bbH"};
+  std::vector<TString> names = {"Data","VVL","TTL","W","ZTT","ZL","VVT","TTT","Higgs","bbH","bbH_bb","bbH_nobb"};
   
   std::map<TString, std::vector<TString>> nameSamples = {
     {"Data",DataSamples},
@@ -179,20 +189,24 @@ int main(int argc, char * argv[]) {
     {"VVT",EWKSamples},
     {"TTT",TTSamples},
     {"Higgs",HiggsSamples},
-    {"bbH",bbHSamples}
+    {"bbH",bbHSamples},
+    {"bbH_bb",bbHSamples},
+    {"bbH_nobb",bbHSamples_noBB}
   };
   
   std::map<TString, std::vector<TString> > nameCuts = {
-    {"Data",  {CutsSR,      CutsSB,     CutsSR}},
-    {"VVL",   {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"TTL",   {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"W",     {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
-    {"ZTT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"ZL",    {genCutsSR_L, genCutsSB_L,genCutsSingleFake_L}},
-    {"VVT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"TTT",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"Higgs", {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
-    {"bbH",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}}
+    {"Data",    {CutsSR,      CutsSB,     CutsSR}},
+    {"VVL",     {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"TTL",     {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"W",       {genCutsSR_L, genCutsSB,  genCutsSingleFake}},
+    {"ZTT",     {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"ZL",      {genCutsSR_L, genCutsSB_L,genCutsSingleFake_L}},
+    {"VVT",     {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"TTT",     {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"Higgs",   {genCutsSR_TT,genCutsSB,  genCutsSingleFake}},
+    {"bbH",     {CutsSR,      genCutsSB,  genCutsSingleFake}},
+    {"bbH_bb",  {genCutsSR_B, genCutsSB,  genCutsSingleFake}},
+    {"bbH_nobb",{genCutsSR_noB, genCutsSB,  genCutsSingleFake}},
   };
 
   std::map<TString, SampleAttributes> nameAttributes;
@@ -249,7 +263,7 @@ int main(int argc, char * argv[]) {
       tree->Draw(Variable+">>histSB",WeightSampleSB+"("+CutsSampleSB+")");
       tree->Draw(Variable+">>histSingleFake",WeightSampleSingleFake+"("+CutsSampleSingleFake+")");
       double yield = histSample->GetSumOfWeights();
-      std::cout << setw(30) << sampleName << " : " << setw(6) << int(yield) << std::endl; 
+      std::cout << setw(5) << name << setw(30) << sampleName << " : " << setw(6) << yield << std::endl; 
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,1.);
       sampleAttr.histSB->Add(sampleAttr.histSB,histSampleSB,1.,1.);
       sampleAttr.histSingleFake->Add(sampleAttr.histSingleFake,histSampleSingleFake,1.,1.);
@@ -268,27 +282,37 @@ int main(int argc, char * argv[]) {
   TH1D * Fakes = nameAttributes["Data"].histSB;
   TH1D * SingleFake = nameAttributes["TTL"].histSingleFake;
 
-  double fakes0 = Fakes->GetSumOfWeights();
   Fakes->Add(Fakes,nameAttributes["ZTT"].histSB,1.,-1.);
   Fakes->Add(Fakes,nameAttributes["TTL"].histSB,1.,-1.);
   Fakes->Add(Fakes,nameAttributes["VVL"].histSB,1.,-1.);
   Fakes->Add(Fakes,nameAttributes["W"].histSB,1.,-1.);
-  double fakes1 = Fakes->GetSumOfWeights();
+  double fakes0 = Fakes->GetSumOfWeights();
+
 
   SingleFake->Add(SingleFake,nameAttributes["ZTT"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["VVL"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["W"].histSingleFake,1.,1.);
+  double fakes1 = SingleFake->GetSumOfWeights();
 
   Fakes->Add(Fakes,SingleFake,1.,1.);
-  double fakes2 = Fakes->GetSumOfWeights();
+  double fakes2 = Fakes->GetSumOfWeights();  
 
   std::cout << "Fakes : " << fakes0 << "(QCD) + " << fakes1 << "(WJets) = " << fakes2 << std::endl;
+
+  double scaleFF = histData->GetSumOfWeights()/Fakes->GetSumOfWeights();
+  Fakes->Scale(scaleFF);
 
   TH1D * TT  = nameAttributes["TTL"].hist;
   TH1D * EWK = nameAttributes["VVL"].hist;
   TH1D * ZTT = nameAttributes["ZTT"].hist;
   TH1D * Higgs = nameAttributes["Higgs"].hist;
   TH1D * bbH = nameAttributes["bbH"].hist;
+  TH1D * bbH_bb = nameAttributes["bbH_bb"].hist;
+  TH1D * bbH_nobb = nameAttributes["bbH_nobb"].hist;
+
+  //  ZTT->Scale(1./1.27); // 2016
+  //  ZTT->Scale(1./1.22); // 2017
+  //  ZTT->Scale(1./1.13); // 2018
 
   TT->Add(TT,nameAttributes["TTT"].hist,1.,1.);
   EWK->Add(EWK,nameAttributes["VVT"].hist,1.,1.);
@@ -300,13 +324,18 @@ int main(int argc, char * argv[]) {
   std::cout << "EWK   : " << EWK->GetSumOfWeights() << std::endl;
   std::cout << "ZTT   : " << ZTT->GetSumOfWeights() << std::endl;
   std::cout << "Fakes : " << Fakes->GetSumOfWeights() << std::endl;
-  double total = TT->GetSumOfWeights() + EWK->GetSumOfWeights() + ZTT->GetSumOfWeights() + Fakes->GetSumOfWeights();
+  std::cout << "Higgs : " << Higgs->GetSumOfWeights() << std::endl;
+  double total = TT->GetSumOfWeights() + EWK->GetSumOfWeights() + ZTT->GetSumOfWeights() + Fakes->GetSumOfWeights() + Higgs->GetSumOfWeights();
   std::cout << "Total : " << total << std::endl;
   std::cout << "Data  : " << histData->GetSumOfWeights() << std::endl;
   std::cout << std::endl;
-  std::cout << "Higgs : " << Higgs->GetSumOfWeights() << std::endl;
-  std::cout << "bbH   : " << bbH->GetSumOfWeights() << std::endl;
- 
+  std::cout << "bbH       : " << bbH->GetSumOfWeights() << std::endl;
+  std::cout << std::endl;
+  double bbH_total =  bbH_bb->GetSumOfWeights() + bbH_nobb->GetSumOfWeights();
+  std::cout << "bbH_bb    : " << bbH_bb->GetSumOfWeights() << std::endl;
+  std::cout << "bbH_nobb  : " << bbH_nobb->GetSumOfWeights() << std::endl;
+  std::cout << "bbH_total : " << bbH_total << std::endl;
+
   //  adding normalization systematics
   double ZTT_norm   = 0.05; //  normalization ZTT   :  5%
   double QCD_norm   = 0.08; //  normalization Fakes :  7%
@@ -338,14 +367,87 @@ int main(int argc, char * argv[]) {
       tte = TMath::Sqrt(tte*tte+tt*tt*(TT_norm*TT_norm+eff_MC*eff_MC));
       TT->SetBinError(iB,tte);
       float total = tt+ewk+ztt+qcd;
-      if (total>0)
-	std::cout << iB << " : " << ztte/total << std::endl;
+      //      if (total>0)
+      //	std::cout << iB << " : " << ztte/total << std::endl;
+    }
+  }
+  /*
+  if (Variable=="bpt_1") {
+    if (era=="2016") {
+      Fakes->SetBinContent(8,0.8*Fakes->GetBinContent(8));
+      ZTT->SetBinContent(8,0.8*ZTT->GetBinContent(8));
+    }
+    if (era=="2017") {
+      Fakes->SetBinContent(6,0.9*Fakes->GetBinContent(6));
+      ZTT->SetBinContent(6,0.9*ZTT->GetBinContent(6));
+      Fakes->SetBinContent(8,0.9*Fakes->GetBinContent(8));
+      ZTT->SetBinContent(8,0.9*ZTT->GetBinContent(8));
+    }
+    if (era=="2018") {
+      Fakes->SetBinContent(8,1.11*Fakes->GetBinContent(8));
+      ZTT->SetBinContent(8,1.11*ZTT->GetBinContent(8));
+    }
+  }
+
+  if (Variable=="njets") {
+    if (era=="2016") {
+      Fakes->SetBinContent(5,1.15*Fakes->GetBinContent(5));
+      Fakes->SetBinContent(6,1.27*Fakes->GetBinContent(6));
+      Fakes->SetBinContent(7,1.23*Fakes->GetBinContent(7));
+      Fakes->SetBinContent(8,1.40*Fakes->GetBinContent(8));
+      ZTT->SetBinContent(5,1.15*ZTT->GetBinContent(5));
+      ZTT->SetBinContent(6,1.27*ZTT->GetBinContent(6));
+      ZTT->SetBinContent(7,1.23*ZTT->GetBinContent(7));
+      ZTT->SetBinContent(8,1.40*ZTT->GetBinContent(8));
+    }
+    if (era=="2017") {
+      Fakes->SetBinContent(5,1.15*Fakes->GetBinContent(5));
+      Fakes->SetBinContent(7,1.15*Fakes->GetBinContent(7));
+      ZTT->SetBinContent(5,1.15*ZTT->GetBinContent(5));
+      ZTT->SetBinContent(7,1.15*ZTT->GetBinContent(7));
+    }
+    if (era=="2018") {
+      Fakes->SetBinContent(6,1.1*Fakes->GetBinContent(6));
+      Fakes->SetBinContent(7,1.2*Fakes->GetBinContent(7));
+      ZTT->SetBinContent(6,1.1*ZTT->GetBinContent(6));
+      ZTT->SetBinContent(7,1.2*ZTT->GetBinContent(7));
+    }
+  }
+  */
+  if (Variable=="njets") {
+    if (era=="2016") {
+      Fakes->SetBinContent(3,0.95*Fakes->GetBinContent(3));
+      Fakes->SetBinContent(4,0.90*Fakes->GetBinContent(4));
+      Fakes->SetBinContent(5,0.95*Fakes->GetBinContent(5));
+      Fakes->SetBinContent(6,0.80*Fakes->GetBinContent(6));
+    }
+    if (era=="2017") {
+      Fakes->SetBinContent(2,0.98*Fakes->GetBinContent(2));
+      Fakes->SetBinContent(5,0.91*Fakes->GetBinContent(5));
+    }
+    if (era=="2018") {
+      Fakes->SetBinContent(3,0.95*Fakes->GetBinContent(3));
+      Fakes->SetBinContent(4,0.95*Fakes->GetBinContent(4));
+      Fakes->SetBinContent(6,0.87*Fakes->GetBinContent(6));
+    }
+  }
+
+  if (Variable=="nbtag") {
+    if (era=="2016") {
+      Fakes->SetBinContent(2,0.90*Fakes->GetBinContent(2));
+      Fakes->SetBinContent(4,0.70*Fakes->GetBinContent(4));
+    }
+    if (era=="2018") {
+      Fakes->SetBinContent(2,0.95*Fakes->GetBinContent(2));
+      Fakes->SetBinContent(3,0.85*Fakes->GetBinContent(3));
     }
   }
 
   EWK->Add(EWK,TT);
   ZTT->Add(ZTT,EWK);
   Fakes->Add(Fakes,ZTT);
+  //  ZTT->Add(ZTT,Fakes);
+  //  Higgs->Add(Higgs,ZTT);
 
   TH1D * bkgdErr = (TH1D*)Fakes->Clone("bkgdErr");
   bkgdErr->SetFillStyle(3013);
@@ -358,13 +460,22 @@ int main(int argc, char * argv[]) {
     EWK->SetBinError(iB,0);
     Fakes->SetBinError(iB,0);
     ZTT->SetBinError(iB,0);
+    Higgs->SetBinError(iB,0);
   }
   InitData(histData);
 
+  InitHist(Higgs,"","",TColor::GetColor("#FFCCFF"),1001);
   InitHist(Fakes,"","",TColor::GetColor("#c6f74a"),1001);
   InitHist(TT,"","",TColor::GetColor("#9999CC"),1001);
   InitHist(EWK,"","",TColor::GetColor("#DE5A6A"),1001);
   InitHist(ZTT,"","",TColor::GetColor("#FFCC66"),1001);
+  InitSignal(bbH);
+  bbH->SetLineColor(4);
+  bbH->SetLineStyle(1);
+  bbH->SetLineWidth(2);
+  bbH->SetMarkerStyle(0);
+  bbH->SetMarkerSize(0);
+  bbH->Scale(signalScale);
 
   histData->GetXaxis()->SetTitle(xtitle);
   histData->GetYaxis()->SetTitle(ytitle);
@@ -407,13 +518,25 @@ int main(int argc, char * argv[]) {
   upper->SetFrameBorderMode(0);
   upper->SetFrameBorderSize(10);
 
+  if (blindData) {
+    for (int iB=1; iB<=nbins; ++iB) {
+      float xcenter = histData->GetXaxis()->GetBinCenter(iB);
+      if (xcenter>xmin_blind&&xcenter<xmax_blind) {
+	histData->SetBinContent(iB,1e+7);
+	histData->SetBinError(iB,0.);
+      }
+    }
+  }
+
   histData->Draw("e1");
+  //  Higgs->Draw("sameh");
   Fakes->Draw("sameh");
   ZTT->Draw("sameh");
   EWK->Draw("sameh");
   TT->Draw("sameh");
   histData->Draw("e1same");
   bkgdErr->Draw("e2same");
+  //  bbH->Draw("sameh");
   histData->Draw("e1same");
   float chi2 = 0;
   for (int iB=1; iB<=nbins; ++iB) {
@@ -438,9 +561,11 @@ int main(int argc, char * argv[]) {
   leg->SetTextSize(0.044);
   leg->AddEntry(histData,"Data","lp");
   leg->AddEntry(Fakes,"Fakes","f");
+  //  leg->AddEntry(Higgs,"H(125)","f");
   leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
+  //  leg->AddEntry(bbH,"Hbb","l");
   if (plotLegend) leg->Draw();
   writeExtraText = true;
   extraText = "Preliminary";
@@ -527,6 +652,15 @@ int main(int argc, char * argv[]) {
   lower->SetFrameBorderMode(0);
   lower->SetFrameBorderSize(10);
 
+  if (blindData) {
+    for (int iB=1; iB<=nbins; ++iB) {
+      float xcenter = ratioH->GetXaxis()->GetBinCenter(iB);
+      if (xcenter>xmin_blind&&xcenter<xmax_blind) {
+	ratioH->SetBinContent(iB,1e+7);
+	ratioH->SetBinError(iB,0.);
+      }
+    }
+  }
   ratioH->Draw("e1");
   ratioErrH->Draw("e2same");
   ratioH->Draw("e1same");

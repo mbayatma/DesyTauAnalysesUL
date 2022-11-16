@@ -153,7 +153,7 @@ int main(int argc, char * argv[]) {
   TString sel_suffix(FileSuffix);
 
   // OS cut is not applied (it is a part of additional cut)
-  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1");
+  TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1&&m_sv>30&&m_vis>30");
 
   Selection += AdditionalCut;
 
@@ -395,6 +395,10 @@ int main(int argc, char * argv[]) {
 
   Fakes->Add(Fakes,SingleFake,1.,1.);
   double fakes2 = Fakes->GetSumOfWeights();
+
+  // only for ss events
+  double scaleFF = histData->GetSumOfWeights()/Fakes->GetSumOfWeights();
+  Fakes->Scale(scaleFF);
 
   std::cout << "Fakes : " << fakes0 << " vs. " << fakes1 << " vs. " << fakes2 << std::endl;
 

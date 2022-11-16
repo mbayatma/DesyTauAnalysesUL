@@ -93,7 +93,7 @@ int main(int argc, char * argv[]) {
   TString AdditionalCut(additional_cut);
   bool isBTag = cfg.get<bool>("ApplyBTagQCDScale");
   TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.3&&pt_1>15.&&pt_2>15.");
-  Selection += "&&weightEMu<100."; // protection against large weights
+  Selection += "&&weightEMu<1000."; // protection against large weights
   Selection += AdditionalCut; // additional cut, for example nbtag>=1
   string SelSuffix = cfg.get<string>("FileSuffix");
   TString sel_suffix(SelSuffix);
@@ -345,7 +345,7 @@ int main(int argc, char * argv[]) {
       }
       double yield = norm*histSample->GetSumOfWeights();
       //      std::cout << "   " << sampleName << "   nEvents = " << nevents << "   xsec = " << xsec << "  entries = " << histSample->GetEntries() << "   yield =" << norm*histSample->GetSumOfWeights() << std::endl;
-      std::cout << "   " << sampleName << "   yield = " << yield << std::endl;
+      std::cout << "   " << sampleName << "  norm = " << norm << "  hist = " << histSample->GetSumOfWeights() << "   yield = " << yield << std::endl;
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,norm);
       sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,norm);
       //      delete file;

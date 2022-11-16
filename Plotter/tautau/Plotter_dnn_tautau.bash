@@ -11,6 +11,7 @@ logY = false
 AdditionalCut = &&os>0.5
 PlotLegend = true
 FileSuffix = incl_os
+SignalScale = 100
 ApplySystematics = true
 EOF
 cat > plotter_tautau_btg.cfg <<EOF
@@ -26,6 +27,7 @@ logY = false
 AdditionalCut = &&os>0.5&&nbtag>=1
 PlotLegend = true
 FileSuffix = btag_os
+SignalScale = 100
 ApplySystematics = true
 EOF
 PlotTauTau_dnn plotter_tautau.cfg pt_1     30    0 150

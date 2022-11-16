@@ -23,6 +23,22 @@
 
 class SynchTree {
 public :
+  
+  const std::vector<std::string> btag_unc = 
+    {"jes","lf","hf","hfstats1","hfstats2","lfstats1","lfstats2","cferr1","cferr2"};
+
+ 
+  std::map<std::string, unsigned int> btag_unc_map = {
+    {"jes",0},
+    {"lf",1},
+    {"hf",2},
+    {"hfstats1",3},
+    {"hfstats2",4},
+    {"lfstats1",5},
+    {"lfstats2",6},
+    {"cferr1",7},
+    {"cferr2",8}
+  };
 
   const std::vector<std::string> ggHWeights_name = {
     "A_b_ratio",
@@ -588,6 +604,8 @@ public :
 
   Float_t         topptweight;
   Double_t 	  zptweight;
+  Double_t        zptweight_0btag;
+  Double_t        zptweight_1btag;
   Double_t        zptembweight;
   Double_t        trkeffweight;
   Float_t         etaufakeweight;
@@ -715,6 +733,7 @@ public :
   
   //b-jets
   Int_t           nbtag;
+  Int_t           nbtag_raw;
   Int_t           gen_nbjets_cut;
   Int_t           gen_nbjets;
   Float_t         bpt_1;
@@ -894,6 +913,8 @@ public :
   Float_t ggHWeights[30];
 
   Float_t ff_sys[30];
+
+  Float_t btagweight_sys[10]; // btag reshaping
 
   //////////////////////////////////////////////
   //            List of branches              //
@@ -1391,6 +1412,8 @@ public :
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
+  TBranch        *b_zptweight_0btag;
+  TBranch        *b_zptweight_1btag;
   TBranch	 *b_zptembweight;
   TBranch	 *b_trkeffweight;
   TBranch	 *b_etaufakeweight;
@@ -1495,6 +1518,7 @@ public :
   
   //b-jets
   TBranch	 *b_nbtag;
+  TBranch        *b_nbtag_raw;
   TBranch        *b_gen_nbjets_cut;
   TBranch        *b_gen_nbjets;
   TBranch	 *b_bpt_1;
@@ -1510,6 +1534,7 @@ public :
   TBranch        *b_dRbb;
 
   TBranch        *b_ff_sys[30];
+  TBranch        *b_btagweight_sys[10];
 
   //Misc  
 

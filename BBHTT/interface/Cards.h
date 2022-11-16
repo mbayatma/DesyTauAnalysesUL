@@ -375,7 +375,10 @@ class Cards {
     "Nbtag0_Pzeta3","NbtagGe1_Pzeta3",
     "cat0"       ,  "cat1",         "cat2",         "cat3",          "cat4",
     "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",   "cat4_Nbtag0",
+    "cat0_Nbtag1",  "cat1_Nbtag1",  "cat2_Nbtag1",  "cat3_Nbtag1",   "cat4_Nbtag1",
+    "cat0_Nbtag2",  "cat1_Nbtag2",  "cat2_Nbtag2",  "cat3_Nbtag2",   "cat4_Nbtag2",
     "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1", "cat4_NbtagGe1"
+    
   };
 
   TString globalWeight="xsec_lumi_weight*";

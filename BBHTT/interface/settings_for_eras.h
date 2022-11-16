@@ -572,6 +572,16 @@ std::map<TString,double> LUMI = {
   {"2018",     59830}
 };
 
+std::vector<TString> systematics_names = {
+  "CMS_scale_t_1prong_13TeV",
+  "CMS_scale_t_1prong1pizero_13TeV",
+  "CMS_scale_t_3prong_13TeV",
+  "CMS_scale_t_3prong1pizero_13TeV",
+  "CMS_scale_j_JES_13TeV",
+  "CMS_res_j_13TeV",
+  "CMS_scale_met_unclustered_13TeV"
+};
+
 double getNEventsProcessed(TString filename)
 {
   TFile * file = new TFile(filename);

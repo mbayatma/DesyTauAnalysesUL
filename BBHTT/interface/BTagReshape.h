@@ -12,6 +12,8 @@
 #include "CondTools/BTau/interface/BTagCalibrationReader.h"
 #include "CondFormats/BTauObjects/interface/BTagEntry.h"
 
+using namespace std;
+
 class BTagReshape {
 
  private:
@@ -29,6 +31,15 @@ class BTagReshape {
 		   double jetEta,
 		   double jetDiscr,
 		   int jetFlavor);
+
+  double getWeightSys(double jetPt,
+		      double jetEta,
+		      double jetDiscr,
+		      int jetFlavor,
+		      string sysName,
+		      bool dir);
+
+
   
   double getWeightCSV(double jetPt, 
 		      double jetEta, 

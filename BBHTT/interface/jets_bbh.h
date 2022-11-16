@@ -289,7 +289,11 @@ namespace jets{
 
    bool isData = cfg->get<bool>("isData");
    bool ApplyBTagScaling = cfg->get<bool>("ApplyBTagScaling");
-   
+
+   //   std::cout << std::endl;
+   //   std::cout << "isData = " << isData << std::endl;
+   //   std::cout << "ApplyBTagScaling " << ApplyBTagScaling << std::endl;
+
    bool is2017 = false;
    string era = cfg->get<string>("era");
    TString Era(era);
@@ -337,6 +341,9 @@ namespace jets{
    TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
 
    double bweight_event = 1.0;
+   double bweight_event_sys[10];
+   for (unsigned int i=0; i<otree->btag_unc.size(); ++i)
+     bweight_event_sys[i] = 1.0;
 
    float dRmin1 = 2.0;
    float dRmin2 = 2.0;
@@ -438,13 +445,29 @@ namespace jets{
        if(!isData) {
 	 int flavor = abs(analysisTree->pfjet_flavour[jet]);
 	 double bweight_jet = 1.0;
+	 double bweight_jet_sys[10];
+	 for (unsigned int i=0; i<10; ++i) bweight_jet_sys[i] = 1.0;
+	 
 	 BTagReshape * btagShape = inputs_btag_scaling->btagShape;
-	 if (btagShape!=NULL)
-	   btagShape->getWeight(double(jetPt),
-				double(absJetEta),
-				double(bdiscriminant),
-				flavor);
+	 if (btagShape!=NULL) {
+	   bweight_jet = btagShape->getWeight(double(jetPt),
+					      double(absJetEta),
+					      double(bdiscriminant),
+					      flavor);
+	   //	   std::cout << jet << " : flavor = " << flavor << " : bweight = " << bweight_jet << std::endl;
+	   for (unsigned int i=0; i<otree->btag_unc.size(); ++i) {
+	     bool bdir = true;
+	     bweight_jet_sys[i] = btagShape->getWeightSys(double(jetPt),
+							  double(jetEta),
+							  double(bdiscriminant),
+							  flavor,
+							  otree->btag_unc[i],
+							  bdir);
+	     //	     std::cout << "     " << otree->btag_unc[i] << "  " << bweight_jet_sys[i] << std::endl;
+	   }
+	 }
 	 bweight_event *= bweight_jet;
+	 for (unsigned int i=0; i<otree->btag_unc.size(); ++i) bweight_event_sys[i] *= bweight_jet_sys[i];
        }
        
        if(!isData && ApplyBTagScaling) {
@@ -497,16 +520,21 @@ namespace jets{
 	 
 	 // promote-demote method
 	 if (jet_scalefactor < 1 && tagged)  { // downgrade - demote
-	   if (rannum < 1 - jet_scalefactor)  
+	   if (rannum < 1 - jet_scalefactor) { 
 	     tagged = false;
+	   }
 	 }
 	 if (jet_scalefactor > 1 && !tagged) { // upgrade - promote
 	   double fraction = (1.0 - jet_scalefactor)/(1.0 - 1.0 / tageff);
-	   if (rannum < fraction) tagged = true;
+	   if (rannum < fraction) { 
+	     tagged = true;
+	   }
 	 }
        }
        
-       if (taggedRaw) bjetsRaw.push_back(jet); 
+       if (taggedRaw) 
+	 bjetsRaw.push_back(jet); 
+
        if (tagged) {
 	 bjets.push_back(jet);
 	 
@@ -520,7 +548,7 @@ namespace jets{
 	   indexSubLeadingBJet = indexLeadingBJet;
 	   ptSubLeadingBJet = ptLeadingBJet;
 	   indexLeadingBJet = jet;
-          ptLeadingBJet = jetPt;
+	   ptLeadingBJet = jetPt;
 	 }
        }
      } // jet within b-tagging acceptance 
@@ -547,9 +575,17 @@ namespace jets{
    otree->njetspt20 = jetspt20.size();
    otree->njetspt20_central = jetspt20_central.size();
    otree->nbtag = bjets.size();
+   otree->nbtag_raw = bjetsRaw.size();
    otree->btagweight = bweight_event;
-   //   std::cout << "bweight_event : " << bweight_event << std::endl;
-
+   //   std::cout << std::endl;
+   //   std::cout << "n(central) = " << jetspt20_central.size() << "  bweight_event : " << bweight_event << std::endl;   
+   for (unsigned int i=0; i<otree->btag_unc.size(); ++i) {
+     otree->btagweight_sys[i] = 1.0;
+     if (bweight_event>1e-1) { 
+       otree->btagweight_sys[i] = bweight_event_sys[i]/bweight_event;
+       //       std::cout << otree->btag_unc[i] << " = " << otree->btagweight_sys[i] << std::endl;
+     }
+   }
    if (!otree->apply_recoil) {
 
      //     std::cout << "changing met " << std::endl;

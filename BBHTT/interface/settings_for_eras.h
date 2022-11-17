@@ -205,6 +205,10 @@ const vector<TString> WHToTauTau = {
   "WminusHToTauTau_M125" 
 };
 
+const vector<TString> TTHToTauTau = {
+  "ttHToTauTau_M125"
+};
+
 const vector<TString> GluGluHToTauTau = {
   "GluGluHToTauTau_M125" 
 };
@@ -276,6 +280,7 @@ const map<TString, double> xsec_map_2018 = {
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
+  {"ttHToTauTau_M125"         , 0.5033*0.06208},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.087},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
@@ -331,6 +336,7 @@ const map<TString, double> xsec_map_2017 = {
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
+  {"ttHToTauTau_M125"         , 0.5033*0.06208},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
@@ -385,6 +391,7 @@ const map<TString, double> xsec_map_2016 = {
   {"WplusHToTauTau_M125"      , 0.0527},
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
+  {"ttHToTauTau_M125"         , 0.5033*0.06208},
   {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
@@ -475,6 +482,11 @@ const map<TString, vector<TString> > map_sample = {
   {"ZHToTauTau_2017",ZHToTauTau},
   {"ZHToTauTau_2016_pre",ZHToTauTau},
   {"ZHToTauTau_2016_post",ZHToTauTau},
+  
+  {"TTHToTauTau_2018",TTHToTauTau},
+  {"TTHToTauTau_2017",TTHToTauTau},
+  {"TTHToTauTau_2016_pre",TTHToTauTau},
+  {"TTHToTauTau_2016_post",TTHToTauTau},
   
   {"BBHToTauTau_2018",BBHToTauTau},
   {"BBHToTauTau_2017",BBHToTauTau},

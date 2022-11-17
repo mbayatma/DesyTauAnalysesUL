@@ -44,7 +44,8 @@ fi
 if [[ $CHANNEL == "mm" ]]; then
 
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_M-50_amcatnlo 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu_amcatnlo 20
 
 else 
 
@@ -53,11 +54,16 @@ else
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_1J_amcatnlo 10
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf DYJetsToLL_2J_amcatnlo 10
 
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W1JetsToLNu 20
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W2JetsToLNu 20
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W3JetsToLNu 20
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W4JetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W1JetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W2JetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W3JetsToLNu 20
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf W4JetsToLNu 20
+
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu_amcatnlo 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu_0J_amcatnlo 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu_1J_amcatnlo 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf WJetsToLNu_2J_amcatnlo 20
 
     # H->tautau
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_17_MC.conf GluGluHToTauTau_M125 4

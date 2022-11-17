@@ -19,16 +19,22 @@ fi
 
 if [[ $CHANNEL == "mm" ]]; then
     
-    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
+#    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
+    ls $dirMC_UL/WJetsToLNu_amcatnlo/*root > $OUTDIR/WJetsToLNu_amcatnlo
 
 else
 
-    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
-    ls $dirMC_UL/W1JetsToLNu/*root > $OUTDIR/W1JetsToLNu
-    ls $dirMC_UL/W2JetsToLNu/*root > $OUTDIR/W2JetsToLNu
-    ls $dirMC_UL/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
-    ls $dirMC_UL/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
+#    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
+#    ls $dirMC_UL/W1JetsToLNu/*root > $OUTDIR/W1JetsToLNu
+#    ls $dirMC_UL/W2JetsToLNu/*root > $OUTDIR/W2JetsToLNu
+#    ls $dirMC_UL/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
+#    ls $dirMC_UL/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
 
+    ls $dirMC_UL/WJetsToLNu_amcatnlo/*root > $OUTDIR/WJetsToLNu_amcatnlo
+    ls $dirMC_UL/WJetsToLNu_0J_amcatnlo/*root > $OUTDIR/WJetsToLNu_0J_amcatnlo
+    ls $dirMC_UL/WJetsToLNu_1J_amcatnlo/*root > $OUTDIR/WJetsToLNu_1J_amcatnlo
+    ls $dirMC_UL/WJetsToLNu_2J_amcatnlo/*root > $OUTDIR/WJetsToLNu_2J_amcatnlo
+    
     ls $dirMC_UL/GluGluHToTauTau/*root > $OUTDIR/GluGluHToTauTau_M125
     ls $dirMC_UL/VBFHToTauTau/*.root > $OUTDIR/VBFHToTauTau_M125
     ls $dirMC_UL/WplusHToTauTau/*.root > $OUTDIR/WplusHToTauTau_M125

@@ -20,12 +20,13 @@ echo $OUTDIR
 
 if [ ! -d "$OUTDIR" ]; then
   mkdir ${OUTDIR}
-  cp ./run_${CHANNEL}_synchntuples.sh $OUTDIR/run_synchntuples.sh
-  cp ./split_filelist.sh $OUTDIR/.
-  cp ./gc_synch.conf $OUTDIR/. 
-  cp ./make_parameter_file_$YEAR.sh $OUTDIR/.
-  cp ./add_samples.sh $OUTDIR/.
 fi
+cp ./run_${CHANNEL}_synchntuples.sh $OUTDIR/run_synchntuples.sh
+cp ./split_filelist.sh $OUTDIR/.
+cp ./gc_synch.conf $OUTDIR/. 
+cp ./make_parameter_file_$YEAR.sh $OUTDIR/.
+cp ./add_samples.sh $OUTDIR/.
+
 
 ./make_config_Run2.sh $1 MC $CHANNEL
 ./make_config_Run2.sh $1 data $CHANNEL

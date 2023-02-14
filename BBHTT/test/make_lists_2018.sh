@@ -31,16 +31,16 @@ else
     ls $dirMC_UL/WJetsToLNu_1J_amcatnlo/*root > $OUTDIR/WJetsToLNu_1J_amcatnlo
     ls $dirMC_UL/WJetsToLNu_2J_amcatnlo/*root > $OUTDIR/WJetsToLNu_2J_amcatnlo
 
-    ls $dirMC_UL/GluGluHToTauTau_amcatnlo_M125_MiniAOD/*root > $OUTDIR/GluGluHToTauTau_M125
+    ls $dirMC_UL/GluGluHToTauTau_M-125_amcatnlo/*root > $OUTDIR/GluGluHToTauTau_M125
     ls $dirMC_UL/VBFHToTauTau_M125/*.root > $OUTDIR/VBFHToTauTau_M125
     ls $dirMC_UL/WplusHToTauTau_M125/*.root > $OUTDIR/WplusHToTauTau_M125
     ls $dirMC_UL/WminusHToTauTau_M125/*.root > $OUTDIR/WminusHToTauTau_M125
     ls $dirMC_UL/ZHToTauTau_M125/*.root > $OUTDIR/ZHToTauTau_M125
-    ls $dirMC_UL/ttHToTauTau_M125/*.root $OUTDIR/ttHToTauTau_M125
+    ls $dirMC_UL/ttHToTauTau_M125/*.root > $OUTDIR/ttHToTauTau_M125
     
     ls $dirMC_UL/bbHToTauTau_yb2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
     ls $dirMC_UL/bbHToTauTau_yt2_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
-    ls $dirMC_UL/bbHToTauTau_ybyt_M125_MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
+    ls $dirMC_UL/bbHToTauTau_M125_ybyt_UL18MiniAODv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
 
 fi
 

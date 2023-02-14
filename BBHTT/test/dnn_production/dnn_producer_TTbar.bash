@@ -1,16 +1,17 @@
 #!/bin/bash
-# $1 - sample (MuonEG or Tau, DYJets_amcatnlo, WJets, TTbar, 
+# $1 - era (2016_pre, 2016_post, 2017, 2018)
+# $2 - sample (MuonEG or Tau, DYJets_amcatnlo, WJets, TTbar, 
 #              SingleTop, Diboson, GluGluHToTauTau, VBFHToTauTau,
 #              WHToTauTau, ZHToTauTau, TTHToTauTau, BBHToTauTau_YT2, BBHToTauTau_YB2, BBHToTauTau_YBYT
 #              em only : GluGluHToWW, VBFHToWW, WHToWW, ZHToWW, BBHToWW_YB2, BBHToWW_YBYT
-# $2 - era (2016_pre, 2016_post, 2017, 2018)
 # $3 - channel (em,tt)
-# $4 - directory where output of condor jobs are stored 
+# $4 - systematics : Central, JESUp, JESDown, JERUp, JERDown, UnclEnUp, UnclEnDown
+# $5 - directory where output of condor jobs are stored 
 #      : example /nfs/dust/cms/user/rasp/jobs 
 #        PLEASE SPECIFY YOUR OWN DIRECTORY ->
-dir=${4}
+dir=${5}
 
-jobname=dnntuple_producer_${1}_${2}_${3}
+jobname=dnntuple_producer_${1}_${2}_${3}_${4}
 cat > ${dir}/${jobname}.sh <<EOF1
 #!/bin/bash
 source /cvmfs/cms.cern.ch/cmsset_default.sh
@@ -18,7 +19,7 @@ export SCRAM_ARCH=slc7_amd64_gcc700
 cd ${CMSSW_BASE}/src
 cmsenv
 cd -
-create_dnn $1 $2 $3
+create_dnn $1 $2 $3 $4
 EOF1
 
 cat > ${dir}/${jobname}.submit <<EOF

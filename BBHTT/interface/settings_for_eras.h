@@ -140,6 +140,13 @@ const vector<TString> DYJets_amcatnlo = {
   "DYJetsToLL_2J_amcatnlo"
 };
 
+const vector<TString> WJets_amcatnlo = { 
+  //  "WJetsToLNu_amcatnlo",
+  "WJetsToLNu_0J_amcatnlo",
+  "WJetsToLNu_1J_amcatnlo",
+  "WJetsToLNu_2J_amcatnlo"
+};
+
 const vector<TString> DYJets_amcatnlo_incl = { 
   "DYJetsToLL_M-50_amcatnlo"
 };
@@ -238,11 +245,28 @@ const vector<TString> BBHToWW_YBYT = {
   "bbHToWWTo2L2Nu_ybyt_M125"
 };
 
+const vector<TString> BBHToWW_YT2 = {
+  "bbHToWWTo2L2Nu_yt2_M125"
+};
+
+const vector<TString> TTVJets = {
+  "ttWJets",
+  "ttZJets"
+};
+
+const vector<TString> TTHToWW = {
+  "ttHJetToNonbb_M125"
+};
+
 // **************************************************************************************************
 // **************************************************************************************************
 // Cross-section map
 // 2018 (checked with AN-19-177)
 const map<TString, double> xsec_map_2018 = {
+  {"WJetsToLNu_amcatnlo", 61526.7},
+  {"WJetsToLNu_0J_amcatnlo", 50002.6},
+  {"WJetsToLNu_1J_amcatnlo", 8395.38},
+  {"WJetsToLNu_2J_amcatnlo", 3128.68},
   {"WJetsToLNu"  , 61526.7}, // NNLO (1)
   {"W1JetsToLNu" , 9370.5}, // NNLO (2)
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
@@ -257,9 +281,9 @@ const map<TString, double> xsec_map_2018 = {
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
   {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
   {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
-  {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-  {"TTToHadronic"     , 377.96}, // NNLO (22)
-  {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
+  {"TTTo2L2Nu"             , 88.29},  // NNLO (21)
+  {"TTToHadronic"          , 377.96}, // NNLO (22)
+  {"TTToSemiLeptonic"      , 365.35}, // NNLO (23)
   {"ST_t-channel_top_4f"      , 136.02}, // ? (24) -> could be improved
   {"ST_t-channel_antitop_4f"  , 80.95}, // ? (25) -> could be improved
   {"ST_tW_top_5f"             , 35.85}, // ? (26) -> could be improved
@@ -281,24 +305,31 @@ const map<TString, double> xsec_map_2018 = {
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
   {"ttHToTauTau_M125"         , 0.5033*0.06208},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
+  {"GluGluHToWWTo2L2Nu_M125"  , 3.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.087},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
+  {"ttHJetToNonbb_M125"       , 0.212},
   // from AN-21-090
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
-  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
-
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0281},
+  {"bbHToWWTo2L2Nu_yt2_M125"  , 1.040*0.0281},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0281},
+  {"ttWJets",0.205},
+  {"ttZJets",0.920},
 };
 
 // 2017 (checked again - AN-19-177 -> DY xsec updated )
 const map<TString, double> xsec_map_2017 = {
+  {"WJetsToLNu_amcatnlo", 61526.7},
+  {"WJetsToLNu_0J_amcatnlo", 50002.6},
+  {"WJetsToLNu_1J_amcatnlo", 8395.38},
+  {"WJetsToLNu_2J_amcatnlo", 3128.68},
   {"WJetsToLNu"  , 61526.7}, // NNLO (1)
   {"W1JetsToLNu" , 9370.5}, // NNLO (2)
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
@@ -313,13 +344,13 @@ const map<TString, double> xsec_map_2017 = {
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
   {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
   {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
-  {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-  {"TTToHadronic"     , 377.96}, // NNLO (22)
-  {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
+  {"TTTo2L2Nu"             , 88.29},  // NNLO (21)
+  {"TTToHadronic"          , 377.96}, // NNLO (22)
+  {"TTToSemiLeptonic"      , 365.35}, // NNLO (23)
   {"ST_t-channel_top_4f"      , 136.02}, // ? (24) -> could be improved
   {"ST_t-channel_antitop_4f"  , 80.95}, // ? (25) -> could be improved
-  {"ST_tW_top_5f"             , 35.85}, // ? (26) -> could be improved
-  {"ST_tW_antitop_5f"         , 35.85}, // ? (27) -> could be improved
+  {"ST_tW_top_5f"             , 35.85*0.543}, // ? (26) -> could be improved
+  {"ST_tW_antitop_5f"         , 35.85*0.543}, // ? (27) -> could be improved
   {"VVTo2L2Nu"                , 13.84},
   {"WWTo2L2Nu"                , 11.59},
   {"WWToLNuQQ"                , 49.997},
@@ -337,23 +368,31 @@ const map<TString, double> xsec_map_2017 = {
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
   {"ttHToTauTau_M125"         , 0.5033*0.06208},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
+  {"GluGluHToWWTo2L2Nu_M125"  , 3.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
+  {"ttHJetToNonbb_M125"       , 0.212},
   // from AN-21-090
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
-  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0281},
+  {"bbHToWWTo2L2Nu_yt2_M125"  , 1.040*0.0281},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0281},
+  {"ttWJets",0.205},
+  {"ttZJets",0.920},
 };
 
 // 2016 (taken from AN-19-177)
 const map<TString, double> xsec_map_2016 = {
+  {"WJetsToLNu_amcatnlo", 61526.7},
+  {"WJetsToLNu_0J_amcatnlo", 50002.6},
+  {"WJetsToLNu_1J_amcatnlo", 8395.38},
+  {"WJetsToLNu_2J_amcatnlo", 3128.68},
   {"WJetsToLNu"  , 61526.7}, // NNLO (1)
   {"W1JetsToLNu" , 9370.5}, // NNLO (2)
   {"W2JetsToLNu" , 3170.9}, // NNLO (3)
@@ -368,9 +407,9 @@ const map<TString, double> xsec_map_2016 = {
   {"DY2JetsToLL_M-50"      , 347.3}, // NNLO (20b)
   {"DY3JetsToLL_M-50"      , 126.1}, // NNLO (20c)
   {"DY4JetsToLL_M-50"      , 71.67}, // NNLO (20d)
-  {"TTTo2L2Nu"        , 88.29},  // NNLO (21)
-  {"TTToHadronic"     , 377.96}, // NNLO (22)
-  {"TTToSemiLeptonic" , 365.35}, // NNLO (23)
+  {"TTTo2L2Nu"             , 88.29},  // NNLO (21)
+  {"TTToHadronic"          , 377.96}, // NNLO (22)
+  {"TTToSemiLeptonic"      , 365.35}, // NNLO (23)
   {"ST_t-channel_top_4f"      , 136.02}, // ? (24) -> could be improved
   {"ST_t-channel_antitop_4f"  , 80.95}, // ? (25) -> could be improved
   {"ST_tW_top_5f"             , 35.85}, // ? (26) -> could be improved
@@ -392,19 +431,23 @@ const map<TString, double> xsec_map_2016 = {
   {"WminusHToTauTau_M125"     , 0.0334},
   {"ZHToTauTau_M125"          , 0.0477},
   {"ttHToTauTau_M125"         , 0.5033*0.06208},
-  {"GluGluHToWWTo2L2Nu_M125"  , 1.11},
+  {"GluGluHToWWTo2L2Nu_M125"  , 3.11},
   {"VBFHToWWTo2L2Nu_M125"     , 0.0850},
   {"WminusHToWWTo2L2Nu_M125"  , 0.114},
   {"WplusHToWWTo2L2Nu_M125"   , 0.18},
   {"ZHToWWTo2L2Nu_M125"       , 0.163},
-  // from Pascal (AN-2021-090)
+  {"ttHJetToNonbb_M125"       , 0.212},
+  // from AN-21-090
   // yb2: 0.4822*0.06208, yt2: 1.040*0.06208, ytyb: -0.033*0.06208
   {"bbHToTauTau_yb2_M125"     , 0.4822*0.06208},
   {"bbHToTauTau_yt2_M125"     , 1.040*0.06208},
   {"bbHToTauTau_ybyt_M125"    , -0.033*0.06208},
   // cross sections for the H->WW
-  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0231},
-  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0231},
+  {"bbHToWWTo2L2Nu_yb2_M125"  , 0.4822*0.0281},
+  {"bbHToWWTo2L2Nu_yt2_M125"  , 1.040*0.0281},
+  {"bbHToWWTo2L2Nu_ybyt_M125" , -0.033*0.0281},
+  {"ttWJets",0.205},
+  {"ttZJets",0.920},
 };
 
 const map<TString, vector<TString> > map_sample = {
@@ -442,6 +485,16 @@ const map<TString, vector<TString> > map_sample = {
   {"DYJets_amcatnlo_2017",DYJets_amcatnlo},
   {"DYJets_amcatnlo_2016_pre",DYJets_amcatnlo},
   {"DYJets_amcatnlo_2016_post",DYJets_amcatnlo},
+
+  {"WJets_amcatnlo_2018",WJets_amcatnlo},
+  {"WJets_amcatnlo_2017",WJets_amcatnlo},
+  {"WJets_amcatnlo_2016_pre",WJets_amcatnlo},
+  {"WJets_amcatnlo_2016_post",WJets_amcatnlo},
+
+  //  {"WJets_nnlo_2018",WJets_nnlo},
+  //  {"WJets_nnlo_2017",WJets_nnlo},
+  //  {"WJets_nnlo_2016_pre",WJets_nnlo},
+  //  {"WJets_nnlo_2016_post",WJets_nnlo},
 
   {"WJets_2018",WJets},
   {"WJets_2017",WJets},
@@ -533,19 +586,58 @@ const map<TString, vector<TString> > map_sample = {
   {"BBHToWW_YB2_2016_pre",BBHToWW_YB2},
   {"BBHToWW_YB2_2016_post",BBHToWW_YB2},
 
+  {"BBHToWW_YT2_2018",BBHToWW_YT2},
+  {"BBHToWW_YT2_2017",BBHToWW_YT2},
+  {"BBHToWW_YT2_2016_pre",BBHToWW_YT2},
+  {"BBHToWW_YT2_2016_post",BBHToWW_YT2},
+
   {"BBHToWW_YBYT_2018",BBHToWW_YBYT},
   {"BBHToWW_YBYT_2017",BBHToWW_YBYT},
   {"BBHToWW_YBYT_2016_pre",BBHToWW_YBYT},
   {"BBHToWW_YBYT_2016_post",BBHToWW_YBYT},
 
+  {"TTVJets_2018",TTVJets},
+  {"TTVJets_2017",TTVJets},
+  {"TTVJets_2016_pre",TTVJets},
+  {"TTVJets_2016_post",TTVJets},
+  
+  {"TTHToWW_2018",TTHToWW},
+  {"TTHToWW_2017",TTHToWW},
+  {"TTHToWW_2016_pre",TTHToWW},
+  {"TTHToWW_2016_post",TTHToWW},
+
+
+};
+
+std::vector<TString> systematics_tt = {
+  "CMS_scale_t_1prong_13TeV",
+  "CMS_scale_t_1prong1pizero_13TeV",
+  "CMS_scale_t_3prong_13TeV",
+  "CMS_scale_t_3prong1pizero_13TeV",
+  "CMS_scale_j_JES_13TeV",
+  "CMS_res_j_13TeV",
+  "CMS_scale_met_unclustered_13TeV"
+};
+
+std::vector<TString> systematics_em = {
+  //  "CMS_scale_e_13TeV",
+  "CMS_scale_j_JES_13TeV",
+  "CMS_res_j_13TeV",
+  "CMS_scale_met_unclustered_13TeV"
 };
 
 const map<TString , TString> process_map_2018 = {
+  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+
   { "WJets"   , "WJetsToLNu"},
   { "W1Jets"  , "W1JetsToLNu"},
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
+
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
   { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
@@ -553,11 +645,17 @@ const map<TString , TString> process_map_2018 = {
 };
 
 const map<TString , TString> process_map_2017 = {
+  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+
   { "WJets"   , "WJetsToLNu"},
   { "W1Jets"  , "W1JetsToLNu"},
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
+
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
   { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
@@ -565,11 +663,17 @@ const map<TString , TString> process_map_2017 = {
 };
 
 const map<TString , TString> process_map_2016 = {
+  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+
   { "WJets"   , "WJetsToLNu"},
   { "W1Jets"  , "W1JetsToLNu"},
   { "W2Jets"  , "W2JetsToLNu"},
   { "W3Jets"  , "W3JetsToLNu"},
   { "W4Jets"  , "W4JetsToLNu"},
+
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
   { "DY1Jets" , "DYJetsToLL_1J_amcatnlo"},
@@ -582,16 +686,6 @@ std::map<TString,double> LUMI = {
   {"2016_post",16810},
   {"2017",     41480},
   {"2018",     59830}
-};
-
-std::vector<TString> systematics_names = {
-  "CMS_scale_t_1prong_13TeV",
-  "CMS_scale_t_1prong1pizero_13TeV",
-  "CMS_scale_t_3prong_13TeV",
-  "CMS_scale_t_3prong1pizero_13TeV",
-  "CMS_scale_j_JES_13TeV",
-  "CMS_res_j_13TeV",
-  "CMS_scale_met_unclustered_13TeV"
 };
 
 double getNEventsProcessed(TString filename)

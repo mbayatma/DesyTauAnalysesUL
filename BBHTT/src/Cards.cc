@@ -21,7 +21,7 @@ Cards::Cards(TString Sample,
   channel = Channel;
   input_dir = InputDir + "/" + era;
   input_friend_dir = PredDir + "/" + era;
-  runWithShapeSystematics = false;
+  runWithShapeSystematics = true;
   output_filename = OutputDir+"/"+era+"/"+Sample+"_"+Category+".root";
   sampleToProcess = Sample;
   category = channel+"_"+Category;
@@ -158,8 +158,11 @@ Cards::Cards(TString Sample,
 
   commonCuts += categoryCuts[category];
 
-  if (channel=="em") 
-    commonCuts += "&&pzeta<20&&nbtag<3";
+  if (channel=="em") {
+    commonCuts += "&&pzeta<20.0&&nbtag<3";
+    if (category=="em_cat3_NbtagGe1")
+      commonCuts += "&&puppimet>20.&&mt_tot>40.0";
+  }
 
   regionCut.clear();
   if(channel=="tt"){
@@ -216,17 +219,19 @@ Cards::Cards(TString Sample,
   nameSampleMap["ST"] = ST; nameHistoMap["ST"] = "ST";
   nameSampleMap["STToL"] = ST; nameHistoMap["STToL"] = "STL"; 
   nameSampleMap["STToTT"] = ST; nameHistoMap["STToTT"] = "STT";
-  //  nameSampleMap["EMB"] = Embedded; nameHistoMap["EMB"] = "EMB";
+  nameSampleMap["TTVJets"] = TTVJets; nameHistoMap["TTVJets"] = "TTVJets";
 
   nameSampleMap["ggHWW"] = ggHWW; nameHistoMap["ggHWW"] = "ggH_hww";
   nameSampleMap["qqHWW"] = qqHWW; nameHistoMap["qqHWW"] = "qqHWW125";
   nameSampleMap["WHWW"] = WHWW; nameHistoMap["WHWW"] = "WHWW125";
   nameSampleMap["ZHWW"] = ZHWW; nameHistoMap["ZHWW"] = "ZHWW125";
+  nameSampleMap["TTHWW"] = TTHWW; nameHistoMap["TTHWW"] = "TTHWW125";
 
   nameSampleMap["ggHTT"] = ggH; nameHistoMap["ggHTT"] = "ggH_htt";
   nameSampleMap["qqHTT"] = qqH; nameHistoMap["qqHTT"] = "qqH125";
   nameSampleMap["WHTT"] = WH; nameHistoMap["WHTT"] = "WH125";
   nameSampleMap["ZHTT"] = ZH; nameHistoMap["ZHTT"] = "ZH125";
+  nameSampleMap["TTHTT"] = TTH; nameHistoMap["TTHTT"] = "TTH125";
 
   nameSampleMap["bbHTTybyt"] = bbH_ybyt; nameHistoMap["bbHTTybyt"] = "intH_bb_htt";
   nameSampleMap["bbHTTyt2"] = bbH_yt2; nameHistoMap["bbHTTyt2"] = "ggH_bb_htt";
@@ -235,7 +240,7 @@ Cards::Cards(TString Sample,
   nameSampleMap["bbHTTyb2_nobb"] = bbH_yb2; nameHistoMap["bbHTTyb2_nobb"] = "bbH_nobb_htt";
 
   nameSampleMap["bbHWWybyt"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt"] = "intH_bb_hww";
-  nameSampleMap["bbHWWyt2"] = ggHWW; nameHistoMap["bbHWWyt2"] = "ggH_bb_hww";
+  nameSampleMap["bbHWWyt2"] = bbHWW_yt2; nameHistoMap["bbHWWyt2"] = "ggH_bb_hww";
   nameSampleMap["bbHWWyb2"] = bbHWW_yb2; nameHistoMap["bbHWWyb2"] = "bbH_hww";
   nameSampleMap["bbHWWybyt_nobb"] = bbHWW_ybyt; nameHistoMap["bbHWWybyt_nobb"] = "intH_hww";
   nameSampleMap["bbHWWyb2_nobb"] = bbHWW_yb2; nameHistoMap["bbHWWyb2_nobb"] = "bbH_nobb_hww";
@@ -265,17 +270,22 @@ Cards::Cards(TString Sample,
   else if (sampleToProcess=="TT") {
     samplesContainer.push_back("TT");
   }
+  else if (sampleToProcess=="TTVJets") {
+    samplesContainer.push_back("TTVJets");
+  }
   else if (sampleToProcess=="HTT") {
     samplesContainer.push_back("ggHTT");
     samplesContainer.push_back("qqHTT");
     samplesContainer.push_back("WHTT");
     samplesContainer.push_back("ZHTT");
+    samplesContainer.push_back("TTHTT");
   }
   else if (sampleToProcess=="HWW") {
     samplesContainer.push_back("ggHWW");
     samplesContainer.push_back("qqHWW");
     samplesContainer.push_back("WHWW");
     samplesContainer.push_back("ZHWW");
+    samplesContainer.push_back("TTHWW");
   }
   else if (sampleToProcess=="bbHTT_nobb") {
     samplesContainer.push_back("bbHTTybyt_nobb");
@@ -285,7 +295,6 @@ Cards::Cards(TString Sample,
     samplesContainer.push_back("bbHTTybyt");
     samplesContainer.push_back("bbHTTyb2");
     samplesContainer.push_back("bbHTTyt2");
-    //    samplesContainer.push_back("bbHTT");
   }
   else if (sampleToProcess=="bbHWW") {
     samplesContainer.push_back("bbHWWybyt");
@@ -376,11 +385,8 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
   TString mcSS("");
   TString ngenPartonsCut("");
 
-  if (name=="W")
-    ngenPartonsCut = "&&xsec_lumi_weight<1000.";
-
   if (name=="ggHTT"||name=="ggHWW") {
-    ngenPartonsCut = "&&gen_nbjets_cut==0";
+    ngenPartonsCut = "&&gen_nbjets_cut==0&&weightEMu<30.";
   }
   
   if (name=="bbHTTybyt_nobb"||name=="bbHTTyb2_nobb") {
@@ -392,11 +398,11 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
   }
 
   if (name=="bbHWWybyt_nobb"||name=="bbHWWyb2_nobb") {
-    ngenPartonsCut = "&&gen_nbjets_cut==0";
+    ngenPartonsCut = "&&gen_nbjets_cut==0&&weightEMu<30.";
   }
 
   if (name=="bbHWWybyt"||name=="bbHWWyt2"||name=="bbHWWyb2") {
-    ngenPartonsCut = "&&gen_nbjets_cut>0";
+    ngenPartonsCut = "&&gen_nbjets_cut>0&&weightEMu<30.";
   }
 
   if (name=="TTToL"||name=="VVToL"||name=="STToLL"||name=="DYToLL") {
@@ -739,7 +745,29 @@ int Cards::CreateShapeSystematicsMap() {
 
   if (sampleToProcess=="Data")
     return numberOfShapeSystematics;
+
+  if (channel=="tt") {
+    for (auto mapIter : ShapeSystematicsTT) {
+      TString sysName = mapIter.first;
+      TString treeName = mapIter.second;
+      shapeSystematicsMap[sysName+era+"Up"] = treeName+"Up";
+      shapeSystematicsMap[sysName+era+"Down"] = treeName+"Down";
+      numberOfShapeSystematics += 2;
+    }
+  }
+
+  if (channel=="em") {
+    for (auto mapIter : ShapeSystematicsEM) {
+      TString sysName = mapIter.first;
+      TString treeName = mapIter.second;
+      shapeSystematicsMap[sysName+era+"Up"] = treeName+"Up";
+      shapeSystematicsMap[sysName+era+"Down"] = treeName+"Down";
+      numberOfShapeSystematics += 2;
+    }
+  }
+
   /*
+       
   if (sampleToProcess=="EMB") {
     for (auto mapIter : EmbeddedShapeSystematics) {
       TString sysName = mapIter.first;
@@ -844,6 +872,16 @@ int Cards::CreateWeightSystematicsMap() {
     return numberOfWeightSystematics;
 
   }
+
+  for (auto mapIter : BTagSystematics) {
+    TString sysName = "btag" + era + "_" + mapIter.first + "Up";
+    TString weightName = mapIter.second;
+    weightSystematicsMap[sysName] = weightName+"*";
+
+    sysName = "btag" + era + "_" + mapIter.first + "Down";
+    weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
+    numberOfWeightSystematics += 2;
+  }
   
   // Prefiring weight;
   for (auto mapIter : PrefiringSystematics) {
@@ -864,7 +902,12 @@ int Cards::CreateWeightSystematicsMap() {
     }
   }
 
-  if (sampleToProcess=="HTT"||sampleToProcess=="HWW") {
+  if (sampleToProcess=="HTT"||
+      sampleToProcess=="HWW"||
+      sampleToProcess=="bbHTT"||
+      sampleToProcess=="bbHTT_nobb"||
+      sampleToProcess=="bbHWW"||
+      sampleToProcess=="bbHWW_nobb") {
     for (auto mapIter : SignalSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
@@ -882,23 +925,28 @@ int Cards::CreateWeightSystematicsMap() {
   // TTbar ---->
   if (sampleToProcess=="TT") {
     for (auto mapIter : TopShapeSystematics) {
-      TString sysName = mapIter.first;
+      TString sysName = mapIter.first + "Up";
       TString weightName = mapIter.second;
       weightSystematicsMap[sysName] = weightName+"*";
-      numberOfWeightSystematics++;
-    }      
+      
+      sysName = mapIter.first + "Down";
+      weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
+      numberOfWeightSystematics += 2;
+      
+   }      
     return numberOfWeightSystematics;
   }
 
   // DYJets ---->
   if (sampleToProcess=="DY"||sampleToProcess=="DYToTT"||sampleToProcess=="DYToLL") {
-    map<TString,TString> DYSys = DYShapeSystematics;
-    if (era=="2016") DYSys = DYShapeSystematics_2016;
-    for (auto mapIter : DYSys) {
-      TString sysName = mapIter.first;
+    for (auto mapIter : DYShapeSystematics) {
+      TString sysName = mapIter.first + "Up";
       TString weightName = mapIter.second;
       weightSystematicsMap[sysName] = weightName+"*";
-      numberOfWeightSystematics++;
+
+      sysName = mapIter.first + "Down";
+      weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
+      numberOfWeightSystematics += 2;
     }
     return numberOfWeightSystematics;
   }

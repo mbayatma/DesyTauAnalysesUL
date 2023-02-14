@@ -477,15 +477,14 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
      fChain->SetBranchAddress("qcdweight", &qcdweight, &b_qcdweight);
      
    }
-   /*
+   
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
-   fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
    fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
    fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
-   */
+   
    /*
    if (ch == "tt") {
      for (unsigned int i=0; i<ff_sysnames.size(); ++i) {
@@ -1204,12 +1203,12 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     fChain->Branch("weight_CMS_mufake_mt_MVADM11_13TeVDown", &weight_CMS_mufake_mt_MVADM11_13TeVDown, "weight_CMS_mufake_mt_MVADM11_13TeVDown/F");
   }
 
-  //  fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
-  //  fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
-  //  fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, "weight_CMS_PS_ISR_ggH_13TeVUp/F");
-  //  fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, "weight_CMS_PS_ISR_ggH_13TeVDown/F");
-  //  fChain->Branch("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, "weight_CMS_PS_FSR_ggH_13TeVUp/F");
-  //  fChain->Branch("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, "weight_CMS_PS_FSR_ggH_13TeVDown/F");
+  fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
+  fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
+  fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, "weight_CMS_PS_ISR_ggH_13TeVUp/F");
+  fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, "weight_CMS_PS_ISR_ggH_13TeVDown/F");
+  fChain->Branch("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, "weight_CMS_PS_FSR_ggH_13TeVUp/F");
+  fChain->Branch("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, "weight_CMS_PS_FSR_ggH_13TeVDown/F");
 
   if (ch == "em") {
     fChain->Branch("qcdweight_deltaR",&qcdweight_deltaR,"qcdweight_deltaR/F");
@@ -1273,10 +1272,10 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     fChain->Branch("trigweightExcl", &trigweightExcl, "trigweightExcl/F");
   }
 
-  //  if (ch == "tt") {
-  //    fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
+  if (ch == "tt") {
+    fChain->Branch("ff_nom",&ff_nom,"ff_nom/F");
   //    fChain->Branch("ff_nom_sys",&ff_nom_sys,"ff_nom_sys/F");
-  //  }
+  }
 
   if ((ch == "mt")||(ch == "et")) {
     fChain->Branch("ff_mva",&ff_mva,"ff_mva/F");

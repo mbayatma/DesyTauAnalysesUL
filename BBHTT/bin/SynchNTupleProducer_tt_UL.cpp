@@ -255,7 +255,8 @@ int main(int argc, char * argv[]){
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DYJets") != string::npos) || (infiles.find("DY1Jets") != string::npos) || (infiles.find("DY2Jets") != string::npos) || (infiles.find("DY3Jets") != string::npos) || (infiles.find("DY4Jets") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
-  const bool isDYamcatnlo = (infiles.find("amcatnlo") != string::npos) && isDY;
+  const bool is_amcatnlo = (infiles.find("amcatnlo") != string::npos);
+  const bool isDYamcatnlo = is_amcatnlo && isDY;
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
   const bool isHiggs = (infiles.find("VBFHTo")!= string::npos) || (infiles.find("WminusHTo")!= string::npos) || (infiles.find("WplusHTo")!= string::npos) || (infiles.find("ZHTo")!= string::npos) || (infiles.find("GluGluHTo")!= string::npos); 
   const bool isEWKZ =  infiles.find("EWKZ") != string::npos;
@@ -1157,8 +1158,10 @@ int main(int argc, char * argv[]){
 	if (analysisTree.genweight<0.0)
 	  otree->mcweight = -1.0;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
-	if (isDYamcatnlo)
+	if (is_amcatnlo) {
 	  otree->gen_noutgoing = analysisTree.genparticles_noutgoing_NLO;
+	  //	  std::cout << "npartons : " << otree->gen_noutgoing << std::endl;
+	}
 	if (isEmbedded) {
 	  otree->mcweight = analysisTree.genweight;
 	  if (otree->mcweight>1.0)

@@ -274,7 +274,8 @@ int main(int argc, char * argv[]){
 
   // MET Recoil Corrections
   const bool isDY = (infiles.find("DYJets") != string::npos) || (infiles.find("DY1Jets") != string::npos) || (infiles.find("DY2Jets") != string::npos) || (infiles.find("DY3Jets") != string::npos) || (infiles.find("DY4Jets") != string::npos) || (infiles.find("EWKZ") != string::npos);//Corrections that should be applied on EWKZ are the same needed for DY
-  const bool isDYamcatnlo = (infiles.find("amcatnlo") != string::npos) && isDY;
+  const bool is_amcatnlo = (infiles.find("amcatnlo") != string::npos);
+  const bool isDYamcatnlo = is_amcatnlo && isDY;
   const bool isWJets = (infiles.find("WJets") != string::npos) || (infiles.find("W1Jets") != string::npos) || (infiles.find("W2Jets") != string::npos) || (infiles.find("W3Jets") != string::npos) || (infiles.find("W4Jets") != string::npos) || (infiles.find("EWK") != string::npos);
   const bool isWGamma = infiles.find("WGToLNuG") != string::npos;
   const bool isWWTo1L = infiles.find("WWToLNuQQ") != string::npos;
@@ -523,8 +524,9 @@ int main(int argc, char * argv[]){
     std::cout << "quitting..." << std::endl;
     exit(-1);
   }
-  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptNLOhist")));
-  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get(TString(cfg.get<string>("ZptBNLOhist")));
+  TH2D * h_zptNLOweight = (TH2D*)f_zptNLOweight->Get("DY_NLO");
+  TH2D * h_zptNLOweight_1btag = (TH2D*)f_zptNLOweight->Get("DY_Btag_NLO");
+  TH2D * h_zptNLOweight_1bsys = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO");
   //  TH2D * h_zptNLOweight_2btag = (TH2D*)f_zptNLOweight->Get("DYJetscorr_NLO_2btag");
   if (h_zptNLOweight == NULL ||
       h_zptNLOweight_1btag == NULL) {
@@ -657,12 +659,12 @@ int main(int argc, char * argv[]){
 
     // systematics only for MC
     if (!isEmbedded) {
-      btagSys = new BtagSys(otree,TString("Btag"));
-      btagSys->SetConfig(&cfg);
-      btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
-      mistagSys = new BtagSys(otree,TString("Mistag"));
-      mistagSys->SetConfig(&cfg);
-      mistagSys->SetBtagScaling(&inputs_btag_scaling_medium);
+      //      btagSys = new BtagSys(otree,TString("Btag"));
+      //      btagSys->SetConfig(&cfg);
+      //      btagSys->SetBtagScaling(&inputs_btag_scaling_medium);
+      //      mistagSys = new BtagSys(otree,TString("Mistag"));
+      //      mistagSys->SetConfig(&cfg);
+      //      mistagSys->SetBtagScaling(&inputs_btag_scaling_medium);
       if (ApplyRecoilCorrections) {
 	if (usePuppiMET) {
 	  for (unsigned int i = 0; i < recoilSysNames.size(); ++i) {
@@ -777,8 +779,8 @@ int main(int argc, char * argv[]){
     AC1B analysisTree(_tree);
     // set AC1B for JES Btag and MET systematics
     if ( !isData && !isEmbedded && ApplySystShift) {
-	btagSys->SetAC1B(&analysisTree);
-	mistagSys->SetAC1B(&analysisTree);
+      //	btagSys->SetAC1B(&analysisTree);
+      //	mistagSys->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++)
       	(jetEnergyScaleSys.at(i))->SetAC1B(&analysisTree);
       for (unsigned int i = 0; i < metSys.size(); i++)
@@ -1137,7 +1139,7 @@ int main(int argc, char * argv[]){
 	otree->mcweight = 1.0;
 	if (analysisTree.genweight<0.) otree->mcweight = -1.0;
         otree->gen_noutgoing = analysisTree.genparticles_noutgoing;
-	if (isDYamcatnlo)
+	if (is_amcatnlo)
 	  otree->gen_noutgoing = analysisTree.genparticles_noutgoing_NLO;
 	if (isEmbedded) {
 	  otree->mcweight = analysisTree.genweight;
@@ -1323,6 +1325,27 @@ int main(int argc, char * argv[]){
 	//	std::cout << "amcatnlo ->" << std::endl;
 	//	std::cout << "Z Mass = " << bosonMass << "  pt = " << bosonPt << "  weight = " << zptmassweight << std::endl;
 	otree->zptweight = zptmassweight;
+	// Pascal's corretion ->
+	if (otree->nbtag>=1) {
+	  histZPt = h_zptNLOweight_1bsys;
+	  bosonMass = genV.M();
+	  bosonPt = genV.Pt();
+	  massBins = histZPt->GetNbinsY();
+	  ptBins = histZPt->GetNbinsX();
+	  MassMin = histZPt->GetYaxis()->GetBinLowEdge(1);
+	  MassMax = histZPt->GetYaxis()->GetBinLowEdge(massBins+1);
+	  ptMin = histZPt->GetXaxis()->GetBinLowEdge(1);
+	  ptMax = histZPt->GetXaxis()->GetBinLowEdge(ptBins+1);	  
+	  if (bosonMass<MassMin) bosonMass = MassMin+0.5;
+	  if (bosonMass>MassMax) bosonMass = MassMax-0.5;
+	  if (bosonPt<ptMin) bosonPt = ptMin+0.5;
+	  if (bosonPt>ptMax) bosonPt = ptMax-0.5;
+	  otree->zptweight_1btag = histZPt->GetBinContent(histZPt->FindBin(bosonPt,bosonMass));
+	}
+	else {
+	  otree->zptweight_0btag = zptmassweight;
+	}
+
       }
       otree->weight *= otree->zptweight;
       otree->weightSingle *= otree->zptweight;
@@ -1487,8 +1510,8 @@ int main(int argc, char * argv[]){
 
       // evaluate systematics for MC 
       if( !isData && !isEmbedded && ApplySystShift){
-	  btagSys->Eval();
-	  mistagSys->Eval();
+	//	  btagSys->Eval();
+	//	  mistagSys->Eval();
 	for(unsigned int i = 0; i < jetEnergyScaleSys.size(); i++) {
 	  //	  cout << endl;
 	  //	  cout << "+++++++++++++++++++++++++++++++++++++++++++++++++" << endl;
@@ -1558,15 +1581,15 @@ int main(int argc, char * argv[]){
     delete electronScaleSys;
   }
 
-  if (btagSys != 0) {
-    btagSys->Write("",TObject::kOverwrite);
-    delete btagSys;
-  }
+  //  if (btagSys != 0) {
+  //    btagSys->Write("",TObject::kOverwrite);
+  //    delete btagSys;
+  //  }
 
-  if (mistagSys != 0) {
-    mistagSys->Write("",TObject::kOverwrite);
-    delete mistagSys;
-  }
+  //  if (mistagSys != 0) {
+  //    mistagSys->Write("",TObject::kOverwrite);
+  //    delete mistagSys;
+  //  }
 
   if(jetEnergyScaleSys.size() > 0){
     for (unsigned int i = 0; i < jetEnergyScaleSys.size(); i++){

@@ -1,3 +1,4 @@
+
 #ifndef DataCards_h
 #define DataCards_h
 
@@ -138,6 +139,7 @@ class Cards {
     {"CMS_scale_j_Absolute","CMS_scale_j_Absolute_13TeV"},    
   };
 
+  /*
   const map<TString,TString> ShapeSystematics_2016 = {
     {"CMS_scale_t_1prong_2016","CMS_scale_t_1prong_13TeV"},
     {"CMS_scale_t_1prong1pizero_2016","CMS_scale_t_1prong1pizero_13TeV"},
@@ -191,29 +193,39 @@ class Cards {
     {"CMS_scale_j_BBEC1_2018","CMS_scale_j_BBEC1_2018_13TeV"},
     {"CMS_res_j_2018","CMS_res_j_13TeV"},
   };  
+  */
+
+  const map<TString,TString> ShapeSystematicsTT = {
+    {"scale_t_1prong","CMS_scale_t_1prong_13TeV"},
+    {"scale_t_1prong1pi","CMS_scale_t_1prong1pizero_13TeV"},
+    {"scale_t_3prong","CMS_scale_t_3prong_13TeV"},
+    {"scale_t_3prong1pi","CMS_scale_t_3prong1pizero_13TeV"},
+    {"met_unclustered","CMS_scale_met_unclustered_13TeV"},
+    {"jer","CMS_res_j_13TeV"},
+    {"jesTotal","CMS_scale_j_JES_13TeV"}
+  };
+
+  const map<TString,TString> ShapeSystematicsEM = {
+    {"met_unclustered","CMS_scale_met_unclustered_13TeV"},
+    {"jer","CMS_res_j_13TeV"},
+    {"jesTotal","CMS_scale_j_JES_13TeV"}
+  };
 
   // ******************************
   // *** Weight systematics *******
   // ******************************
 
   const map<TString,TString> PrefiringSystematics = {
-    {"CMS_prefiringUp","(prefiringweightUp/prefiringweight)"},
-    {"CMS_prefiringDown","(prefiringweightDown/prefiringweight)"},    
-  };
-
-  const map<TString,TString> DYShapeSystematics_2016 = {
-    {"CMS_htt_dyShape_2016Up","zptweight"},
-    {"CMS_htt_dyShape_2016Down","(1/zptweight)"},
+    {"prefiringUp","(prefiringweightUp/prefiringweight)"},
+    {"prefiringDown","(prefiringweightDown/prefiringweight)"},    
   };
 
   const map<TString,TString> DYShapeSystematics = {
-    {"CMS_htt_dyShapeUp","zptweight"},
-    {"CMS_htt_dyShapeDown","(1/zptweight)"},
+    {"dyShape","zptweight"},
   };
 
   const map<TString,TString> TopShapeSystematics = {
-    {"CMS_htt_ttbarShapeUp","topptweight"},
-    {"CMS_htt_ttbarShapeDown","(1/topptweight)"},
+    {"ttbarShape","topptweight"},
   };
 
   const map<TString,TString> WeightSystematicsTT = {
@@ -225,8 +237,8 @@ class Cards {
     {"CMS_eff_t_dm1","weight_CMS_eff_tauid_DM1"},
     {"CMS_eff_t_dm10","weight_CMS_eff_tauid_DM10"},
     {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
-    //    {"CMS_htt_fake_e_tt","weight_CMS_etaufake"},
-    {"CMS_htt_fake_m_tt","weight_CMS_mutaufake"}
+    {"fake_e_tt","weight_CMS_etaufake"},
+    {"fake_m_tt","weight_CMS_mutaufake"}
   };
 
   const map<TString,TString> EmbeddedWeightSystematicsTT = {
@@ -247,6 +259,19 @@ class Cards {
     {"CMS_eff_t_dm10","weight_CMS_eff_tauid_DM10"},
     {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
   };
+
+  const map<TString,TString> BTagSystematics = {
+    {"jes","btagweight_jes"},
+    {"lf","btagweight_lf"},
+    {"hf","btagweight_hf"},
+    {"hfstats1","btagweight_hfstats1"},
+    {"hfstats2","btagweight_hfstats2"},
+    {"lfstats1","btagweight_lfstats1"},
+    {"lfstats2","btagweight_lfstats2"},
+    {"cferr1","btagweight_cferr1"},
+    {"cferr2","btagweight_cferr2"}
+  };
+
 
   const map<TString,TString> QCDSystematics = {
     {"CMS_htt_em_qcd_0jet_rate","qcdweight_deltaR_0jet_Par0"},
@@ -277,9 +302,9 @@ class Cards {
   };
 
   const map<TString,TString> SignalSystematics = {
-    {"CMS_QCDscale","weight_CMS_scale_gg_13TeV"},
-    //    {"CMS_PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
-    //    {"CMS_PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"},
+    {"QCDscale","weight_CMS_scale_gg_13TeV"},
+    //    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
+    //    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
   };
 
   // ******************************************************* 
@@ -290,7 +315,6 @@ class Cards {
   map<TString, TString> shapeSystematicsMap;
   map<TString, TFile*> sampleFileMap; // sample-file map
   map<TString, TFile*> samplePredFileMap; // sample-friend map
-  //  map<TString, TString> baseNameMap; // sample-baseName map
   map<TString, vector<TString> > nameSampleMap; // sample map
   map<TString, vector<TString> > sampleSpecificCutMap; // sample-specific-cut map
   map<TString, TString> nameHistoMap;
@@ -318,7 +342,7 @@ class Cards {
   const std::vector<TString> Tau = {"Tau"};
   const std::vector<TString> MuonEG = {"MuonEG"};
   const std::vector<TString> DYJets = {"DYJets_amcatnlo"};
-  const std::vector<TString> WJets  = {"WJets"};
+  const std::vector<TString> WJets  = {"WJets_amcatnlo"};
   const std::vector<TString> VV = {"Diboson"};
   const std::vector<TString> ST = {"SingleTop"};
   const std::vector<TString> TTbar = {"TTbar"};
@@ -326,14 +350,18 @@ class Cards {
   const std::vector<TString> qqH = {"VBFHToTauTau"};
   const std::vector<TString> WH = {"WHToTauTau"};
   const std::vector<TString> ZH = {"ZHToTauTau"};
+  const std::vector<TString> TTH = {"TTHToTauTau"};
   const std::vector<TString> ggHWW = {"GluGluHToWW"};
   const std::vector<TString> qqHWW = {"VBFHToWW"};
   const std::vector<TString> WHWW  = {"WHToWW"};
   const std::vector<TString> ZHWW  = {"ZHToWW"};
-  const std::vector<TString> bbH_yt2 = {"BBHToTauTau_YT2"};
-  const std::vector<TString> bbH_yb2 = {"BBHToTauTau_YB2"};
+  const std::vector<TString> TTHWW = {"TTHToWW"};
+  const std::vector<TString> TTVJets = {"TTVJets"};
+  const std::vector<TString> bbH_yt2 =  {"BBHToTauTau_YT2"};
+  const std::vector<TString> bbH_yb2 =  {"BBHToTauTau_YB2"};
   const std::vector<TString> bbH_ybyt = {"BBHToTauTau_YBYT"};
-  const std::vector<TString> bbHWW_yb2 = {"BBHToWW_YB2"};
+  const std::vector<TString> bbHWW_yt2 =  {"BBHToWW_YT2"};
+  const std::vector<TString> bbHWW_yb2 =  {"BBHToWW_YB2"};
   const std::vector<TString> bbHWW_ybyt = {"BBHToWW_YBYT"};
 
   const std::vector<TString> availableSamplesToProcess = 
@@ -345,6 +373,7 @@ class Cards {
      "ST",
      "HTT",
      "HWW",
+     "TTVJets",
      "bbHTT",
      "bbHTT_nobb",
      "bbHWW",

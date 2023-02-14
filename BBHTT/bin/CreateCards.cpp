@@ -63,9 +63,14 @@ int main(int argc, char * argv[]) {
 
   if (equidistant)
     cards->SetVariableToPlot(variable,nbins,xmin,xmax);
-  else
+  else {
+    nbins = xbins.size() - 1;
     cards->SetVariableToPlot(variable,nbins,xbins);
-
+    std::cout << "nbins = " << nbins << std::endl;
+    for (int i=0; i<=nbins; ++i)
+      std::cout << xbins[i] << std::endl;
+    //    exit(-1);
+  }
   cards->Run();
   cards->CloseFile();
 

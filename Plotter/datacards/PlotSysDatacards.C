@@ -2,13 +2,13 @@
 #include "HttStylesNew.cc"
 
 void PlotSysDatacards(TString era = "2018",
-		      TString histName = "jetFakes",
-		      TString sysName  = "CMS_htt_tt_qcd_syst_met_closur_2018",
-		      TString category = "tt_cat2",
+		      TString histName = "bbH_hww",
+		      TString sysName  = "QCDscale",
+		      TString category = "em_cat3_NbtagGe1",
 		      float upRange = -100) {
 
-  //  TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_datacards_UL/BDT/bbH_em_"+era;
-  TString fileName = "/nfs/dust/cms/user/rasp/Run/tautau_datacards_UL/BDT/bbH_tt_"+era;
+  //  TString fileName = "/nfs/dust/cms/user/rasp/Run/tautau_datacards_sys_UL/BDT_coarse/bbH_tt_"+era;
+  TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_fine/bbH_em_"+era;
 
   TString header = category+":"+histName;
   TString SysLeg = sysName;
@@ -16,6 +16,8 @@ void PlotSysDatacards(TString era = "2018",
   TString xtitle("BDT"); 
   bool logX = false;
   bool logY = false;
+  float YMin = 0.95;
+  float YMax = 1.05;
 
   SetStyle();
   gStyle->SetErrorX(0);
@@ -24,6 +26,9 @@ void PlotSysDatacards(TString era = "2018",
   TH1D * histUp = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Up");
   TH1D * histDown = (TH1D*)file->Get(category+"/"+histName+"_"+sysName+"Down");
   std::cout << histNominal << " " <<  histUp << " " << histDown << std::endl;
+  if (histNominal==NULL) return;
+  if (histUp==NULL) return;
+  if (histDown==NULL) return;
 
   double xNominal = histNominal->GetSumOfWeights();
   double xUp = histUp->GetSumOfWeights();
@@ -146,7 +151,7 @@ void PlotSysDatacards(TString era = "2018",
   canv1->cd();
 
   ratioUp->SetTitle("");
-  ratioUp->GetYaxis()->SetRangeUser(0.7,1.3);
+  ratioUp->GetYaxis()->SetRangeUser(YMin,YMax);
   ratioUp->GetYaxis()->SetNdivisions(505);
   ratioUp->GetXaxis()->SetLabelFont(42);
   ratioUp->GetXaxis()->SetLabelOffset(0.04);
@@ -200,6 +205,6 @@ void PlotSysDatacards(TString era = "2018",
   canv1->cd();
   canv1->Modified();
   canv1->cd();
-  canv1->Print(histName+"_"+category+"_"+sysName+"_era"+era+".png");
+  canv1->Print("systematics/"+histName+"_"+category+"_"+sysName+"_era"+era+".png");
 
 } 

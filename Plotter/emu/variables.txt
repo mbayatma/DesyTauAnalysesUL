@@ -1,0 +1,8 @@
+/nfs/dust/cms/user/rasp/Run/emu_sys_UL 
+CMS_scale_j_JES_13TeV			jpt_1		20 	30	230
+CMS_scale_j_JES_13TeV			njets		7	-0.5	6.5
+CMS_scale_j_JES_13TeV			puppimet	20	0	200
+CMS_scale_met_unclustered_13TeV		puppimet	20	0	200
+CMS_scale_e_13TeV			pt_1		10 	0	200
+CMS_scale_e_13TeV			m_vis		10	0	200
+CMS_scale_e_13TeV			mt_tot		10	0	200

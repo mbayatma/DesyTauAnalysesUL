@@ -1,6 +1,8 @@
 using namespace std;
 
 #include "DesyTauAnalyses/Plotter/bin/HttStylesNew.cc"
+#include "DesyTauAnalyses/Plotter/bin/CMS_lumi.C"
+#include "DesyTauAnalyses/Plotter/interface/settings.h"
 #include "TString.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -11,6 +13,26 @@ using namespace std;
 #include <map>
 #include <vector>
 #include "DesyTauAnalyses/Common/interface/Config.h"
+#include "TGraphAsymmErrors.h"
+
+std::map<TString, TString> catMap_tt = {
+  {"bbhtt_tt_1_13TeV","bbH"},
+  {"bbhtt_tt_2_13TeV","Fakes"},
+  {"bbhtt_tt_3_13TeV","Drell-Yan"},
+  {"bbhtt_tt_4_13TeV","TTbar"}
+};
+
+std::map<TString, TString> catMap_em = {
+  {"bbhtt_em_1_13TeV","TTbar"},
+  {"bbhtt_em_2_13TeV","bbHtautau"},
+  {"bbhtt_em_3_13TeV","bbHWW"}
+};
+
+std::map<TString, TString> lumiLegend = {
+  {"2018","2018, 59.8 fb^{-1}"},
+  {"2017","2017, 41.5 fb^{-1}"},
+  {"2016","2016, 36.3 fb^{-1}"}
+};
 
 void Check(TH1D * hist, TString name) {
   if (hist==NULL) {
@@ -22,7 +44,8 @@ void Check(TH1D * hist, TString name) {
 void Plot(TFile * file,
 	  TString era,
 	  TString channel,
-	  TString category,
+	  TString cat,
+	  bool postfit,
 	  TString xtitle,
 	  bool logY,
 	  bool plotLegend,
@@ -30,6 +53,8 @@ void Plot(TFile * file,
 	  bool blindData, 
 	  float xmin_blind,
 	  float xmax_blind,
+	  float XMin,
+	  float XMax,
 	  float YMin,
 	  float YMax,
 	  TString outputdir
@@ -39,15 +64,21 @@ void Plot(TFile * file,
 
   bool logX = false;
   float yLower = 0.5;
-  float scaleYUpper = 100;
-  if (channel=="em") scaleYUpper = 2000;
-  //  TString xtitle = "m_{#tau#tau} (GeV)";
+  float scaleYUpper = 1000;
+  if (channel=="em") scaleYUpper = 1000;
   TString ytitle = "Events";
 
+  TString category = "shapes_prefit/" + cat + era;
+  if (postfit)
+    category = "shapes_fit_s/" + cat + era;
+
   std::cout << category << std::endl;
-  TH1D * histData = (TH1D*)file->Get(category+"/data_obs");
-  if (histData==NULL) {
-    std::cout << "  era/category " << era << "/" << category << " does not exist" << std::endl;
+
+  //  TH1D * histData = (TH1D*)file->Get(category+"/data_obs");
+  TGraphAsymmErrors * graphData = (TGraphAsymmErrors*)file->Get(category+"/data");
+  TH1D * totalBkg = (TH1D*)file->Get(category+"/total_background");
+  if (graphData==NULL||totalBkg==NULL) {
+    std::cout << "  category "  << category << " does not exist" << std::endl;
     std::cout << "  nothing is done... " << std::endl;
     std::cout << std::endl;
     std::cout << "+++++++++++++++++++++++++++++++" << std::endl;
@@ -59,14 +90,33 @@ void Plot(TFile * file,
     std::cout << "processing era/category : " << era << "/" << category << std::endl;
     std::cout << std::endl;
   }
+  int nBins = totalBkg->GetNbinsX();
+  TH1D * histData = (TH1D*)totalBkg->Clone("histData");
+  TH1D * H125 = (TH1D*)totalBkg->Clone("H125");
+  for (int iB=0; iB<nBins; ++iB) {
+    double xData = graphData->GetY()[iB];
+    double eData = TMath::Sqrt(xData);
+    histData->SetBinContent(iB+1,xData);
+    histData->SetBinError(iB+1,eData);
+  }
+  
 
   TH1D * VV  = (TH1D*)file->Get(category+"/VV");
   TH1D * TT  = (TH1D*)file->Get(category+"/TT");
   TH1D * ST  = (TH1D*)file->Get(category+"/ST");
   TH1D * ZTT = (TH1D*)file->Get(category+"/ZTT");
   TH1D * ZLL = (TH1D*)file->Get(category+"/ZL");
-  TH1D * W   = (TH1D*)file->Get(category+"/W");
-  Check(VV,"VV"); Check(TT,"TT"); Check(ST,"ST"); Check(ZTT,"ZTT"); Check(ZLL,"ZL"); Check(W,"W");
+  TH1D * W   = NULL;
+  if (channel=="em") (TH1D*)file->Get(category+"/W");
+  else {
+    W = (TH1D*)totalBkg->Clone("WJets");
+    for (int iB=1; iB<=nBins; ++iB) {
+      W->SetBinContent(iB,0);
+      W->SetBinError(iB,0);
+    }
+  }
+  Check(VV,"VV"); Check(TT,"TT"); Check(ST,"ST"); Check(ZTT,"ZTT"); Check(ZLL,"ZL"); 
+  if (channel=="") Check(W,"W");
 
   TH1D * QCD = NULL;
   if(channel=="em") {
@@ -94,13 +144,8 @@ void Plot(TFile * file,
 
   TH1D * bbH_yt2 = (TH1D*)file->Get(category+"/ggH_bb_htt");
   TH1D * bbH_yb2 = (TH1D*)file->Get(category+"/bbH_htt");
-  TH1D * bbH_ybyt = (TH1D*)file->Get(category+"/intH_bb_htt");
-  Check(bbH_yt2,"ggH_bb_htt"); Check(bbH_yb2,"bbH_htt"), Check(bbH_ybyt,"intH_bb_htt");
+  Check(bbH_yt2,"ggH_bb_htt"); Check(bbH_yb2,"bbH_htt"); 
   
-  TH1D * bbH_yb2_nobb = (TH1D*)file->Get(category+"/bbH_nobb_htt");
-  TH1D * bbH_ybyt_nobb = (TH1D*)file->Get(category+"/intH_htt");
-  Check(bbH_yb2_nobb,"bbH_nobb_htt"); Check(bbH_ybyt_nobb,"intH_htt");
-
   TH1D * ggHWW = NULL;
   TH1D * qqHWW = NULL;
   TH1D * WHWW = NULL;
@@ -109,10 +154,6 @@ void Plot(TFile * file,
   // FIX ME : Add bbHWW templates for em
   TH1D * bbHWW_yt2 = NULL;
   TH1D * bbHWW_yb2 = NULL;
-  TH1D * bbHWW_ybyt = NULL;
-
-  TH1D * bbHWW_yb2_nobb = NULL;
-  TH1D * bbHWW_ybyt_nobb = NULL;
 
   if (channel=="em") {
     ggHWW = (TH1D*)file->Get(category+"/ggH_hww");
@@ -122,11 +163,7 @@ void Plot(TFile * file,
     Check(ggHWW,"ggHWW125"); Check(qqHWW,"qqHWW125"); Check(WHWW,"WHWW125"); Check(ZHWW,"ZHWW125");
     bbHWW_yb2 = (TH1D*)file->Get(category+"/bbH_hww");
     bbHWW_yt2 = (TH1D*)file->Get(category+"/ggH_bb_hww");
-    bbHWW_ybyt = (TH1D*)file->Get(category+"/intH_bb_hww");
-    Check(bbHWW_yb2,"bbH_hww");Check(bbHWW_yt2,"ggH_bb_hww");Check(bbHWW_ybyt,"intH_bb_htt");
-    bbHWW_yb2_nobb = (TH1D*)file->Get(category+"/bbH_nobb_hww");
-    bbHWW_ybyt_nobb = (TH1D*)file->Get(category+"/intH_hww");
-    Check(bbHWW_yb2_nobb,"bbH_nobb_hww"); Check(bbHWW_ybyt_nobb,"intH_hww");
+    Check(bbHWW_yb2,"bbH_hww");Check(bbHWW_yt2,"ggH_bb_hww");
   }
 
   double xTT = TT->GetSumOfWeights();
@@ -164,13 +201,9 @@ void Plot(TFile * file,
   std::cout << std::endl;
   std::cout << "bbH_yt2       : " << bbH_yt2->GetSumOfWeights() << std::endl;
   std::cout << "bbH_yb2       : " << bbH_yb2->GetSumOfWeights() << std::endl;
-  std::cout << "bbH_ybyt      : " << bbH_ybyt->GetSumOfWeights() << std::endl;
-  std::cout << "bbH_yb2_nobb  : " << bbH_yb2_nobb->GetSumOfWeights() << std::endl;
-  std::cout << "bbH_ybyt_nobb : " << bbH_ybyt_nobb->GetSumOfWeights() << std::endl;
   if (channel=="em") {
     std::cout << "bbHWW_yt2     : " << bbHWW_yt2->GetSumOfWeights() << std::endl;
     std::cout << "bbHWW_yb2     : " << bbHWW_yb2->GetSumOfWeights() << std::endl;
-    std::cout << "bbHWW_ybyt    : " << bbHWW_ybyt->GetSumOfWeights() << std::endl;
   }
   std::cout << std::endl;
 
@@ -188,71 +221,17 @@ void Plot(TFile * file,
   VV->Add(VV,W);
 
   TH1D * bbH = (TH1D*)bbH_yb2->Clone("bbH");
-  TH1D * bbH_nobb = (TH1D*)bbH_yb2_nobb->Clone("bbH_nobb");
-
   bbH->Add(bbH,bbH_yt2);
-  bbH->Add(bbH,bbH_ybyt,1.,-1.);
-  bbH_nobb->Add(bbH_nobb,bbH_ybyt_nobb,1.,-1.);
 
   TH1D * bbHWW = NULL;
   if (channel=="em") {
     bbHWW = (TH1D*)bbHWW_yb2->Clone("bbHWW");
     bbHWW->Add(bbHWW,bbHWW_yt2);
-    bbHWW->Add(bbHWW,bbHWW_ybyt,1.,-1.);
   }
 
   if(channel=="tt")
     QCD->Add(QCD,wFakes);
 
-  int nBins = histData->GetNbinsX();
-
-  //  adding normalization systematics
-  double ZTT_norm = 0.04; //  normalization ZTT : 3% 
-  double VV_norm  = 0.06; //  normalization EWK : 6%
-  double QCD_norm = 0.10; //  normalization Fakes : 10%
-  double ZLL_mtau = 0.15; //  l->tau fake rate ZLL : 15%
-  double TT_norm  = 0.06; //  normalization TT  : 6%
-  double eff_MC   = 0.04; //  MC efficiency : 6%
-
-  if (channel=="em") {
-    TT_norm  = 0.08;
-    QCD_norm = 0.15;
-    ZTT_norm = 0.06;
-    eff_MC = 0.05;
-  }
-
-  for (int iB=1; iB<=nBins; ++iB) {
-
-    float ztt  = ZTT->GetBinContent(iB);
-    float ztte = ZTT->GetBinError(iB);
-    ztte = TMath::Sqrt(ztte*ztte+ztt*ztt*(ZTT_norm*ZTT_norm+eff_MC*eff_MC));
-    ZTT->SetBinError(iB,ztte);
-
-    float ewk  = VV->GetBinContent(iB);
-    float ewke = VV->GetBinError(iB);
-    ewke = TMath::Sqrt(ewke*ewke+ewk*ewk*(VV_norm*VV_norm+eff_MC*eff_MC));
-    VV->SetBinError(iB,ewke);
-
-    float qcd  = QCD->GetBinContent(iB);
-    float qcde = QCD->GetBinError(iB);
-    qcde = TMath::Sqrt(qcde*qcde+qcd*qcd*QCD_norm*QCD_norm);
-    QCD->SetBinError(iB,qcde);
-    if (qcd<0) {
-      QCD->SetBinContent(iB,0.);
-      QCD->SetBinError(iB,0.);
-    }
-
-    float tt  = TT->GetBinContent(iB);
-    float tte = TT->GetBinError(iB);
-    tte = TMath::Sqrt(tte*tte+tt*tt*TT_norm*TT_norm);
-    TT->SetBinError(iB,tte);
-
-    float zll  = ZLL->GetBinContent(iB);
-    float zlle = ZLL->GetBinError(iB);
-    zlle = TMath::Sqrt(zlle*zlle+zll*zll*eff_MC*eff_MC);
-    ZLL->SetBinError(iB,zlle);
-
-  }
 
   VV->Add(VV,ZLL);
   TT->Add(TT,VV);
@@ -260,22 +239,19 @@ void Plot(TFile * file,
   ZTT->Add(ZTT,QCD);
   ggH->Add(ggH,ZTT);
 
-  float bbH_total = bbH->GetSumOfWeights() + bbH_nobb->GetSumOfWeights();
   std::cout << std::endl;
   //  std::cout << "Model    = " << ggH->GetSumOfWeights() << std::endl;
   //  std::cout << "Data     = " << histData->GetSumOfWeights() << std::endl;
   std::cout << "bbH_bb   = " << bbH->GetSumOfWeights() << std::endl;
-  std::cout << "bbH_nobb = " << bbH_nobb->GetSumOfWeights() << std::endl; 
-  std::cout << "bbH_tot  = " << bbH_total << std::endl;
+  bbH->Scale(50);
   std::cout << std::endl;
   if (channel=="em") {
     std::cout << "bbHWW_tot = " << bbHWW->GetSumOfWeights() << std::endl;
     //    bbH->Add(bbH,bbHWW);
     bbHWW->Scale(50);
   }
-  bbH->Scale(50);
 
-  TH1D * bkgdErr = (TH1D*)ggH->Clone("bkgdErr");
+  TH1D * bkgdErr = (TH1D*)totalBkg->Clone("bkgdErr");
   bkgdErr->SetFillStyle(3013);
   bkgdErr->SetFillColor(1);
   bkgdErr->SetMarkerStyle(21);
@@ -290,6 +266,7 @@ void Plot(TFile * file,
     bbH->SetBinError(iB,0);
     if (channel=="em") bbHWW->SetBinError(iB,0);
     ggH->SetBinError(iB,0);
+    H125->SetBinError(iB,0);
   }
   float chi2 = 0;
   for (int iB=1; iB<=nBins; ++iB) {
@@ -325,6 +302,7 @@ void Plot(TFile * file,
   InitHist(VV,"","",TColor::GetColor("#DE5A6A"),1001);
   InitHist(ZTT,"","",TColor::GetColor("#FFCC66"),1001);
   InitHist(ggH,"","",TColor::GetColor("#FFCCFF"),1001);
+  InitHist(H125,"","",TColor::GetColor("#FFCCFF"),1001);
   bbH->SetLineStyle(1);
   bbH->SetLineColor(4);
   bbH->SetLineWidth(3);
@@ -348,11 +326,13 @@ void Plot(TFile * file,
   float yUpper = QCD->GetMaximum();
 
   histData->GetYaxis()->SetRangeUser(0,1.4*yUpper);
-  ggH->GetYaxis()->SetRangeUser(0,1.4*yUpper);
+  H125->GetYaxis()->SetRangeUser(0,1.4*yUpper);
+  histData->GetXaxis()->SetRangeUser(XMin,XMax);
+  H125->GetXaxis()->SetRangeUser(XMin,XMax);  
 
   if (logY) {
     histData->GetYaxis()->SetRangeUser(yLower,scaleYUpper*yUpper);
-    ggH->GetYaxis()->SetRangeUser(yLower,scaleYUpper*yUpper);
+    H125->GetYaxis()->SetRangeUser(yLower,scaleYUpper*yUpper);
   }
 
   histData->SetMarkerSize(1.4);
@@ -385,10 +365,10 @@ void Plot(TFile * file,
   upper->SetFrameBorderMode(0);
   upper->SetFrameBorderSize(10);
 
-  histData->SetTitle(category+" : "+era);
-  ggH->SetTitle(category+" : "+era);
+  //  histData->SetTitle(category+" : "+era);
+  //  ggH->SetTitle(category+" : "+era);
 
-  ggH->Draw("h");
+  H125->Draw("h");
   ZTT->Draw("sameh");
   QCD->Draw("sameh");
   TT->Draw("sameh");
@@ -404,7 +384,7 @@ void Plot(TFile * file,
   SetLegendStyle(leg);
   leg->SetTextSize(0.04);
   leg->AddEntry(histData,"Data","lp");
-  leg->AddEntry(ggH,"H(125)","f");
+  leg->AddEntry(H125,"H(125)","f");
   leg->AddEntry(ZTT,"Z#rightarrow #tau#tau","f");
   if (channel=="tt")
     leg->AddEntry(QCD,"j#rightarrow#tau mis-id","f");
@@ -416,8 +396,15 @@ void Plot(TFile * file,
   if (channel=="em") leg->AddEntry(bbHWW,"bbHWW(x50)","l");
   if (plotLegend) leg->Draw();
 
+  lumi_13TeV = lumiLegend[era];
+  writeExtraText = true;
+  extraText = "Preliminary";
+  CMS_lumi(upper,4,33);
+
   if (logY) upper->SetLogy(true);
   if (logX) upper->SetLogx(true);
+  
+
     
   upper->Draw("SAME");
   upper->RedrawAxis();
@@ -513,7 +500,7 @@ void Plot(TFile * file,
     
   string cmsswBase = (getenv("CMSSW_BASE"));
 
-  canv1->Print(outputdir+"/"+category+"_"+era+".png");
+  canv1->Print(outputdir+"/"+cat+era+".png");
   std::cout << std::endl; 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
   std::cout << std::endl;
@@ -529,7 +516,7 @@ int main(int argc, char * argv[]) {
   }
 
   string cmsswBase = (getenv("CMSSW_BASE"));
-  string config_file = cmsswBase + "/src/DesyTauAnalyses/Plotter/datacards/plot_cards_"+string(argv[3])+".conf";
+  string config_file = cmsswBase + "/src/DesyTauAnalyses/Plotter/datacards/plot_mlfit_"+string(argv[3])+".conf";
   TString era = TString(argv[1]);
   TString category = TString(argv[2]);
   TString channel = TString(argv[3]);
@@ -541,20 +528,25 @@ int main(int argc, char * argv[]) {
   TString xtitle = TString(cfg.get<string>("Xtitle"));
   float xmin_blind = cfg.get<float>("XminBlind");
   float xmax_blind = cfg.get<float>("XmaxBlind");
+  float XMin = cfg.get<float>("XMin");
+  float XMax = cfg.get<float>("XMax");
   float YMin = cfg.get<float>("YMin");
   float YMax = cfg.get<float>("YMax");
+  bool postfit = cfg.get<bool>("PostFit");
   TString output_dir = TString(cfg.get<string>("PlotDir"));
   bool logY = cfg.get<bool>("logY");
   bool plotLegend = cfg.get<bool>("PlotLegend");
   bool legRight = cfg.get<bool>("LegendRight");
 
-  TFile * file = new TFile(input_dir+"/bbH_"+channel+"_"+era+".root");
+  TFile * file = new TFile(input_dir+"/fitDiagnostics_"+channel+"_data.root");
   if (file->IsZombie()||file==NULL) {
-    std::cout << "cannot open RooT file " << input_dir << "/bbH_" << channel << "_" << era << ".root" << std::endl;
+    std::cout << "cannot open RooT file " << input_dir << "/fitDiagnostics_" << channel << "_data.root" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  Plot(file,era,channel,category,xtitle,logY,plotLegend,legRight,blindData,xmin_blind,xmax_blind,YMin,YMax,output_dir);
+  SetStyle();
+
+  Plot(file,era,channel,category,postfit,xtitle,logY,plotLegend,legRight,blindData,xmin_blind,xmax_blind,XMin,XMax,YMin,YMax,output_dir);
 
 }
   

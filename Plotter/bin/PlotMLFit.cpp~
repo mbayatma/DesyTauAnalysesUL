@@ -1,6 +1,8 @@
 using namespace std;
 
 #include "DesyTauAnalyses/Plotter/bin/HttStylesNew.cc"
+#include "DesyTauAnalyses/Plotter/bin/CMS_lumi.C"
+#include "DesyTauAnalyses/Plotter/interface/settings.h"
 #include "TString.h"
 #include "TFile.h"
 #include "TH1.h"
@@ -12,6 +14,25 @@ using namespace std;
 #include <vector>
 #include "DesyTauAnalyses/Common/interface/Config.h"
 
+std::map<TString, TString> catMap_tt = {
+  {"bbhtt_tt_1_13TeV","bbH"},
+  {"bbhtt_tt_2_13TeV","Fakes"},
+  {"bbhtt_tt_3_13TeV","Drell-Yan"},
+  {"bbhtt_tt_4_13TeV","TTbar"}
+};
+
+std::map<TString, TString> catMap_em = {
+  {"bbhtt_tt_1_13TeV","TTbar"},
+  {"bbhtt_tt_2_13TeV","bbHtautau"},
+  {"bbhtt_tt_3_13TeV","bbHWW"}
+};
+
+std::map<TString, TString> lumiLegend = {
+  {"2018","2018, 59.8 fb^{-1}}"},
+  {"2017","2017, 41.5 fb^{-1}"},
+  {"2016","2016, 36.3 fb^{-1}"}
+};
+
 void Check(TH1D * hist, TString name) {
   if (hist==NULL) {
     std::cout << "histogram " << name << " is absent in the datacards file... quitting" << std::endl;
@@ -22,7 +43,8 @@ void Check(TH1D * hist, TString name) {
 void Plot(TFile * file,
 	  TString era,
 	  TString channel,
-	  TString category,
+	  TString cat,
+	  bool postfit,
 	  TString xtitle,
 	  bool logY,
 	  bool plotLegend,
@@ -40,9 +62,12 @@ void Plot(TFile * file,
   bool logX = false;
   float yLower = 0.5;
   float scaleYUpper = 100;
-  if (channel=="em") scaleYUpper = 2000;
-  //  TString xtitle = "m_{#tau#tau} (GeV)";
+  if (channel=="em") scaleYUpper = 500;
   TString ytitle = "Events";
+
+  TString category = "shapes_prefit/" + cat + era;
+  if (postfit)
+    category = "shapes_fit_s/" + cat + era;
 
   std::cout << category << std::endl;
   TH1D * histData = (TH1D*)file->Get(category+"/data_obs");
@@ -385,8 +410,8 @@ void Plot(TFile * file,
   upper->SetFrameBorderMode(0);
   upper->SetFrameBorderSize(10);
 
-  histData->SetTitle(category+" : "+era);
-  ggH->SetTitle(category+" : "+era);
+  //  histData->SetTitle(category+" : "+era);
+  //  ggH->SetTitle(category+" : "+era);
 
   ggH->Draw("h");
   ZTT->Draw("sameh");
@@ -416,8 +441,15 @@ void Plot(TFile * file,
   if (channel=="em") leg->AddEntry(bbHWW,"bbHWW(x50)","l");
   if (plotLegend) leg->Draw();
 
+  lumi_13TeV = lumiLegend[era];
+  writeExtraText = true;
+  extraText = "Preliminary";
+  CMS_lumi(upper,4,33);
+
   if (logY) upper->SetLogy(true);
   if (logX) upper->SetLogx(true);
+  
+
     
   upper->Draw("SAME");
   upper->RedrawAxis();
@@ -513,7 +545,7 @@ void Plot(TFile * file,
     
   string cmsswBase = (getenv("CMSSW_BASE"));
 
-  canv1->Print(outputdir+"/"+category+"_"+era+".png");
+  canv1->Print(outputdir+"/"+cat+era+".png");
   std::cout << std::endl; 
   std::cout << "+++++++++++++++++++++++++++++++++++++++++" << std::endl;
   std::cout << std::endl;
@@ -543,18 +575,21 @@ int main(int argc, char * argv[]) {
   float xmax_blind = cfg.get<float>("XmaxBlind");
   float YMin = cfg.get<float>("YMin");
   float YMax = cfg.get<float>("YMax");
+  bool postfit = cfg.get<float>("PostFit");
   TString output_dir = TString(cfg.get<string>("PlotDir"));
   bool logY = cfg.get<bool>("logY");
   bool plotLegend = cfg.get<bool>("PlotLegend");
   bool legRight = cfg.get<bool>("LegendRight");
 
-  TFile * file = new TFile(input_dir+"/bbH_"+channel+"_"+era+".root");
+  TFile * file = new TFile(input_dir+"/fitDiagnostics_"+channel+"_data.root");
   if (file->IsZombie()||file==NULL) {
-    std::cout << "cannot open RooT file " << input_dir << "/bbH_" << channel << "_" << era << ".root" << std::endl;
+    std::cout << "cannot open RooT file " << input_dir << "/fitDiagnostics_" << channel << "_data.root" << std::endl;
     exit(EXIT_FAILURE);
   }
 
-  Plot(file,era,channel,category,xtitle,logY,plotLegend,legRight,blindData,xmin_blind,xmax_blind,YMin,YMax,output_dir);
+  SetStyle();
+
+  Plot(file,era,channel,category,postfit,xtitle,logY,plotLegend,legRight,blindData,xmin_blind,xmax_blind,YMin,YMax,output_dir);
 
 }
   

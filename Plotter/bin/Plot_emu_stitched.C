@@ -95,10 +95,14 @@ int main(int argc, char * argv[]) {
   string additional_cut = cfg.get<string>("AdditionalCut");
   TString AdditionalCut(additional_cut);
   bool isBTag = cfg.get<bool>("ApplyBTagQCDScale");
-  TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&xsec_lumi_weight<1000.");
+  TString Selection("&&iso_1<0.15&&iso_2<0.20&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&xsec_lumi_weight<100.");
   Selection += AdditionalCut; // additional cut, for example nbtag>=1
   string SelSuffix = cfg.get<string>("FileSuffix");
+  float signalScale = cfg.get<float>("SignalScale");
   bool plotSignal = cfg.get<bool>("PlotSignal");
+  bool blindData = cfg.get<bool>("BlindData");
+  float xmin_blind = cfg.get<float>("xmin_blind");
+  float xmax_blind = cfg.get<float>("xmax_blind");
   TString sel_suffix(SelSuffix);
   double scaleQCD = 1.0;  
   std::map<TString,double> scaleQCD_btag = 
@@ -111,10 +115,17 @@ int main(int argc, char * argv[]) {
     };
   if (isBTag) 
     scaleQCD = scaleQCD_btag[era];
+
+  char signalScaleChar[5];
+  if (signalScale>1000)
+    sprintf(signalScaleChar,"%4i",int(signalScale));
+  else if (signalScale>100)
+    sprintf(signalScaleChar,"%3i",int(signalScale));
+  else
+    sprintf(signalScaleChar,"%2i",int(signalScale));
+  TString signalScaleTS(signalScaleChar);
  
   // ******** end of settings *********
-
-  //  std::cout << dir << std::endl;
 
   lumi_13TeV = "2018, 59.8 fb^{-1}";
   if (era=="2017")
@@ -160,7 +171,7 @@ int main(int argc, char * argv[]) {
 
   std::vector<TString> MuonEG = {"MuonEG"};
   std::vector<TString> DYSamples = {"DYJets_amcatnlo"};
-  std::vector<TString> WJetsSamples = {"WJets"};
+  std::vector<TString> WJetsSamples = {"WJets_amcatnlo"};
   std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
   std::vector<TString> TTSamples = {"TTbar"};
   std::vector<TString> HTTSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau","ZHToTauTau"};
@@ -385,7 +396,7 @@ int main(int argc, char * argv[]) {
       //	norm = xsec*lumi/nevents;
       //      }
       double yield = histSample->GetSumOfWeights();
-      std::cout << setw(30) << sampleName << " : " << setw(6) << int(yield) << std::endl;
+      std::cout << setw(30) << sampleName << " : " << setw(6) << int(yield) << " : " << setw(10) << tree->GetEntries() << std::endl;
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,1.);
       sampleAttr.histSS->Add(sampleAttr.histSS,histSampleSS,1.,1.);
       //      delete file;
@@ -446,6 +457,7 @@ int main(int argc, char * argv[]) {
   std::cout << "Data : " << data_SS->GetSumOfWeights() << std::endl;
   std::cout << std::endl;
   */
+  if (era=="2016") TT->Scale(1.05); // calibration for 2016
   double xTop = TT->GetSumOfWeights();
   double xEWK = EWK->GetSumOfWeights()+W->GetSumOfWeights()+ZLL->GetSumOfWeights();
   double xQCD = QCD->GetSumOfWeights();
@@ -481,15 +493,15 @@ int main(int argc, char * argv[]) {
   }
 
   //  adding normalization systematics
-  double ZTT_norm = 0.06; //  normalization ZTT     :   4% (EMBEDDED)
-  double EWK_norm = 0.06; //  normalization EWK     :   5%
-  double QCD_norm = 0.15; //  normalization Fakes   :  12%
-  double ZLL_mtau = 0.15; //  mu->tau fake rate ZLL :   7%
-  double TT_norm  = 0.08; //  normalization TT      :   6%
-  double W_norm   = 0.08; //  normalization W       :   7%
+  double ZTT_norm = 0.04; //  normalization ZTT     :   4%
+  double EWK_norm = 0.06; //  normalization EWK     :   6%
+  double QCD_norm = 0.15; //  normalization Fakes   :  15%
+  double ZLL_mtau = 0.15; //  mu->tau fake rate ZLL :  15%
+  double TT_norm  = 0.08; //  normalization TT      :   8%
+  double W_norm   = 0.08; //  normalization W       :   8%
 
-  double eff_Emb = 0.06;
-  double eff_MC  = 0.06;
+  double eff_Emb = 0.04; // 4%
+  double eff_MC  = 0.04; // 4%
   
   bool applyNormSys = cfg.get<bool>("ApplySystematics");
   if (applyNormSys) {
@@ -586,8 +598,8 @@ int main(int argc, char * argv[]) {
   bbHTT->SetLineStyle(1);
   bbHWW->SetLineWidth(3);
   bbHTT->SetLineWidth(3);
-  bbHWW->Scale(200);
-  bbHTT->Scale(200);
+  bbHWW->Scale(signalScale);
+  bbHTT->Scale(signalScale);
 
   histData->GetXaxis()->SetTitle(xtitle);
   histData->GetYaxis()->SetTitle(ytitle);
@@ -630,6 +642,17 @@ int main(int argc, char * argv[]) {
   upper->SetFrameBorderMode(0);
   upper->SetFrameBorderSize(10);
 
+  if (blindData) {
+    for (int iB=1; iB<=nBins; ++iB) {
+      float xcenter = histData->GetXaxis()->GetBinCenter(iB);
+      if (xcenter>xmin_blind&&xcenter<xmax_blind) {
+	histData->SetBinContent(iB,1e+7);
+	histData->SetBinError(iB,0.);
+      }
+    }
+  }
+
+
   ZTT->Draw("h");
   QCD->Draw("sameh");
   EWK->Draw("sameh");
@@ -668,8 +691,8 @@ int main(int argc, char * argv[]) {
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
   if (plotSignal) {
-    leg->AddEntry(bbHWW,"H#rightarrow WW(x200)","l");
-    leg->AddEntry(bbHTT,"H#rightarrow #tau#tau(x200)","l");
+    leg->AddEntry(bbHWW,"H#rightarrow WW(x"+signalScaleTS+")","l");
+    leg->AddEntry(bbHTT,"H#rightarrow #tau#tau(x"+signalScaleTS+")","l");
   }
   if (plotLegend) leg->Draw();
   writeExtraText = true;
@@ -757,6 +780,15 @@ int main(int argc, char * argv[]) {
   lower->SetFrameBorderMode(0);
   lower->SetFrameBorderSize(10);
 
+  if (blindData) {
+    for (int iB=1; iB<=nBins; ++iB) {
+      float xcenter = ratioH->GetXaxis()->GetBinCenter(iB);
+      if (xcenter>xmin_blind&&xcenter<xmax_blind) {
+	ratioH->SetBinContent(iB,1e+7);
+	ratioH->SetBinError(iB,0.);
+      }
+    }
+  }
   ratioH->Draw("e1");
   ratioErrH->Draw("e2same");
   lower->Modified();

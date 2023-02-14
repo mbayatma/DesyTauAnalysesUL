@@ -114,8 +114,8 @@ int main(int argc, char * argv[]) {
   float ymin_ratio = cfg.get<float>("YMin");
   float ymax_ratio = cfg.get<float>("YMax");
   bool plotLegend = cfg.get<bool>("PlotLegend");
-  bool legRight = true;
-  if (Variable=="bcsv_1"||Variable=="bcsv_2") legRight = false;
+  int legPos = 0;
+  if (Variable=="bcsv_1"||Variable=="bcsv_2") legPos = 1;
   bool logY = cfg.get<bool>("logY");
   bool logX = cfg.get<bool>("logX");
   bool blindData = cfg.get<bool>("BlindData");
@@ -125,8 +125,18 @@ int main(int argc, char * argv[]) {
   TString AdditionalCut(additional_cut);
   string FileSuffix = cfg.get<string>("FileSuffix");
   float signalScale = cfg.get<float>("SignalScale");
+  bool plotSignal = cfg.get<bool>("PlotSignal");
   TString sel_suffix(FileSuffix);
   TString Selection("trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&TMath::Abs(eta_1)<2.1&&TMath::Abs(eta_2)<2.1&&m_sv>30&&m_vis>30");
+
+  char signalScaleChar[5];
+  if (signalScale>1000)
+    sprintf(signalScaleChar,"%4i",int(signalScale));
+  else if (signalScale>100)
+    sprintf(signalScaleChar,"%3i",int(signalScale));
+  else
+    sprintf(signalScaleChar,"%2i",int(signalScale));
+  TString signalScaleTS(signalScaleChar);
 
   Selection += AdditionalCut;
 
@@ -170,7 +180,7 @@ int main(int argc, char * argv[]) {
 
   std::vector<TString> DataSamples = {"Tau"};
   std::vector<TString> DYSamples = {"DYJets_amcatnlo"};
-  std::vector<TString> WJetsSamples = {"WJets"};
+  std::vector<TString> WJetsSamples = {"WJets_amcatnlo"};
   std::vector<TString> EWKSamples = {"Diboson","SingleTop"};
   std::vector<TString> TTSamples = {"TTbar"};
   std::vector<TString> HiggsSamples = {"GluGluHToTauTau","VBFHToTauTau","WHToTauTau","ZHToTauTau"};
@@ -263,7 +273,7 @@ int main(int argc, char * argv[]) {
       tree->Draw(Variable+">>histSB",WeightSampleSB+"("+CutsSampleSB+")");
       tree->Draw(Variable+">>histSingleFake",WeightSampleSingleFake+"("+CutsSampleSingleFake+")");
       double yield = histSample->GetSumOfWeights();
-      std::cout << setw(5) << name << setw(30) << sampleName << " : " << setw(6) << yield << std::endl; 
+      std::cout << setw(5) << name << setw(30) << sampleName << " : " << setw(6) << yield << " : " << setw(10) << histSample->GetEntries() << std::endl; 
       sampleAttr.hist->Add(sampleAttr.hist,histSample,1.,1.);
       sampleAttr.histSB->Add(sampleAttr.histSB,histSampleSB,1.,1.);
       sampleAttr.histSingleFake->Add(sampleAttr.histSingleFake,histSampleSingleFake,1.,1.);
@@ -292,15 +302,15 @@ int main(int argc, char * argv[]) {
   SingleFake->Add(SingleFake,nameAttributes["ZTT"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["VVL"].histSingleFake,1.,1.);
   SingleFake->Add(SingleFake,nameAttributes["W"].histSingleFake,1.,1.);
+  
+  std::cout << "Z : " << nameAttributes["ZTT"].histSingleFake->GetSumOfWeights() << std::endl;
+  std::cout << "W : " << nameAttributes["W"].histSingleFake->GetSumOfWeights() << std::endl;
   double fakes1 = SingleFake->GetSumOfWeights();
 
   Fakes->Add(Fakes,SingleFake,1.,1.);
   double fakes2 = Fakes->GetSumOfWeights();  
 
   std::cout << "Fakes : " << fakes0 << "(QCD) + " << fakes1 << "(WJets) = " << fakes2 << std::endl;
-
-  double scaleFF = histData->GetSumOfWeights()/Fakes->GetSumOfWeights();
-  Fakes->Scale(scaleFF);
 
   TH1D * TT  = nameAttributes["TTL"].hist;
   TH1D * EWK = nameAttributes["VVL"].hist;
@@ -310,9 +320,34 @@ int main(int argc, char * argv[]) {
   TH1D * bbH_bb = nameAttributes["bbH_bb"].hist;
   TH1D * bbH_nobb = nameAttributes["bbH_nobb"].hist;
 
-  //  ZTT->Scale(1./1.27); // 2016
-  //  ZTT->Scale(1./1.22); // 2017
-  //  ZTT->Scale(1./1.13); // 2018
+  /*
+  bool isBTag = sel_suffix.Contains("btag");
+  double scaleDY = 1.0;
+
+  std::map<TString,double> scaleDY_incl = {
+    {"2016_pre",1.30},
+    {"2016_post",1.30},
+    {"2016",1.30},
+    {"2017",1.27},
+    {"2018",1.13}
+  };
+
+  std::map<TString,double> scaleDY_btag = {
+    {"2016_pre",1.50},
+    {"2016_post",1.30},
+    {"2016",1.30},
+    {"2017",1.30},
+    {"2018",1.13}
+  };
+
+  // Normalize back ->
+  if (isBTag)
+    scaleDY = 1.0/scaleDY_btag[era];
+  else
+    scaleDY = 1.0/scaleDY_incl[era];
+
+  ZTT->Scale(scaleDY);
+  */
 
   TT->Add(TT,nameAttributes["TTT"].hist,1.,1.);
   EWK->Add(EWK,nameAttributes["VVT"].hist,1.,1.);
@@ -338,7 +373,7 @@ int main(int argc, char * argv[]) {
 
   //  adding normalization systematics
   double ZTT_norm   = 0.05; //  normalization ZTT   :  5%
-  double QCD_norm   = 0.08; //  normalization Fakes :  7%
+  double QCD_norm   = 0.08; //  normalization Fakes :  8%
   double TT_norm    = 0.06; //  normalization TT    :  6%
   double EWK_norm   = 0.05; //  normalization EWK   :  5%
   double eff_MC  = 0.04; // efficiency MC
@@ -371,77 +406,6 @@ int main(int argc, char * argv[]) {
       //	std::cout << iB << " : " << ztte/total << std::endl;
     }
   }
-  /*
-  if (Variable=="bpt_1") {
-    if (era=="2016") {
-      Fakes->SetBinContent(8,0.8*Fakes->GetBinContent(8));
-      ZTT->SetBinContent(8,0.8*ZTT->GetBinContent(8));
-    }
-    if (era=="2017") {
-      Fakes->SetBinContent(6,0.9*Fakes->GetBinContent(6));
-      ZTT->SetBinContent(6,0.9*ZTT->GetBinContent(6));
-      Fakes->SetBinContent(8,0.9*Fakes->GetBinContent(8));
-      ZTT->SetBinContent(8,0.9*ZTT->GetBinContent(8));
-    }
-    if (era=="2018") {
-      Fakes->SetBinContent(8,1.11*Fakes->GetBinContent(8));
-      ZTT->SetBinContent(8,1.11*ZTT->GetBinContent(8));
-    }
-  }
-
-  if (Variable=="njets") {
-    if (era=="2016") {
-      Fakes->SetBinContent(5,1.15*Fakes->GetBinContent(5));
-      Fakes->SetBinContent(6,1.27*Fakes->GetBinContent(6));
-      Fakes->SetBinContent(7,1.23*Fakes->GetBinContent(7));
-      Fakes->SetBinContent(8,1.40*Fakes->GetBinContent(8));
-      ZTT->SetBinContent(5,1.15*ZTT->GetBinContent(5));
-      ZTT->SetBinContent(6,1.27*ZTT->GetBinContent(6));
-      ZTT->SetBinContent(7,1.23*ZTT->GetBinContent(7));
-      ZTT->SetBinContent(8,1.40*ZTT->GetBinContent(8));
-    }
-    if (era=="2017") {
-      Fakes->SetBinContent(5,1.15*Fakes->GetBinContent(5));
-      Fakes->SetBinContent(7,1.15*Fakes->GetBinContent(7));
-      ZTT->SetBinContent(5,1.15*ZTT->GetBinContent(5));
-      ZTT->SetBinContent(7,1.15*ZTT->GetBinContent(7));
-    }
-    if (era=="2018") {
-      Fakes->SetBinContent(6,1.1*Fakes->GetBinContent(6));
-      Fakes->SetBinContent(7,1.2*Fakes->GetBinContent(7));
-      ZTT->SetBinContent(6,1.1*ZTT->GetBinContent(6));
-      ZTT->SetBinContent(7,1.2*ZTT->GetBinContent(7));
-    }
-  }
-  */
-  if (Variable=="njets") {
-    if (era=="2016") {
-      Fakes->SetBinContent(3,0.95*Fakes->GetBinContent(3));
-      Fakes->SetBinContent(4,0.90*Fakes->GetBinContent(4));
-      Fakes->SetBinContent(5,0.95*Fakes->GetBinContent(5));
-      Fakes->SetBinContent(6,0.80*Fakes->GetBinContent(6));
-    }
-    if (era=="2017") {
-      Fakes->SetBinContent(2,0.98*Fakes->GetBinContent(2));
-      Fakes->SetBinContent(5,0.91*Fakes->GetBinContent(5));
-    }
-    if (era=="2018") {
-      Fakes->SetBinContent(3,0.95*Fakes->GetBinContent(3));
-      Fakes->SetBinContent(4,0.95*Fakes->GetBinContent(4));
-      Fakes->SetBinContent(6,0.87*Fakes->GetBinContent(6));
-    }
-  }
-
-  if (Variable=="nbtag") {
-    if (era=="2016") {
-      Fakes->SetBinContent(2,0.90*Fakes->GetBinContent(2));
-      Fakes->SetBinContent(4,0.70*Fakes->GetBinContent(4));
-    }
-    if (era=="2018") {
-      Fakes->SetBinContent(2,0.95*Fakes->GetBinContent(2));
-      Fakes->SetBinContent(3,0.85*Fakes->GetBinContent(3));
-    }
-  }
 
   EWK->Add(EWK,TT);
   ZTT->Add(ZTT,EWK);
@@ -456,6 +420,7 @@ int main(int argc, char * argv[]) {
   bkgdErr->SetMarkerSize(0);
   
   for (int iB=1; iB<=nbins; ++iB) {
+    bbH->SetBinError(iB,0);
     TT->SetBinError(iB,0);
     EWK->SetBinError(iB,0);
     Fakes->SetBinError(iB,0);
@@ -470,9 +435,10 @@ int main(int argc, char * argv[]) {
   InitHist(EWK,"","",TColor::GetColor("#DE5A6A"),1001);
   InitHist(ZTT,"","",TColor::GetColor("#FFCC66"),1001);
   InitSignal(bbH);
+
   bbH->SetLineColor(4);
   bbH->SetLineStyle(1);
-  bbH->SetLineWidth(2);
+  bbH->SetLineWidth(3);
   bbH->SetMarkerStyle(0);
   bbH->SetMarkerSize(0);
   bbH->Scale(signalScale);
@@ -536,7 +502,7 @@ int main(int argc, char * argv[]) {
   TT->Draw("sameh");
   histData->Draw("e1same");
   bkgdErr->Draw("e2same");
-  //  bbH->Draw("sameh");
+  if (plotSignal) bbH->Draw("sameh");
   histData->Draw("e1same");
   float chi2 = 0;
   for (int iB=1; iB<=nbins; ++iB) {
@@ -548,14 +514,15 @@ int main(int argc, char * argv[]) {
       chi2 += diff2/(xMC+eMC*eMC);
     }
   }
-  double ndof = nbins - 1;
+  double ndof = nbins;
   double prob = TMath::Prob(chi2,ndof); 
   std::cout << std::endl;
   std::cout << "Chi2/ndof = " << chi2 << "/" << ndof << " -> p-value = " << prob << std::endl;
   std::cout << std::endl;
 
   TLegend * leg;
-  if (legRight) leg = new TLegend(0.61,0.47,0.90,0.77);
+  if (legPos==0) leg = new TLegend(0.61,0.47,0.90,0.77);
+  else if (legPos==1) leg = new TLegend(0.44,0.60,0.64,0.90); 
   else leg = new TLegend(0.20,0.60,0.50,0.90);
   SetLegendStyle(leg);
   leg->SetTextSize(0.044);
@@ -565,7 +532,7 @@ int main(int argc, char * argv[]) {
   leg->AddEntry(ZTT,"Z#rightarrow#tau#tau","f");
   leg->AddEntry(EWK,"electroweak","f");
   leg->AddEntry(TT,"t#bar{t}","f");
-  //  leg->AddEntry(bbH,"Hbb","l");
+  if (plotSignal) leg->AddEntry(bbH,"bbH(x"+signalScaleTS+")","l");
   if (plotLegend) leg->Draw();
   writeExtraText = true;
   extraText = "Preliminary";

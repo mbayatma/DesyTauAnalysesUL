@@ -1,23 +1,29 @@
 #include "HtoH.h"
 #include "HttStylesNew.cc"
 
+// "CMS_qcd_subtr_syst_em_2016",
 void PlotSysDatacards(TString era = "2018",
-		      TString histName = "bbH_hww",
-		      TString sysName  = "QCDscale",
+		      TString channel = "em",
+		      TString histName = "QCD",
+		      TString sysName  = "CMS_qcd_subtr_syst_em_2018",
 		      TString category = "em_cat3_NbtagGe1",
+		      bool print = true,
+		      float YMin = 0.0,
+		      float YMax = 2.0,
 		      float upRange = -100) {
 
-  //  TString fileName = "/nfs/dust/cms/user/rasp/Run/tautau_datacards_sys_UL/BDT_coarse/bbH_tt_"+era;
-  TString fileName = "/nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_fine/bbH_em_"+era;
+  TString plotDir = "/afs/desy.de/user/r/rasp/BBH/syst";
+  TString inputDir = "/nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_fine";
+  if (channel=="tt")
+    inputDir = "/nfs/dust/cms/user/rasp/Run/tautau_datacards_newTauID_UL/BDT_coarse";
+  TString fileName = inputDir + "/bbH_"+channel+"_"+era;
 
-  TString header = category+":"+histName;
+  TString header = histName+":"+sysName;
   TString SysLeg = sysName;
   TString ytitle("Events / bin");
   TString xtitle("BDT"); 
   bool logX = false;
   bool logY = false;
-  float YMin = 0.95;
-  float YMax = 1.05;
 
   SetStyle();
   gStyle->SetErrorX(0);
@@ -35,18 +41,23 @@ void PlotSysDatacards(TString era = "2018",
   double xDown = histDown->GetSumOfWeights();
 
   std::cout << "lnN    " << xDown/xNominal << "/" << xUp/xNominal << std::endl;
-
+  std::cout << std::endl;
   int nBins = histNominal->GetNbinsX(); 
   float xmax = histNominal->GetBinLowEdge(nBins+1)-0.01;
 
-  InitData(histNominal);
-  /*
-  for (int iB=1; iB<=nBins; ++iB) {
-    double x = histNominal->GetBinContent(iB);
-    double ex = TMath::Sqrt(x);
-    histNominal->SetBinError(iB,ex);
+  if (print) {
+    for (int iB=1; iB<=nBins; ++iB) {
+      double x = histNominal->GetBinContent(iB);
+      double ex = histNominal->GetBinError(iB);
+      double xmin = histNominal->GetBinLowEdge(iB);
+      double xmax = histNominal->GetBinLowEdge(iB+1);
+      printf("[%4.2f,%4.2f] : %6.1f +/- %4.1f\n",xmin,xmax,x,ex);
+
+    }
   }
-  */
+  std::cout << std::endl;
+
+  InitData(histNominal);
 
   histNominal->GetXaxis()->SetTitleSize(0.0);
   histNominal->GetXaxis()->SetTitleOffset(1.2);
@@ -108,6 +119,8 @@ void PlotSysDatacards(TString era = "2018",
 
   histUp->GetYaxis()->SetTitleOffset(1.4);
 
+  histNominal->SetTitle(header);
+
   TCanvas * canv1 = MakeCanvas("canv1", "", 600, 700);
   TPad *upper = new TPad("upper", "pad",0,0.31,1,1);
   upper->Draw();
@@ -141,7 +154,7 @@ void PlotSysDatacards(TString era = "2018",
   leg->AddEntry(histNominal,"  Central","ep");
   leg->AddEntry(histUp,SysLeg+" Up","l");
   leg->AddEntry(histDown,SysLeg+" Down","l");
-  leg->Draw();
+  //  leg->Draw();
   upper->SetLogx(logX);
   upper->SetLogy(logY);
   upper->Draw("SAME");
@@ -205,6 +218,6 @@ void PlotSysDatacards(TString era = "2018",
   canv1->cd();
   canv1->Modified();
   canv1->cd();
-  canv1->Print("systematics/"+histName+"_"+category+"_"+sysName+"_era"+era+".png");
+  canv1->Print(plotDir+"/"+channel+era+"_"+histName+"_"+category+"_"+sysName+".png");
 
 } 

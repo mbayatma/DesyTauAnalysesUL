@@ -1,4 +1,3 @@
-
 #ifndef DataCards_h
 #define DataCards_h
 
@@ -8,6 +7,7 @@
 #include "TFile.h"
 #include "TList.h"
 #include "TString.h"
+#include "TMath.h"
 #include <vector>
 #include <map>
 #include <iostream>
@@ -89,15 +89,26 @@ class Cards {
   void PrintSamples();
   void PrintShapeSystematics();
   void PrintWeightSystematics();
+  void SetSmoothing(int min, int max, int range);
+  void SetLooseShape(bool shape);
+  void Rebin(bool rebinHisto, vector<double> bins);
   ~Cards();
 
  private:
+
+  int min_smooth;
+  int max_smooth;
+  int range_smooth;
+
+  bool useLooseShape;
+  bool rebin;
 
   TString mcNotTauTau;
   TString mcTauTau;
   const TString BaseTreeName = "TauCheck"; 
   TString baselineTT="trg_doubletau>0.5&&extraelec_veto<0.5&&extramuon_veto<0.5&&dr_tt>0.5&&pt_1>40.&&pt_2>40.&&byVVLooseDeepTau2017v2p1VSe_1>0.5&&byVLooseDeepTau2017v2p1VSmu_1>0.5&&byVVLooseDeepTau2017v2p1VSe_2>0.5&&byVLooseDeepTau2017v2p1VSmu_2>0.5&&os>0.5";
-  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&iso_1<0.15&&iso_2<0.2&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&extraelec_veto<0.5&&extramuon_veto<0.5";
+  TString baselineEM="((trg_muhigh_elow >0.5 && pt_2 > 24) || (trg_ehigh_mulow >0.5&& pt_1 > 24))&&dr_tt>0.5&&pt_1>15.&&pt_2>15.&&extraelec_veto<0.5&&extramuon_veto<0.5&&nbtag<3&&pzeta<20.";
+
   TString category;
   const TString mcNotTauTau_TT = "&&!(gen_match_1==5&&gen_match_2==5)";
   const TString mcTauTau_TT = "&&(gen_match_1==5&&gen_match_2==5)";
@@ -109,8 +120,10 @@ class Cards {
   const TString mcSideBand = "&&gen_match_1!=6" ;
   const TString mcSingleFake = "&&gen_match_1!=6&&gen_match_2==6";
 
-  const TString sameSignRegion = "&&os<0.5";
-  const TString oppositeSignRegion = "&&os>0.5";
+  const TString sameSignRegion = "&&os<0.5&&iso_1<0.15&&iso_2<0.2";
+  const TString oppositeSignRegion = "&&os>0.5&&iso_1<0.15&&iso_2<0.2";
+  const TString sameSignAntiIsoRegion = "&&os<0.5&&iso_1>0.05&&iso_1<0.25&&iso_2>0.05&&iso_2<0.25";
+  const TString sameSignLooseIsoRegion = "&&os<0.5&&iso_1<0.3&&iso_2<0.3";
 
   vector<TString> regionCut;    // three regions defined (SR, fake AR, single fake region)
   vector<TString> regionWeight; // three regions defined 
@@ -303,8 +316,8 @@ class Cards {
 
   const map<TString,TString> SignalSystematics = {
     {"QCDscale","weight_CMS_scale_gg_13TeV"},
-    //    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
-    //    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
+    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
+    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
   };
 
   // ******************************************************* 
@@ -332,6 +345,9 @@ class Cards {
   // for the second variable 
   int nBins2;
   double Bins2[10];
+  // for the rebinned histograms
+  int nBins_rebinned;
+  double Bins_rebinned[100];
 
   TString sampleToProcess;
   TString input_dir; // includes era
@@ -387,8 +403,9 @@ class Cards {
       {"ST","single-top template"},
       {"DYToTT","ZTT template"},
       {"DYToLL","ZL template"},
-      {"HTT","ggHTT, qqHTT, WHTT and ZHTT templates"},
-      {"HWW","ggHWW, qqHWW, WHWW and ZHWW templates"},
+      {"TTVJets","TTZ and TTW templates"},
+      {"HTT","ggHTT, qqHTT, WHTT, ZHTT and ttbarHTT templates"},
+      {"HWW","ggHWW, qqHWW, WHWW, ZHWW and ttbarHWW templates"},
       {"bbHTT","bbHTT_yb2, bbHTT_yt2, bbHTT_ybyt templates"},
       {"bbHTT_nobb","bbHTT_yb2, bbHTT_ybyt without b-quarks"},
       {"bbHWW","bbHWW_yb2, bbHWW_yt2, bbHWW_ybyt templates"},
@@ -406,8 +423,8 @@ class Cards {
     "cat0_Nbtag0",  "cat1_Nbtag0",  "cat2_Nbtag0",  "cat3_Nbtag0",   "cat4_Nbtag0",
     "cat0_Nbtag1",  "cat1_Nbtag1",  "cat2_Nbtag1",  "cat3_Nbtag1",   "cat4_Nbtag1",
     "cat0_Nbtag2",  "cat1_Nbtag2",  "cat2_Nbtag2",  "cat3_Nbtag2",   "cat4_Nbtag2",
-    "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1", "cat4_NbtagGe1"
-    
+    "cat0_NbtagGe1","cat1_NbtagGe1","cat2_NbtagGe1","cat3_NbtagGe1", "cat4_NbtagGe1",
+    "cat5_NbtagGe1","cat6_NbtagGe1"
   };
 
   TString globalWeight="xsec_lumi_weight*";
@@ -455,7 +472,7 @@ class Cards {
   bool RunData();
   bool RunModel();
   void zeroBins(TH1D * hist);
-
+  void smooth(TH1D * hist);
 
 };
 

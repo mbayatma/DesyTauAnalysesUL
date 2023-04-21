@@ -32,11 +32,7 @@ TH1F * TH1toTH1(TH1F * histo, int nBinsX, float * xBins, bool setErr,TString suf
     
 }
 
-
-
-
-
-TH1D * TH1DtoTH1D(TH1D * histo, int nBinsX, float * xBins, bool setErr,TString suffix) {
+TH1D * TH1DtoTH1D(TH1D * histo, int nBinsX, double * xBins, bool setErr,TString suffix) {
 
   TString name = TString(histo->GetName()) + suffix;
 
@@ -45,14 +41,14 @@ TH1D * TH1DtoTH1D(TH1D * histo, int nBinsX, float * xBins, bool setErr,TString s
   int nBins = histo->GetNbinsX();
   
   for (int iB=0;iB<nBins;++iB) {
-    float xB = 0.5*(histo->GetBinLowEdge(iB+1)+histo->GetBinLowEdge(iB+2));
-    float xC = histo->GetBinContent(iB+1);
-    float xE = histo->GetBinError(iB+1);
+    double xB = 0.5*(histo->GetBinLowEdge(iB+1)+histo->GetBinLowEdge(iB+2));
+    double xC = histo->GetBinContent(iB+1);
+    double xE = histo->GetBinError(iB+1);
     int binX = newHisto->FindBin(xB);
-    float yC = newHisto->GetBinContent(binX);
-    float yE = newHisto->GetBinError(binX);
-    float content = xC + yC;
-    float error = TMath::Sqrt(xE*xE + yE*yE);
+    double yC = newHisto->GetBinContent(binX);
+    double yE = newHisto->GetBinError(binX);
+    double content = xC + yC;
+    double error = TMath::Sqrt(xE*xE + yE*yE);
     newHisto->SetBinContent(binX,content);
     if (setErr)
       newHisto->SetBinError(binX,error); 

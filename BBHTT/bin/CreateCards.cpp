@@ -38,24 +38,29 @@ int main(int argc, char * argv[]) {
   double xmin = cfg.get<double>("Xmin");
   double xmax = cfg.get<double>("Xmax");
   vector<double> xbins = cfg.get<vector<double> >("Bins");
+  int minSmooth = cfg.get<int>("MinSmooth");
+  int maxSmooth = cfg.get<int>("MaxSmooth");
+  int rangeSmooth = cfg.get<int>("RangeSmooth");
   bool runWithSystematics = cfg.get<bool>("Systematics");
-
+  bool useLooseShape = cfg.get<bool>("UseLooseShape");
+  bool rebin = cfg.get<bool>("Rebin");
+  bool testCards = cfg.get<bool>("TestCards");
   bool runOnEmbedded = false;
 
   Cards * cards = new Cards(sample,
-			       era,
-			       category,
-			       channel,
-			       inputDir,
-			       predDir,
-			       outputDir,
-			       variable,
-			       nbins,
-			       xmin,
-			       xmax,
-			       runWithSystematics,
-			       runOnEmbedded
-			       );
+			    era,
+			    category,
+			    channel,
+			    inputDir,
+			    predDir,
+			    outputDir,
+			    variable,
+			    nbins,
+			    xmin,
+			    xmax,
+			    runWithSystematics,
+			    runOnEmbedded
+			    );
  
   cards->PrintSamples();
   cards->PrintShapeSystematics();
@@ -71,9 +76,12 @@ int main(int argc, char * argv[]) {
       std::cout << xbins[i] << std::endl;
     //    exit(-1);
   }
-  cards->Run();
+  cards->SetSmoothing(minSmooth,maxSmooth,rangeSmooth);
+  if (useLooseShape) cards->SetLooseShape(useLooseShape);
+  if (rebin) cards->Rebin(rebin,xbins);
+  if (!testCards) cards->Run();
   cards->CloseFile();
-
+  cout << endl;
   cout << endl << endl<<" >>>>> DONE >>>>>>" <<endl;
   delete cards;
 

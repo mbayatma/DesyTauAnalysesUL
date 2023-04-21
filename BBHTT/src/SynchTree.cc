@@ -57,32 +57,31 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetMakeClass(1);
 
    fChain->SetBranchAddress("run", &run, &b_run);
-   fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
+   //   fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
    fChain->SetBranchAddress("evt", &evt, &b_evt);
-   fChain->SetBranchAddress("npv", &npv, &b_npv);
-   fChain->SetBranchAddress("npu", &npu, &b_npu);
+   //   fChain->SetBranchAddress("npv", &npv, &b_npv);
+   //   fChain->SetBranchAddress("npu", &npu, &b_npu);
    //   fChain->SetBranchAddress("rho", &rho, &b_rho);
    
-   fChain->SetBranchAddress("passedAllMetFilters", &passedAllMetFilters, &b_passedAllMetFilters);
+   //   fChain->SetBranchAddress("passedAllMetFilters", &passedAllMetFilters, &b_passedAllMetFilters);
 
    fChain->SetBranchAddress("pt_1", &pt_1, &b_pt_1);
-   fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
+   //   fChain->SetBranchAddress("phi_1", &phi_1, &b_phi_1);
    fChain->SetBranchAddress("eta_1", &eta_1, &b_eta_1);
-   fChain->SetBranchAddress("m_1", &m_1, &b_m_1);
+   //   fChain->SetBranchAddress("m_1", &m_1, &b_m_1);
    fChain->SetBranchAddress("gen_match_1", &gen_match_1, &b_gen_match_1);
-   fChain->SetBranchAddress("q_1", &q_1, &b_q_1);
+   //   fChain->SetBranchAddress("q_1", &q_1, &b_q_1);
    fChain->SetBranchAddress("iso_1", &iso_1, &b_iso_1);
    //   fChain->SetBranchAddress("idisoweight_1", &idisoweight_1, &b_idisoweight_1);
    //   fChain->SetBranchAddress("trkeffweight_1", &trkeffweight_1, &b_trkeffweight_1);
    //   fChain->SetBranchAddress("trigweight_1", &trigweight_1, &b_trigweight_1);
 
-   fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
-   fChain->SetBranchAddress("pt_uncorr_1", &pt_uncorr_1, &b_pt_uncorr_1);
    //   fChain->SetBranchAddress("d0_1", &d0_1, &b_d0_1);
    //   fChain->SetBranchAddress("dZ_1", &dZ_1, &b_dZ_1);
-   fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
    if (ch != "em") {
-   
+     fChain->SetBranchAddress("mt_1", &mt_1, &b_mt_1);
+     fChain->SetBranchAddress("puppimt_1", &puppimt_1, &b_puppimt_1);
+     //     fChain->SetBranchAddress("pt_uncorr_1", &pt_uncorr_1, &b_pt_uncorr_1);
      fChain->SetBranchAddress("tau_decay_mode_1", &tau_decay_mode_1, &b_tau_decay_mode_1); 
      //     fChain->SetBranchAddress("dm_1", &dm_1, &b_dm_1);
      //     fChain->SetBranchAddress("dmMVA_1", &dmMVA_1, &b_dmMVA_1);
@@ -169,22 +168,22 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    }
 
    fChain->SetBranchAddress("pt_2", &pt_2, &b_pt_2);
-   fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
+   //   fChain->SetBranchAddress("phi_2", &phi_2, &b_phi_2);
    fChain->SetBranchAddress("eta_2", &eta_2, &b_eta_2);
-   fChain->SetBranchAddress("m_2", &m_2, &b_m_2);
+   //   fChain->SetBranchAddress("m_2", &m_2, &b_m_2);
    fChain->SetBranchAddress("gen_match_2", &gen_match_2, &b_gen_match_2);
-   fChain->SetBranchAddress("q_2", &q_2, &b_q_2);
+   //   fChain->SetBranchAddress("q_2", &q_2, &b_q_2);
    fChain->SetBranchAddress("iso_2", &iso_2, &b_iso_2);
    //   fChain->SetBranchAddress("idisoweight_2", &idisoweight_2, &b_idisoweight_2);
    //   fChain->SetBranchAddress("trkeffweight_2", &trkeffweight_2, &b_trkeffweight_2);
    //   fChain->SetBranchAddress("trigweight_2", &trigweight_2, &b_trigweight_2);
 
-   fChain->SetBranchAddress("pt_uncorr_2", &pt_uncorr_2, &b_pt_uncorr_2);
    //   fChain->SetBranchAddress("d0_2", &d0_2, &b_d0_2);
    //   fChain->SetBranchAddress("dZ_2", &dZ_2, &b_dZ_2);
-   fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
-   fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
    if (ch != "em") {
+     fChain->SetBranchAddress("mt_2", &mt_2, &b_mt_2);
+     fChain->SetBranchAddress("puppimt_2", &puppimt_2, &b_puppimt_2);
+     //     fChain->SetBranchAddress("pt_uncorr_2", &pt_uncorr_2, &b_pt_uncorr_2);
      fChain->SetBranchAddress("tau_decay_mode_2", &tau_decay_mode_2, &b_tau_decay_mode_2); 
      //     fChain->SetBranchAddress("dm_2", &dm_2, &b_dm_2);
      //     fChain->SetBranchAddress("dmMVA_2", &dmMVA_2, &b_dmMVA_2);
@@ -374,15 +373,16 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("prefiringweightUp", &prefiringweightUp, &b_prefiringweightUp);
    fChain->SetBranchAddress("prefiringweightDown", &prefiringweightDown, &b_prefiringweightDown);
    fChain->SetBranchAddress("btagweight", &btagweight, &b_btagweight);
+   fChain->SetBranchAddress("btagSF", &btagSF, &b_btagSF);
 
-   if (ch == "em") {
-     //     fChain->SetBranchAddress("weightSingle", &weightSingle, &b_weightSingle);
-     fChain->SetBranchAddress("weightEMu", &weightEMu, &b_weightEMu);
-     //     fChain->SetBranchAddress("trigweightSingle", &trigweightSingle, &b_trigweightSingle);
-     fChain->SetBranchAddress("trigweightEMu", &trigweightEMu, &b_trigweightEMu);
-     //     fChain->SetBranchAddress("effweightSingle", &effweightSingle, &b_effweightSingle); 
-     fChain->SetBranchAddress("effweightEMu", &effweightEMu, &b_effweightEMu); 
-   }
+   //   if (ch == "em") {
+   //     fChain->SetBranchAddress("weightSingle", &weightSingle, &b_weightSingle);
+   //     fChain->SetBranchAddress("weightEMu", &weightEMu, &b_weightEMu);
+   //     fChain->SetBranchAddress("trigweightSingle", &trigweightSingle, &b_trigweightSingle);
+   //     fChain->SetBranchAddress("trigweightEMu", &trigweightEMu, &b_trigweightEMu);
+   //     fChain->SetBranchAddress("effweightSingle", &effweightSingle, &b_effweightSingle); 
+   //     fChain->SetBranchAddress("effweightEMu", &effweightEMu, &b_effweightEMu); 
+   //   }
 
    if ((ch == "mt")||(ch == "et")) {
      fChain->SetBranchAddress("weightExcl", &weightExcl, &b_weightExcl);
@@ -492,8 +492,13 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
      }
    }
    */
+   
+   //   for (unsigned int i=0; i<9; ++i) {
+   //     fChain->SetBranchAddress("weight_CMS_QCDScale"+index_scale[i],&weight_CMS_QCDScale[i],&b_weight_CMS_QCDScale[i]);
+   //   }
+
    for (unsigned int i=0; i<btag_unc.size(); ++i) 
-     fChain->SetBranchAddress("btagweight_"+TString(btag_unc[i]),&b_btagweight_sys[i]);
+     fChain->SetBranchAddress("btagweight_"+TString(btag_unc[i]),&btagweight_sys[i],&b_btagweight_sys[i]);
    
 
    if ((ch=="mt")||(ch=="et")) {
@@ -540,11 +545,11 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    //  fChain->SetBranchAddress("met_rcmr", &met_rcmr, &b_met_rcmr);
    //   fChain->SetBranchAddress("metphi_rcmr", &metphi_rcmr, &b_metphi_rcmr);
    fChain->SetBranchAddress("met", &met, &b_met);
-   fChain->SetBranchAddress("metphi", &metphi, &b_metphi);
-   fChain->SetBranchAddress("metcov00", &metcov00, &b_metcov00);
-   fChain->SetBranchAddress("metcov01", &metcov01, &b_metcov01);
-   fChain->SetBranchAddress("metcov10", &metcov10, &b_metcov10);
-   fChain->SetBranchAddress("metcov11", &metcov11, &b_metcov11);
+   //   fChain->SetBranchAddress("metphi", &metphi, &b_metphi);
+   //   fChain->SetBranchAddress("metcov00", &metcov00, &b_metcov00);
+   //   fChain->SetBranchAddress("metcov01", &metcov01, &b_metcov01);
+   //   fChain->SetBranchAddress("metcov10", &metcov10, &b_metcov10);
+   //   fChain->SetBranchAddress("metcov11", &metcov11, &b_metcov11);
    
    //   if (ch != "em") {
    //     fChain->SetBranchAddress("pzetavis", &pzetavis, &b_pzetavis);
@@ -554,13 +559,13 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
 
    //PUPPI MET
    fChain->SetBranchAddress("puppimet", &puppimet, &b_puppimet);
-   fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
+   //   fChain->SetBranchAddress("puppimetphi", &puppimetphi, &b_puppimetphi);
    //   fChain->SetBranchAddress("puppimet_rcmr", &puppimet_rcmr, &b_puppimet_rcmr);
    //   fChain->SetBranchAddress("puppimetphi_rcmr", &puppimetphi_rcmr, &b_puppimetphi_rcmr);
-   fChain->SetBranchAddress("puppimetcov00", &puppimetcov00, &b_puppimetcov00);
-   fChain->SetBranchAddress("puppimetcov01", &puppimetcov01, &b_puppimetcov01);
-   fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
-   fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
+   //   fChain->SetBranchAddress("puppimetcov00", &puppimetcov00, &b_puppimetcov00);
+   //   fChain->SetBranchAddress("puppimetcov01", &puppimetcov01, &b_puppimetcov01);
+   //   fChain->SetBranchAddress("puppimetcov10", &puppimetcov10, &b_puppimetcov10);
+   //   fChain->SetBranchAddress("puppimetcov11", &puppimetcov11, &b_puppimetcov11);
 
    //di tau system
    fChain->SetBranchAddress("pt_tt", &pt_tt, &b_pt_tt);
@@ -569,7 +574,7 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("mt_tot", &mt_tot, &b_mt_tot);
 
    fChain->SetBranchAddress("m_sv", &m_sv, &b_m_sv);
-   fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
+   //   fChain->SetBranchAddress("pt_sv", &pt_sv, &b_pt_sv);
    //  fChain->SetBranchAddress("eta_sv", &eta_sv, &b_eta_sv);
    //  fChain->SetBranchAddress("phi_sv", &phi_sv, &b_phi_sv);
    //  fChain->SetBranchAddress("met_sv", &met_sv, &b_met_sv);
@@ -589,18 +594,18 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("nbtag", &nbtag, &b_nbtag);
    fChain->SetBranchAddress("nbtag_raw", &nbtag_raw, &b_nbtag_raw);
    fChain->SetBranchAddress("jpt_1", &jpt_1, &b_jpt_1);
-   fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
+   //   fChain->SetBranchAddress("jeta_1", &jeta_1, &b_jeta_1);
    //   fChain->SetBranchAddress("jphi_1", &jphi_1, &b_jphi_1);
    fChain->SetBranchAddress("jpt_2", &jpt_2, &b_jpt_2);
-   fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
+   //   fChain->SetBranchAddress("jeta_2", &jeta_2, &b_jeta_2);
    //   fChain->SetBranchAddress("jphi_2", &jphi_2, &b_jphi_2);
    //VBF
    fChain->SetBranchAddress("mjj", &mjj, &b_mjj);
    fChain->SetBranchAddress("jdeta", &jdeta, &b_jdeta);
-   fChain->SetBranchAddress("dijetpt", &dijetpt, &b_dijetpt);
-   fChain->SetBranchAddress("dijeteta", &dijeteta, &b_dijeteta);
-   fChain->SetBranchAddress("dijetphi", &dijetphi, &b_dijetphi);
-   fChain->SetBranchAddress("jdphi", &jdphi, &b_jdphi);
+   //   fChain->SetBranchAddress("dijetpt", &dijetpt, &b_dijetpt);
+   //   fChain->SetBranchAddress("dijeteta", &dijeteta, &b_dijeteta);
+   //   fChain->SetBranchAddress("dijetphi", &dijetphi, &b_dijetphi);
+   //   fChain->SetBranchAddress("jdphi", &jdphi, &b_jdphi);
    //   fChain->SetBranchAddress("beta_1", &beta_1, &b_beta_1);
    //   fChain->SetBranchAddress("beta_2", &beta_2, &b_beta_2);
 
@@ -613,8 +618,8 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    fChain->SetBranchAddress("bcsv_1", &bcsv_1, &b_bcsv_1);
    fChain->SetBranchAddress("bcsv_2", &bcsv_2, &b_bcsv_2);
    
-   fChain->SetBranchAddress("mbb",&mbb,&b_mbb);
-   fChain->SetBranchAddress("dRbb",&dRbb,&b_dRbb);
+   //   fChain->SetBranchAddress("mbb",&mbb,&b_mbb);
+   //   fChain->SetBranchAddress("dRbb",&dRbb,&b_dRbb);
 
    //   fChain->SetBranchAddress("njetingap", &njetingap, &b_njetingap);
    //   fChain->SetBranchAddress("njetingap20", &njetingap20, &b_njetingap20);
@@ -830,10 +835,10 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fCurrent = -1;
 
   fChain->Branch("run", &run, "run/i");
-  fChain->Branch("lumi", &lumi, "lumi/i");
+  //  fChain->Branch("lumi", &lumi, "lumi/i");
   fChain->Branch("evt", &evt, "evt/l");
-  fChain->Branch("npv", &npv, "npv/I");
-  fChain->Branch("npu", &npu, "npu/F");
+  //  fChain->Branch("npv", &npv, "npv/I");
+  //  fChain->Branch("npu", &npu, "npu/F");
   //  fChain->Branch("rho", &rho, "rho/F");
   
   //  if (isGGHWeights) {
@@ -876,10 +881,16 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     //    }
   }
 
+  
+
   for (unsigned int i=0; i<btag_unc.size(); ++i)
     fChain->Branch("btagweight_"+TString(btag_unc[i]),&btagweight_sys[i],"btagweight_"+TString(btag_unc[i])+"/F");
 
-
+  
+  //  for (unsigned int i=0; i<9; ++i) {
+  //    fChain->Branch("weight_CMS_QCDScale"+index_scale[i],&weight_CMS_QCDScale[i],"weight_CMS_QCDScale"+index_scale[i]+"/F");
+  //  }
+ 
   if (ch=="tt") {
     fChain->Branch("jleppt_1",&jleppt_1,"jleppt_1/F");
     fChain->Branch("jlepeta_1",&jlepeta_1,"jlepeta_1/F");
@@ -890,21 +901,21 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
     fChain->Branch("jlepphi_2",&jlepphi_2,"jlepphi_2/F");
   }
 
-  fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
+  //  fChain->Branch("passedAllMetFilters", &passedAllMetFilters, "passedAllMetFilters/O");
 
   fChain->Branch("pt_1", &pt_1, "pt_1/F");
-  fChain->Branch("phi_1", &phi_1, "phi_1/F");
+  //  fChain->Branch("phi_1", &phi_1, "phi_1/F");
   fChain->Branch("eta_1", &eta_1, "eta_1/F");
   //  fChain->Branch("m_1", &m_1, "m_1/F");
   fChain->Branch("gen_match_1", &gen_match_1, "gen_match_1/I");
-  fChain->Branch("q_1", &q_1, "q_1/I");
+  //  fChain->Branch("q_1", &q_1, "q_1/I");
   fChain->Branch("iso_1", &iso_1, "iso_1/F");
   //  fChain->Branch("d0_1", &d0_1, "d0_1/F");
   //  fChain->Branch("dZ_1", &dZ_1, "dZ_1/F");
   //  fChain->Branch("pt_uncorr_1", &pt_uncorr_1, "pt_uncorr_1/F");
-  fChain->Branch("mt_1", &mt_1, "mt_1/F");
-  fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
   if (ch != "em") {
+    fChain->Branch("mt_1", &mt_1, "mt_1/F");
+    fChain->Branch("puppimt_1", &puppimt_1, "puppimt_1/F");
     fChain->Branch("tau_decay_mode_1", &tau_decay_mode_1, "tau_decay_mode_1/I"); 
     //    fChain->Branch("dm_1", &dm_1, "dm_1/F");
     //    fChain->Branch("dmMVA_1", &dmMVA_1, "dmMVA_1/F");
@@ -980,18 +991,18 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   }   
    
   fChain->Branch("pt_2", &pt_2, "pt_2/F");
-  fChain->Branch("phi_2", &phi_2, "phi_2/F");
+  //  fChain->Branch("phi_2", &phi_2, "phi_2/F");
   fChain->Branch("eta_2", &eta_2, "eta_2/F");
   //  fChain->Branch("m_2", &m_2, "m_2/F");
   fChain->Branch("gen_match_2", &gen_match_2, "gen_match_2/I");
-  fChain->Branch("q_2", &q_2, "q_2/I");
+  //  fChain->Branch("q_2", &q_2, "q_2/I");
   fChain->Branch("iso_2", &iso_2, "iso_2/F");
   //  fChain->Branch("pt_uncorr_2", &pt_uncorr_2, "pt_uncorr_2/F");
   //  fChain->Branch("d0_2", &d0_2, "d0_2/F");
   //  fChain->Branch("dZ_2", &dZ_2, "dZ_2/F");
-  fChain->Branch("mt_2", &mt_2, "mt_2/F");
-  fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
   if (ch != "em") {
+    fChain->Branch("mt_2", &mt_2, "mt_2/F");
+    fChain->Branch("puppimt_2", &puppimt_2, "puppimt_2/F");
     fChain->Branch("tau_decay_mode_2", &tau_decay_mode_2, "tau_decay_mode_2/I"); 
     //    fChain->Branch("dm_2", &dm_2, "dm_2/F");
     //    fChain->Branch("dmMVA_2", &dmMVA_2, "dmMVA_2/F");
@@ -1253,15 +1264,16 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   //  fChain->Branch("zptembweight", &zptembweight, "zptembweight/D");
   fChain->Branch("effweight", &effweight, "effweight/F"); 
   fChain->Branch("btagweight",&btagweight, "btagweight/F");
+  fChain->Branch("btagSF",&btagSF,"btagSF/F");
 
-  if (ch == "em") {
+  //  if (ch == "em") {
     //    fChain->Branch("weightSingle", &weightSingle, "weightSingle/F");
-    fChain->Branch("weightEMu", &weightEMu, "weightEMu/F");
+    //    fChain->Branch("weightEMu", &weightEMu, "weightEMu/F");
     //    fChain->Branch("trigweightSingle", &trigweightSingle, "trigweightSingle/F");
-    fChain->Branch("trigweightEMu", &trigweightEMu, "trigweightEMu/F");
+    //    fChain->Branch("trigweightEMu", &trigweightEMu, "trigweightEMu/F");
     //    fChain->Branch("effweightSingle", &effweightSingle, "effweightSingle/F"); 
-    fChain->Branch("effweightEMu", &effweightEMu, "effweightEMu/F"); 
-  }
+    //    fChain->Branch("effweightEMu", &effweightEMu, "effweightEMu/F"); 
+  //  }
 
   if ((ch == "mt")||(ch == "et")) {
     fChain->Branch("weightExcl", &weightExcl, "weightExcl/F");
@@ -1316,24 +1328,24 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   //   fChain->Branch("metphi_rcmr", &metphi_rcmr, "metphi_rcmr/F");
 
   fChain->Branch("met", &met, "met/F");
-  fChain->Branch("metphi", &metphi, "metphi/F");
-  fChain->Branch("metcov00", &metcov00, "metcov00/F");
-  fChain->Branch("metcov01", &metcov01, "metcov01/F");
-  fChain->Branch("metcov10", &metcov10, "metcov10/F");
-  fChain->Branch("metcov11", &metcov11, "metcov11/F");
+  //  fChain->Branch("metphi", &metphi, "metphi/F");
+  //  fChain->Branch("metcov00", &metcov00, "metcov00/F");
+  //  fChain->Branch("metcov01", &metcov01, "metcov01/F");
+  //  fChain->Branch("metcov10", &metcov10, "metcov10/F");
+  //  fChain->Branch("metcov11", &metcov11, "metcov11/F");
   //  fChain->Branch("pzetavis", &pzetavis, "pzetavis/F");
-  //    fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
+  //  fChain->Branch("pzetamiss", &pzetamiss, "pzetamiss/F");
  
   fChain->Branch("pzeta", &pzeta, "pzeta/F");
   //PUPPI MET
   fChain->Branch("puppimet", &puppimet, "puppimet/F");
-  fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");
-  //   fChain->Branch("puppimet_rcmr", &puppimet_rcmr, "puppimet_rcmr/F");
-  //   fChain->Branch("puppimetphi_rcmr", &puppimetphi_rcmr, "puppimetphi_rcmr/F");
-  fChain->Branch("puppimetcov00", &puppimetcov00, "puppimetcov00/F");
-  fChain->Branch("puppimetcov01", &puppimetcov01, "puppimetcov01/F");
-  fChain->Branch("puppimetcov10", &puppimetcov10, "puppimetcov10/F");
-  fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
+  //  fChain->Branch("puppimetphi", &puppimetphi, "puppimetphi/F");
+  //  fChain->Branch("puppimet_rcmr", &puppimet_rcmr, "puppimet_rcmr/F");
+  //  fChain->Branch("puppimetphi_rcmr", &puppimetphi_rcmr, "puppimetphi_rcmr/F");
+  //  fChain->Branch("puppimetcov00", &puppimetcov00, "puppimetcov00/F");
+  //  fChain->Branch("puppimetcov01", &puppimetcov01, "puppimetcov01/F");
+  //  fChain->Branch("puppimetcov10", &puppimetcov10, "puppimetcov10/F");
+  //  fChain->Branch("puppimetcov11", &puppimetcov11, "puppimetcov11/F");
 
   //di tau system
   fChain->Branch("pt_tt", &pt_tt, "pt_tt/F");
@@ -1341,7 +1353,7 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("m_vis", &m_vis, "m_vis/F");
   fChain->Branch("mt_tot", &mt_tot, "mt_tot/F");
   fChain->Branch("m_sv", &m_sv, "m_sv/F");
-  fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
+  //  fChain->Branch("pt_sv", &pt_sv, "pt_sv/F");
   //  fChain->Branch("eta_sv", &eta_sv, "eta_sv/F");
   //  fChain->Branch("phi_sv", &phi_sv, "phi_sv/F");
   //  fChain->Branch("met_sv", &met_sv, "met_sv/F");
@@ -1362,17 +1374,17 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("gen_nbjets_cut", &gen_nbjets_cut, "gen_nbjets_cut/I");
   fChain->Branch("gen_nbjets", &gen_nbjets, "gen_nbjets/I");
   fChain->Branch("jpt_1", &jpt_1, "jpt_1/F");
-  fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");
+  //  fChain->Branch("jeta_1", &jeta_1, "jeta_1/F");
   //  fChain->Branch("jphi_1", &jphi_1, "jphi_1/F");
   fChain->Branch("jpt_2", &jpt_2, "jpt_2/F");
-  fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
+  //  fChain->Branch("jeta_2", &jeta_2, "jeta_2/F");
   //  fChain->Branch("jphi_2", &jphi_2, "jphi_2/F");
   fChain->Branch("mjj", &mjj, "mjj/F");
   fChain->Branch("jdeta", &jdeta, "jdeta/F");
-  fChain->Branch("dijetpt", &dijetpt, "dijetpt/F");
-  fChain->Branch("dijeteta", &dijeteta, "dijeteta/F");
-  fChain->Branch("dijetphi", &dijetphi, "dijetphi/F");
-  fChain->Branch("jdphi", &jdphi, "jdphi/F");
+  //  fChain->Branch("dijetpt", &dijetpt, "dijetpt/F");
+  //  fChain->Branch("dijeteta", &dijeteta, "dijeteta/F");
+  //  fChain->Branch("dijetphi", &dijetphi, "dijetphi/F");
+  //  fChain->Branch("jdphi", &jdphi, "jdphi/F");
 
   //BJets 
   fChain->Branch("bpt_1", &bpt_1, "bpt_1/F");
@@ -1385,8 +1397,8 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("bcsv_1", &bcsv_1, "bcsv_1/F");
   //  fChain->Branch("bphi_2", &bphi_2, "bphi_2/F");
   fChain->Branch("bcsv_2", &bcsv_2, "bcsv_2/F");
-  fChain->Branch("mbb",&mbb,"mbb/F");
-  fChain->Branch("dRbb",&dRbb,"dRbb/F");
+  //  fChain->Branch("mbb",&mbb,"mbb/F");
+  //  fChain->Branch("dRbb",&dRbb,"dRbb/F");
   
   if ((ch == "mt")||(ch == "et")) {
     fChain->Branch("njetingap", &njetingap, "njetingap/I");

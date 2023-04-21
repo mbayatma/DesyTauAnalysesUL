@@ -7,3 +7,235 @@ In order to install framework with required CMSSW dependencies:
 wget https://raw.githubusercontent.com/DesyTau/DesyTauAnalysesUL/bbHTT/BBHTT/setup.sh
 source setup.sh
 ```
+
+## Running synchtuples
+
+Before running synch tuples update the code from git repository 
+and replace the folder with correction workspaces (!) 
+```
+cd $CMSSW_BASE/src/DesyTauAnalyses
+git pull
+```
+
+Recompile the code.
+```
+scramv1 b -j 8
+```
+
+IMPORTANT! Update the folder with correction/uncertainty workspaces
+```
+rm -rf $CMSSW_BASE/src/DesyTauAnalyses/Common/data
+cp -r /nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/DesyTauAnalyses/Common/data $CMSSW_BASE/src/DesyTauAnalyses/Common/
+```
+
+Set up working directory preferably outside your CMSSW project area
+```
+mkdir /nfs/dust/cms/user/$username/$working_dir
+cd /nfs/dust/cms/user/$username/$working_dir
+cp $CMSSW_BASE/src/DesyTauAnalyses/BBHTT/test/* ./
+```
+
+Set up configuration files to run synchtuple for a given era
+```
+./gridcontrol_setup_Run2.sh $era $channel
+```
+where $era={16_pre,16_post,17,18} and $channel={em,tt}. 
+
+Don't forget to edit gc_synch.conf file, in particular these parameters 
+need to be adapted accordingly
+```
+[storage]
+; please modify according to your working directory ->
+se path = /nfs/dust/cms/user/rasp/Run/emu_sysJES
+```
+```
+[CMSSW]
+epilog executable = run_synchntuples.sh
+subst files       = run_synchntuples.sh
+input files       = analysisMacroSynch*em_*.conf
+; please modify acoording to your CMSSW project area ->
+project area      = /nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26
+```
+
+Run synchntuple production for each era using grid-control tool. 
+It is suggested to run grid-control in screen session.
+```
+screen
+cd $CMSSW_BASE/src
+cmsenv
+cd /nfs/dust/cms/user/$username/$working_dir/$era
+$grid_control_folder/go.py gc_synch.conf -iGc
+```
+
+Once all jobs have finished, merge RooT files for each processed sample
+```
+cd /nfs/dust/cms/user/$username/$working_dir/$era
+./add_samples.sh
+```
+
+For the current synchtuple production campaign we only reproduce MC samples with
+extended model of systematic uncertainties and updated btag reshaping scale factors
+and uncertainties. There is no need to reproduce synchtuples 
+for data. Moreover, recent glitches of dCache system has caused loss of data.
+The big data tuples (MuonEG and Tau) have been affected. Thus at the moment 
+it makes no sense to run synchtuple production for data.   
+
+Already existing synchtuples for data should be copied to corresponding folders:
+For tt channel:
+```
+cp /nfs/dust/cms/user/rasp/Run/tautau_sys_UL/$era/Tau*root /nfs/dust/cms/user/$username/$working_dir/$era
+```
+For em channel:
+```
+cp /nfs/dust/cms/user/rasp/Run/emu_sys_UL/$era/MuonEG*root /nfs/dust/cms/user/$username/$working_dir/$era
+```
+
+### Systematic trees in em channel.
+
+2016:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2016_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_e_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+```
+
+2017:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2017_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_e_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+```
+
+2018:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2018_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_e_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+```
+
+### Systematic trees in tt channel
+
+2016:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2016_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2016_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong1pizero_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong1pizero_13TeV{Up,Down}
+```
+
+2017:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2017_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2017_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong1pizero_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong1pizero_13TeV{Up,Down}
+```
+
+2018:
+```
+TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down}
+TauCheck_CMS_scale_j_Absolute_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_HF_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_EC2_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_RelativeSample_2018_13TeV{Up,Down}
+TauCheck_CMS_scale_j_BBEC1_2018_13TeV{Up,Down}
+TauCheck_CMS_res_j_13TeV{Up,Down}
+TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_1prong1pizero_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong_13TeV{Up,Down}
+TauCheck_CMS_scale_t_3prong1pizero_13TeV{Up,Down}
+```
+
+The source codes for synchtuple production are
+
+* [SynchNTupleProducer_em_UL.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/SynchNTupleProducer_em_UL.cpp)
+* [SynchNTupleProducer_tt_UL.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/SynchNTupleProducer_tt_UL.cpp)
+
+
+## DNN tuple production
+
+Production of DNN tuples follows the BDT training in tt and em channels. The code requires as inputs synchtuples and BDT prediction tuples with friend trees containing information on predicted classes and BDT scores for each class as well as BDT score for the predicted class (highest BDT score). The source code for this step of the analysis is 
+
+* [create_dnn_ntuples.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/create_dnn_ntuples.cpp)
+
+The code requires three input parameters
+```
+> create_dnn $sample $era $channel
+```     
+where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}.
+The names of the samples to be processed are listed in bash scripts, submitting jobs to condor system: 
+* [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
+* [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
+
+The code loads configuration files depending on the channel specified: 
+* []()
+* []()
+
+
+
+### Datacard producer

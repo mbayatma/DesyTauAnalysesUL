@@ -286,6 +286,10 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
   const bool isTTbar = (infiles.find("TT_INCL") != string::npos) || (infiles.find("TTTo") != string::npos);
+  const bool isYBYT  = infiles.find("_ybyt_M125") != string::npos;
+  const bool isYB2   = infiles.find("_yb2_M125") != string::npos;
+  const bool nonStandardQCDscale = isYBYT || isYB2;
+
 
   const bool isMcCorrectPuppi = 
     SampleName.Contains("TTTo2L2Nu") ||
@@ -597,6 +601,14 @@ int main(int argc, char * argv[]){
   TH1D *inputEventsH = new TH1D("inputEventsH", "", 1, -0.5, 0.5);
   TH1D *nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5, 0.5);
   
+  TH1D *nWeightedEventsScaleCentralH = new TH1D("nWeightedEventsScaleCentral", "", 1, -0.5, 0.5);
+  TH1D *nWeightedEventsScaleUpH      = new TH1D("nWeightedEventsScaleUp", "", 1, -0.5, 0.5);
+  TH1D *nWeightedEventsScaleDownH    = new TH1D("nWeightedEventsScaleDown", "", 1, -0.5, 0.5);
+
+  TH1D *SumScaleCentralH = new TH1D("SumScaleCentral", "", 1, -0.5, 0.5);
+  TH1D *SumScaleUpH      = new TH1D("SumScaleUp", "", 1, -0.5, 0.5);
+  TH1D *SumScaleDownH    = new TH1D("SumScaleDown", "", 1, -0.5, 0.5);
+
   TTree *tree = new TTree("TauCheck", "TauCheck");
   //  TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
   SynchTree *otree = new SynchTree(tree,ch,isGGH);
@@ -801,6 +813,26 @@ int main(int argc, char * argv[]){
       analysisTree.GetEntry(iEntry);
       nEvents++;
 
+      float qcdScaleUp = analysisTree.weightScale4;
+      if (nonStandardQCDscale)
+	qcdScaleUp = analysisTree.weightScale2;
+
+      float qcdScaleDown = 1.0/qcdScaleUp;
+      if (qcdScaleDown>5.) qcdScaleDown = 5.0;
+      if (qcdScaleDown<0.01) qcdScaleDown = 0.01;
+
+      double wghtUp      = qcdScaleUp * analysisTree.genweight;
+      double wghtCentral = analysisTree.genweight;
+      double wghtDown    = qcdScaleDown * analysisTree.genweight;
+
+      nWeightedEventsScaleCentralH->Fill(0.,wghtCentral);
+      nWeightedEventsScaleUpH->Fill(0.,wghtUp);
+      nWeightedEventsScaleDownH->Fill(0.,wghtDown);
+
+      SumScaleCentralH->Fill(0.,1.);
+      SumScaleUpH->Fill(0.,qcdScaleUp);
+      SumScaleDownH->Fill(0.,qcdScaleDown);
+
       // counting b-jets
       int nbjets = 0;
       if (!isData) {
@@ -968,14 +1000,7 @@ int main(int argc, char * argv[]){
       otree->extraelec_veto = extra_electron_veto(electronIndex, chE, &cfg, &analysisTree, era, isEmbedded);
       otree->extramuon_veto = extra_muon_veto(muonIndex, chMu, &cfg, &analysisTree, isData);
 
-      bool isSRevent = otree->iso_1<0.4&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired;
-
-      // when producing synch tuples for final datacards reduces the size of tuples.
-      //      if (ApplySystShift&&!isSRevent) continue;
-      if (!isSRevent) continue;
-
       //      CheckEMu(&analysisTree,otree);
-
       //      std::cout << "after trigger" << std::endl;
 
       jets::CreateUncorrectedJets(&analysisTree);
@@ -990,14 +1015,108 @@ int main(int argc, char * argv[]){
 	jets::associateRecoAndGenJets(&analysisTree, resolution);
 	jets::smear_jets(&analysisTree,resolution,resolution_sf,true);
       }
-      //      std::cout << std::endl;
-
-      //      std::cout << "smeared jets" << std::endl;
 
       //counting jet
       jets::counting_jets(&analysisTree, otree, &cfg, &inputs_btag_scaling_medium);
-  
+
       //      std::cout << "counted jets" << std::endl;
+  
+      ////////////////////////////////////////////////////////////
+      ////////////////////////  M E T ////////////////////////////
+      ////////////////////////////////////////////////////////////
+      TLorentzVector genV( 0., 0., 0., 0.);
+      TLorentzVector genL( 0., 0., 0., 0.);
+
+      // !!!!!!!!!!! include electron and jet !!!!!!!!!!!!!
+      // !!!!!!!!!!! smearing corrections !!!!!!!!!!!!!!!!!
+      GetPuppiMET(&analysisTree, otree);
+      GetPFMET(&analysisTree, otree);
+
+      otree->met_uncorr = otree->puppimet;
+      otree->metphi_uncorr = otree->puppimetphi;
+      otree->njetshad = otree->njets;
+      if (isWJets) otree->njetshad += 1;
+
+      if(ApplyRecoilCorrections){        
+      	genV = genTools::genV(analysisTree);
+      	genL = genTools::genL(analysisTree);
+
+        genTools::KITRecoilCorrections( recoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
+          otree->puppimet, otree->puppimetphi,
+          genV.Px(), genV.Py(),
+          genL.Px(), genL.Py(),
+          otree->njetshad,
+          otree->met_rcmr, otree->metphi_rcmr
+        );
+        
+        // overwriting with recoil-corrected values 
+        otree->puppimet = otree->met_rcmr;
+        otree->puppimetphi = otree->metphi_rcmr;   
+	
+        genTools::KITRecoilCorrections( PFMetRecoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
+          otree->met, otree->metphi,
+          genV.Px(), genV.Py(),
+          genL.Px(), genL.Py(),
+          otree->njetshad,
+          otree->met_rcmr, otree->metphi_rcmr
+        );
+	otree->met = otree->met_rcmr;
+	otree->metphi = otree->metphi_rcmr;
+      }
+      
+      ////////////////////////////////////////////////////////////
+      // Filling variables (with corrected MET and electron pt)
+      ////////////////////////////////////////////////////////////
+
+      TLorentzVector muonLV; muonLV.SetPtEtaPhiM(otree->pt_2,
+						 otree->eta_2,
+						 otree->phi_2,
+						 muonMass);
+
+      TLorentzVector electronLV; electronLV.SetPtEtaPhiM(otree->pt_1,
+							 otree->eta_1,
+							 otree->phi_1,
+							 electronMass);
+
+      TLorentzVector metLV; metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi),
+					  otree->met*TMath::Sin(otree->metphi),
+					  0.0,
+					  otree->met);
+
+      TLorentzVector puppimetLV; puppimetLV.SetXYZT(otree->puppimet*TMath::Cos(otree->puppimetphi),
+						    otree->puppimet*TMath::Sin(otree->puppimetphi),
+						    0.0,
+						    otree->puppimet);
+
+      TLorentzVector dileptonLV = muonLV + electronLV;
+      otree->m_vis = dileptonLV.M();
+    
+      // opposite charge
+      otree->os = (otree->q_1 * otree->q_2) < 0.;
+    
+      otree->mt_1 = mT(electronLV, metLV);
+      otree->mt_2 = mT(muonLV, metLV);
+      otree->puppimt_1 = mT(electronLV, puppimetLV);
+      otree->puppimt_2 = mT(muonLV, puppimetLV);
+    
+      // bisector of lepton and tau transverse momenta
+    
+      otree->pzetavis  = calc::pzetavis(electronLV,muonLV);
+
+      TLorentzVector metxLV = metLV;
+      if (usePuppiMET) 
+	metxLV = puppimetLV;
+
+      otree->pt_tt = (dileptonLV+metxLV).Pt();   
+      otree->mt_tot = calc::mTtot(electronLV,muonLV,metxLV);
+      otree->pzetamiss = calc::pzetamiss(electronLV,muonLV,metxLV);
+      otree->pzeta = calc::pzeta(electronLV,muonLV,metxLV);
+
+
+      // Preselection cuts ->
+      bool isSRevent = otree->iso_1<0.4&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired&&((otree->nbtag>0||otree->nbtag<3)||(otree->nbtag_raw>0||otree->nbtag_raw<3));
+
+      if (!isSRevent) continue;
 
       ////////////////////////////////////////////////////////////
       // ID/Iso and Trigger Corrections
@@ -1101,6 +1220,12 @@ int main(int argc, char * argv[]){
       }
       /*
       */
+      // b-tagging weight 
+      //      std::cout << "BTagSF = " << otree->btagSF << std::endl;
+      if (!isData) {
+	otree->weight *= otree->btagSF;
+	otree->weightEMu *= otree->btagSF;
+      }
 
       // embedded weight
       otree->embweight = 1.0;
@@ -1151,21 +1276,25 @@ int main(int argc, char * argv[]){
 	otree->weightEMu *= otree->mcweight;	
       }
       
-      //Theory uncertainties for CP analysis      
-      otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
-      otree->weight_CMS_scale_gg_13TeVDown = analysisTree.weightScale8;
+      //Theory uncertainties 
+      otree->weight_CMS_scale_gg_13TeVUp   = qcdScaleUp;
+      otree->weight_CMS_scale_gg_13TeVDown = qcdScaleDown;
 
-      otree->weight_CMS_PS_ISR_ggH_13TeVUp   = 1.;
-      otree->weight_CMS_PS_ISR_ggH_13TeVDown = 1.;
-      otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
-      otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
+      otree->weight_CMS_QCDScale[0] = analysisTree.weightScale0;
+      otree->weight_CMS_QCDScale[1] = analysisTree.weightScale1;
+      otree->weight_CMS_QCDScale[2] = analysisTree.weightScale2;
+      otree->weight_CMS_QCDScale[3] = analysisTree.weightScale3;
+      otree->weight_CMS_QCDScale[4] = analysisTree.weightScale4;
+      otree->weight_CMS_QCDScale[5] = analysisTree.weightScale5;
+      otree->weight_CMS_QCDScale[6] = analysisTree.weightScale6;
+      otree->weight_CMS_QCDScale[7] = analysisTree.weightScale7;
+      otree->weight_CMS_QCDScale[8] = analysisTree.weightScale8;
 
-      if(isHiggs || isMSSMsignal){
-	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
-	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
-	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
-	otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[9];
-      }
+      otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[4]/analysisTree.gen_pythiaweights[0];
+      otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[5]/analysisTree.gen_pythiaweights[0];
+
+      otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[26]/analysisTree.gen_pythiaweights[0];
+      otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[27]/analysisTree.gen_pythiaweights[0];
 
       //Prefiring weights for CP analysis
       otree->prefiringweight     = analysisTree.prefiringweight;
@@ -1274,12 +1403,10 @@ int main(int argc, char * argv[]){
       // Z pt weight
       ////////////////////////////////////////////////////////////
       
-      TLorentzVector genV( 0., 0., 0., 0.);
-      TLorentzVector genL( 0., 0., 0., 0.);
 
       otree->zptweight = 1.;
       if (!isData && isDY && !isDYamcatnlo){
-        genV = genTools::genV(analysisTree); // gen Z boson ?
+        genV = genTools::genV(analysisTree); // gen Z boson 
       	float bosonMass = genV.M();
       	float bosonPt = genV.Pt();
 
@@ -1382,94 +1509,6 @@ int main(int argc, char * argv[]){
       //      }
 
 
-      ////////////////////////////////////////////////////////////
-      ////////////////////////  M E T ////////////////////////////
-      ////////////////////////////////////////////////////////////
-
-      // !!!!!!!!!!! include electron and jet !!!!!!!!!!!!!
-      // !!!!!!!!!!! smearing corrections !!!!!!!!!!!!!!!!!
-      GetPuppiMET(&analysisTree, otree);
-      GetPFMET(&analysisTree, otree);
-
-      otree->met_uncorr = otree->puppimet;
-      otree->metphi_uncorr = otree->puppimetphi;
-      otree->njetshad = otree->njets;
-      if (isWJets) otree->njetshad += 1;
-
-      if(ApplyRecoilCorrections){        
-      	genV = genTools::genV(analysisTree);
-      	genL = genTools::genL(analysisTree);
-
-        genTools::KITRecoilCorrections( recoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
-          otree->puppimet, otree->puppimetphi,
-          genV.Px(), genV.Py(),
-          genL.Px(), genL.Py(),
-          otree->njetshad,
-          otree->met_rcmr, otree->metphi_rcmr
-        );
-        
-        // overwriting with recoil-corrected values 
-        otree->puppimet = otree->met_rcmr;
-        otree->puppimetphi = otree->metphi_rcmr;   
-	
-        genTools::KITRecoilCorrections( PFMetRecoilCorrector, ApplyRecoilCorrections, // pass the value != 0 to apply corrections
-          otree->met, otree->metphi,
-          genV.Px(), genV.Py(),
-          genL.Px(), genL.Py(),
-          otree->njetshad,
-          otree->met_rcmr, otree->metphi_rcmr
-        );
-	otree->met = otree->met_rcmr;
-	otree->metphi = otree->metphi_rcmr;
-      }
-      
-      ////////////////////////////////////////////////////////////
-      // Filling variables (with corrected MET and electron pt)
-      ////////////////////////////////////////////////////////////
-
-      TLorentzVector muonLV; muonLV.SetPtEtaPhiM(otree->pt_2,
-						 otree->eta_2,
-						 otree->phi_2,
-						 muonMass);
-
-      TLorentzVector electronLV; electronLV.SetPtEtaPhiM(otree->pt_1,
-							 otree->eta_1,
-							 otree->phi_1,
-							 electronMass);
-
-      TLorentzVector metLV; metLV.SetXYZT(otree->met*TMath::Cos(otree->metphi),
-					  otree->met*TMath::Sin(otree->metphi),
-					  0.0,
-					  otree->met);
-
-      TLorentzVector puppimetLV; puppimetLV.SetXYZT(otree->puppimet*TMath::Cos(otree->puppimetphi),
-						    otree->puppimet*TMath::Sin(otree->puppimetphi),
-						    0.0,
-						    otree->puppimet);
-
-      TLorentzVector dileptonLV = muonLV + electronLV;
-      otree->m_vis = dileptonLV.M();
-    
-      // opposite charge
-      otree->os = (otree->q_1 * otree->q_2) < 0.;
-    
-      otree->mt_1 = mT(electronLV, metLV);
-      otree->mt_2 = mT(muonLV, metLV);
-      otree->puppimt_1 = mT(electronLV, puppimetLV);
-      otree->puppimt_2 = mT(muonLV, puppimetLV);
-    
-      // bisector of lepton and tau transverse momenta
-    
-      otree->pzetavis  = calc::pzetavis(electronLV,muonLV);
-
-      TLorentzVector metxLV = metLV;
-      if (usePuppiMET) 
-	metxLV = puppimetLV;
-
-      otree->pt_tt = (dileptonLV+metxLV).Pt();   
-      otree->mt_tot = calc::mTtot(electronLV,muonLV,metxLV);
-      otree->pzetamiss = calc::pzetamiss(electronLV,muonLV,metxLV);
-      otree->pzeta = calc::pzeta(electronLV,muonLV,metxLV);
 
       //boolean used to compute SVFit variables only on SR events, it is set to true when running Synchronization to run SVFit on all events
 
@@ -1540,11 +1579,11 @@ int main(int argc, char * argv[]){
 	}
 
 	//	muonScaleSys->Eval(utils::EMU);
-	electronScaleSys->SetElectronIndex(electronIndex);
-	electronScaleSys->SetIsEmbedded(isEmbedded);
-	electronScaleSys->SetAC1B(&analysisTree);
-	electronScaleSys->SetConfig(&cfg);
-	electronScaleSys->Eval(utils::EMU);
+		electronScaleSys->SetElectronIndex(electronIndex);
+		electronScaleSys->SetIsEmbedded(isEmbedded);
+		electronScaleSys->SetAC1B(&analysisTree);
+		electronScaleSys->SetConfig(&cfg);
+		electronScaleSys->Eval(utils::EMU);
 	//	std::cout << std::endl;
       }
 
@@ -1571,10 +1610,10 @@ int main(int argc, char * argv[]){
 
   // delete systematics objects
 
-  if (muonScaleSys != 0) {
-    muonScaleSys->Write("",TObject::kOverwrite);
-    delete muonScaleSys;
-  }
+  //  if (muonScaleSys != 0) {
+  //    muonScaleSys->Write("",TObject::kOverwrite);
+  //    delete muonScaleSys;
+  //  }
   
   if (electronScaleSys != 0) {
     electronScaleSys->Write("",TObject::kOverwrite);
@@ -1966,6 +2005,34 @@ void FillElMu(const AC1B *analysisTree, SynchTree *otree, int electronIndex, flo
     otree->q_2 = 1;
 
   otree->dr_tt = deltaR(otree->eta_1,otree->phi_1,otree->eta_2,otree->phi_2);
+
+  if (otree->gen_match_1==0||otree->gen_match_1>5) {
+    float dRMin = 0.4;
+    otree->gen_match_1 = 6;
+    for (unsigned int jet =0; jet<analysisTree->pfjet_count; ++jet) {
+      float dR = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_1, otree->phi_1);
+      if (dR<dRMin) {
+	dRMin = dR;
+	int flavor = analysisTree->pfjet_flavour[jet];
+	if (flavor==4) otree->gen_match_1 = 7;
+	if (flavor==5) otree->gen_match_1 = 8;
+      }
+    }
+  }
+
+  if (otree->gen_match_2==0||otree->gen_match_2>5) {
+    float dRMin = 0.4;
+    otree->gen_match_2 = 6;
+    for (unsigned int jet =0; jet<analysisTree->pfjet_count; ++jet) {
+      float dR = deltaR(analysisTree->pfjet_eta[jet], analysisTree->pfjet_phi[jet], otree->eta_2, otree->phi_2);
+      if (dR<dRMin) {
+	dRMin = dR;
+	int flavor = analysisTree->pfjet_flavour[jet];
+	if (flavor==4) otree->gen_match_2 = 7;
+	if (flavor==5) otree->gen_match_2 = 8;
+      }
+    }
+  }
 
 }
 

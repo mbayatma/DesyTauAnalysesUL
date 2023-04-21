@@ -16,6 +16,44 @@
 
 // Updated tau ID SF -> 
 
+double TauSFv1_UL(TString era,
+		  int tauDM,
+		  int genMatch,
+		  float tauPT) {
+
+  float sf = 1.0;
+  if (genMatch!=5) return sf;
+  float minPT = TMath::Min(tauPT,float(140.)); 
+  if (era=="2016_pre") 
+    sf = 
+      (tauDM==0)*((0.95606+0.00165764*minPT))+
+      (tauDM>=1&&tauDM<=2)*((0.947464+0.000494337*minPT))+
+      (tauDM==10)*((0.857375+0.00132127*minPT))+
+      (tauDM==11)*((0.704867+0.00198543*minPT));
+  if (era=="2016_post") 
+    sf = 
+      (tauDM==0)*((0.924781+0.000788052*minPT))+
+      (tauDM>=1&&tauDM<=2)*((0.858842+0.00248185*minPT))+
+      (tauDM==10)*((0.823274+0.00132487*minPT))+
+      (tauDM==11)*((0.681992+0.000256323*minPT));
+  if (era=="2017")
+    sf =
+      (tauDM==0)*((0.940199+0.000243024*minPT))+
+      (tauDM>=1&&tauDM<=2)*((0.864785+0.00109546*minPT))+
+      (tauDM==10)*((0.862916+0.000676206*minPT))+
+      (tauDM==11)*((0.707493+0.00173345*minPT));
+  if (era=="2018")
+    sf = 
+      (tauDM==0)*((0.866109+0.00187025*minPT))+
+      (tauDM>=1&&tauDM<=2)*((0.845787+0.00123494*minPT))+
+      (tauDM==10)*((0.808835+0.00134081*minPT))+
+      (tauDM==11)*((0.636465+0.002494*minPT));
+
+  return sf;
+
+
+}
+
 double TauSF_UL(TString era, 
 		int tauDM,
 		int genMatch,
@@ -473,6 +511,11 @@ int main(int argc, char * argv[]) {
 	float byVVVLooseDeepTau2017v2p1VSjet_1;
 	float byVVVLooseDeepTau2017v2p1VSjet_2;
 	float ff_nom;
+	// weights ->
+	float weight_CMS_QCDScale4;
+	float weight_CMS_QCDScale2;
+	float weight_CMS_scale_gg_13TeVUp;
+	float weight_CMS_scale_gg_13TeVDown;
 
 	inTree->SetBranchAddress("gen_noutgoing",&gen_noutgoing);
 	inTree->SetBranchAddress("iso_1",&iso_1);
@@ -500,6 +543,11 @@ int main(int argc, char * argv[]) {
 	inTree->SetBranchAddress("nbtag",&nbtag);
 	inTree->SetBranchAddress("trg_doubletau",&trg_doubletau);
 	inTree->SetBranchAddress("weight",&weight);
+	inTree->SetBranchAddress("weight_CMS_QCDScale4",&weight_CMS_QCDScale4);
+	inTree->SetBranchAddress("weight_CMS_QCDScale2",&weight_CMS_QCDScale2);
+	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVUp",&weight_CMS_scale_gg_13TeVUp);
+	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVDown",&weight_CMS_scale_gg_13TeVDown);
+
 	// em specific variables
 	if (channel=="em") {
 	  inTree->SetBranchAddress("trg_muhigh_elow",&trg_muhigh_elow);
@@ -613,6 +661,13 @@ int main(int argc, char * argv[]) {
 	  inTree->GetEntry(i);
 	  trg_muonelectron = (trg_muhigh_elow && pt_2 > 24) || (trg_ehigh_mulow && pt_1 > 24);
 	  // Add here preselection if necessary
+	  weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale4));
+	  weight_CMS_scale_gg_13TeVDown = 1.0/weight_CMS_scale_gg_13TeVUp;
+	  // use different QCD scale
+	  if (process.Contains("_YB2")||process.Contains("_YBY2")) {
+	    weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale2));
+	    weight_CMS_scale_gg_13TeVDown = 1.0/weight_CMS_scale_gg_13TeVUp;
+	  }
 	  if(applyPreselection){
 	    if (channel=="em") {
 	      if( iso_1 > 0.5 )                continue;
@@ -701,7 +756,7 @@ int main(int argc, char * argv[]) {
 	    }
 	    //	    std::cout << std::endl;
 	  }
-	  
+
 	  // Replace jet variables to have an effectie cut of jetpt > 30 GeV
 	  if(njets < 2){
 	    jdeta   = -10;
@@ -754,7 +809,6 @@ int main(int argc, char * argv[]) {
 	  else if (channel=="tt") {
 	    xsec_lumi_weight = xsec_lumi_weight * weight;
 	  
-	    // ad-hoc corrections to tt sample -> should be removed
 	    if (recomputeTauID) {
 	      float tauIdWeight = tauIDWeight(era,
 					      tau_decay_mode_1,
@@ -767,7 +821,7 @@ int main(int argc, char * argv[]) {
 					      trigweight);
 	      xsec_lumi_weight *= tauIdWeight;
 	    }
-	    else {
+	    else { // ad-hoc corrections to DY
 	      if (channel=="tt"&&subsample.Contains("DY") && subsample.Contains("amcatnlo")) {
 		if (nbtag>=1) xsec_lumi_weight *= scaleDY_btag;
 		else xsec_lumi_weight *= scaleDY;

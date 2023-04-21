@@ -2,6 +2,7 @@
 #define Cards_ccx
 
 #include "DesyTauAnalyses/BBHTT/interface/Cards.h"
+#include "DesyTauAnalyses/BBHTT/interface/HtoH.h"
 
 Cards::Cards(TString Sample,
 	     TString Era,
@@ -28,6 +29,8 @@ Cards::Cards(TString Sample,
   variable = Variable;
   runWithSystematics = RunWithSystematics;
   runOnEmbedded = RunOnEmbedded;
+  rebin = false;
+  useLooseShape = false;
 
   _usefriend=true;
   if(PredDir==""||PredDir=="None"||PredDir=="NONE"||PredDir=="none") _usefriend=false;
@@ -156,13 +159,33 @@ Cards::Cards(TString Sample,
   }
   outputFile->mkdir(category);
 
-  commonCuts += categoryCuts[category];
-
+  // additional cuts for em channel
   if (channel=="em") {
-    commonCuts += "&&pzeta<20.0&&nbtag<3";
-    if (category=="em_cat3_NbtagGe1")
-      commonCuts += "&&puppimet>20.&&mt_tot>40.0";
+    commonCuts += "&&m_vis>10.&&m_vis<100.&&mt_tot<200.";
+    //    if (category=="em_cat3_NbtagGe1"||category=="em_cat6_NbtagGe1")
+    //      commonCuts += "&&puppimet>20.&&mt_tot>40.0";
   }
+
+  // joining DY and Higgs bkg categories in tt channel
+  if (category=="tt_cat5_NbtagGe1") {
+    commonCuts += "&&(pred_class==1||pred_class==3)&&nbtag>0";
+    variable="(pred_class_1_proba+pred_class_3_proba)";
+  }
+  else if (category=="tt_cat6_NbtagGe1") {
+    commonCuts += "&&(pred_class==1||pred_class==2)&&nbtag>0";
+    variable="(pred_class_1_proba+pred_class_2_proba)";
+  }
+  else if (category=="em_cat5_NbtagGe1") {
+    commonCuts += "&&(pred_class==0||pred_class==4)&&nbtag>0";
+    variable="(pred_class_0_proba+pred_class_4_proba)";
+  }
+  else if (category=="em_cat6_NbtagGe1") {
+    commonCuts += "&&(pred_class==1||pred_class==3)&&nbtag>0";
+    variable="(pred_class_1_proba+pred_class_3_proba)";
+  }
+  else
+    commonCuts += categoryCuts[category];
+
 
   regionCut.clear();
   if(channel=="tt"){
@@ -172,6 +195,7 @@ Cards::Cards(TString Sample,
   }else{
     regionCut.push_back(commonCuts+oppositeSignRegion); // opposite sign
     regionCut.push_back(commonCuts+sameSignRegion); // same sign
+    regionCut.push_back(commonCuts+sameSignAntiIsoRegion); // same sign anti-iso 
   }
 
   regionWeight.clear();
@@ -199,6 +223,7 @@ Cards::Cards(TString Sample,
 
   regionWeight.push_back(globalWeight+QCDFFWeight);
   if(channel=="tt") regionWeight.push_back(globalWeight);
+  if(channel=="em") regionWeight.push_back(globalWeight+QCDFFWeight);
 
   if (channel=="tt") {
     nameSampleMap["Data"] = Tau; nameHistoMap["Data"] = "data_obs";
@@ -417,6 +442,7 @@ std::vector<TString> Cards::SampleSpecificCutEM(TString name, TString sampleName
   std::vector<TString> Cuts; Cuts.clear();
   Cuts.push_back(mcOS+ngenPartonsCut);
   Cuts.push_back(mcSS+ngenPartonsCut);
+  Cuts.push_back(mcSS+ngenPartonsCut);
 
   return Cuts;
 
@@ -494,13 +520,24 @@ TH1D * Cards::ProcessSample(TString name,
   if(channel=="em") suffix="_OS";
   if (region==0) std::cout << "  signal region / opposite sign" << std::endl; 
   else if (region==1) { 
-    std::cout << "  fake factor application region / same sign region" << std::endl; 
-    suffix = "_SB";
-    if(channel=="em") suffix="_SS";
+    if (channel=="tt") { 
+      std::cout << "  fake factor application region" << std::endl;       
+      suffix = "_SB";
+    }
+    if(channel=="em") { 
+      std::cout << "  same sign region" << std::endl;
+      suffix="_SS";
+    }
   }
-  else if (region==2&&channel=="tt") { 
-    std::cout << "  single fake region" << std::endl;
-    suffix = "_SF";
+  else if (region==2) {
+    if (channel=="tt") { 
+      std::cout << "  single fake region" << std::endl;
+      suffix = "_SF";
+    }
+    else {
+      std::cout << "  same sign anti-iso region" << std::endl;
+      suffix = "_SS_antiiso";
+    }
   }
   else { 
     std::cout << "  unknown region is defined : " << region << std::endl; 
@@ -902,9 +939,7 @@ int Cards::CreateWeightSystematicsMap() {
     }
   }
 
-  if (sampleToProcess=="HTT"||
-      sampleToProcess=="HWW"||
-      sampleToProcess=="bbHTT"||
+  if (sampleToProcess=="bbHTT"||
       sampleToProcess=="bbHTT_nobb"||
       sampleToProcess=="bbHWW"||
       sampleToProcess=="bbHWW_nobb") {
@@ -913,6 +948,8 @@ int Cards::CreateWeightSystematicsMap() {
       TString weightName = mapIter.second;
       weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
       weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
+      //      weightSystematicsMap[sysName+"Down"] = "TMath::Max(0.1,2.0-"+weightName+")*";
+      //      weightSystematicsMap[sysName+"Down"] = "TMath::Max(0.1,1.0/"+weightName+")*";
       numberOfWeightSystematics += 2;
     }
     return numberOfWeightSystematics;
@@ -961,24 +998,84 @@ bool Cards::RunData() {
 
   TH1D * histData = ProcessSample("Data","",0,false);
   nameTH1DMap["data_obs"] = histData;
+  TH1D * QCD_orig;
   
-  TH1D * QCD = ProcessSample("Data","",1,false);
-  TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
-  TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
-  for (auto name : samplesContainer) {
-    //    cout << ">>> processing sample " << name << endl;
-    TH1D * hist = ProcessSample(name,"",1,false);
-    QCD->Add(QCD,hist,1.,-1.);
-    QCD_Up->Add(QCD_Up,hist,1.,-0.8);
-    QCD_Down->Add(QCD_Down,hist,1.,-1.2);
-    delete hist;
+  if (channel=="em") {
+    TH1D * QCD = ProcessSample("Data","",1,false);
+    TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
+    TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
+    for (auto name : samplesContainer) {
+
+      TH1D * hist = ProcessSample(name,"",1,false);
+
+      QCD->Add(QCD,hist,1.,-1.);	
+      QCD_Up->Add(QCD_Up,hist,1.,-0.9);
+      QCD_Down->Add(QCD_Down,hist,1.,-1.1);
+
+      delete hist;
+    }
+    QCD_orig = (TH1D*)QCD->Clone("QCD_orig");
+    
+    if (useLooseShape) {
+      TH1D * QCDLoose = ProcessSample("Data","",2,false);
+      for (auto name : samplesContainer) {
+
+	TH1D * histLoose = ProcessSample(name,"",2,false);
+
+	QCDLoose->Add(QCDLoose,histLoose,1.,-1.);
+
+	delete histLoose;
+      }
+      TH1D * QCDLoose_Up = (TH1D*)QCDLoose->Clone("QCDsubtrLooseUp");
+      TH1D * QCDLoose_Down = (TH1D*)QCDLoose->Clone("QCDsubtrLooseDown");
+      zeroBins(QCD);
+      smooth(QCDLoose); zeroBins(QCDLoose); 
+      double normQCDLoose = QCD->GetSumOfWeights()/QCDLoose->GetSumOfWeights();
+      QCDLoose->Scale(normQCDLoose);
+      int nbins = QCDLoose->GetNbinsX();
+      for (int ib=1; ib<=nbins; ++ib) {
+	double up = QCDLoose->GetBinContent(ib) + QCD_Up->GetBinContent(ib) - QCD_orig->GetBinContent(ib);
+	double down = QCDLoose->GetBinContent(ib) + QCD_Down->GetBinContent(ib) - QCD_orig->GetBinContent(ib);
+	QCDLoose_Up->SetBinContent(ib,up);
+	QCDLoose_Down->SetBinContent(ib,down);
+	
+      }
+      nameTH1DMap["QCD"] = QCDLoose;
+      nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Up"] = QCDLoose_Up;
+      nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Down"] = QCDLoose_Down;
+    }
+    else {
+      smooth(QCD); zeroBins(QCD); 
+      int nbins = QCD->GetNbinsX();
+      for (int ib=1; ib<=nbins; ++ib) {
+	double up = QCD->GetBinContent(ib) + QCD_Up->GetBinContent(ib) - QCD_orig->GetBinContent(ib);
+	double down = QCD->GetBinContent(ib) + QCD_Down->GetBinContent(ib) - QCD_orig->GetBinContent(ib);
+	QCD_Up->SetBinContent(ib,up);
+	QCD_Down->SetBinContent(ib,down);
+      }
+      nameTH1DMap["QCD"] = QCD;
+      nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Up"] = QCD_Up;
+      nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Down"] = QCD_Down;
+    }
   }
-  
-  if(channel=="em"){
-    nameTH1DMap["QCD"] = QCD;
-    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Up"] = QCD_Up;
-    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Down"] = QCD_Down;
-  }else{
+  else {
+    TH1D * QCD = ProcessSample("Data","",1,false);
+    TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
+    TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
+    for (auto name : samplesContainer) {
+      //    cout << ">>> processing sample " << name << endl;
+      TH1D * hist = ProcessSample(name,"",1,false);
+
+      QCD->Add(QCD,hist,1.,-1.);	
+      QCD_Up->Add(QCD_Up,hist,1.,-0.9);
+      QCD_Down->Add(QCD_Down,hist,1.,-1.1);
+      
+      delete hist;
+    }
+
+    zeroBins(QCD);
+    zeroBins(QCD_Up);
+    zeroBins(QCD_Down);
     nameTH1DMap["jetFakes"] = QCD;
     nameTH1DMap["jetFakes_CMS_fakes_subtr_syst_tt_"+era+"Up"] = QCD_Up;
     nameTH1DMap["jetFakes_CMS_fakes_subtr_syst_tt_"+era+"Down"] = QCD_Down;
@@ -999,6 +1096,7 @@ bool Cards::RunData() {
 	delete hist;
       }
     }
+    zeroBins(histSingleFake);
     nameTH1DMap["wFakes"] = histSingleFake;
   }
 
@@ -1015,7 +1113,24 @@ bool Cards::RunData() {
       QCD_sys->Add(QCD_sys,hist,1.,-1.);
       delete hist;
     }
-    if(channel=="em") nameTH1DMap["QCD_"+sysName] = QCD_sys;
+    if(channel=="em") { 
+      int nbins = QCD_sys->GetNbinsX();
+      TH1D * QCD_ref = nameTH1DMap["QCD"];
+      for (int ib=1; ib<=nbins; ++ib) {
+	double ratio = 1;
+	double den = TMath::Abs(QCD_orig->GetBinContent(ib));
+	double num = TMath::Abs(QCD_sys->GetBinContent(ib));
+	double cen = QCD_ref->GetBinContent(ib);
+	if (den>0.01) {
+	  ratio = num/den;
+	  if (ratio<2.0&&ratio>0.5) {
+	    double content = cen*ratio;
+	    QCD_sys->SetBinContent(ib,content);
+	  }
+	}
+	nameTH1DMap["QCD_"+sysName] = QCD_sys;
+      }
+    }
     else nameTH1DMap["jetFakes_"+sysName] = QCD_sys;
   }
 
@@ -1028,11 +1143,13 @@ bool Cards::RunModel() {
   bool status = true;
   
   // central templates ---->
+  std::map<TString,double> normCentral;
   for (auto name : samplesContainer) {
     TH1D * hist = ProcessSample(name,"",0,false);
     TString sampleHistName = nameHistoMap[name];
     nameTH1DMap[sampleHistName] = hist;
     std::cout << "hist : " << sampleHistName << "   entries = " << hist->GetEntries() << "   sumOfW = " << hist->GetSumOfWeights() << std::endl;
+    normCentral[name] = hist->GetSumOfWeights();
   }
 
   if (!runWithSystematics) {
@@ -1062,8 +1179,17 @@ bool Cards::RunModel() {
       TString sysName = weightSys.first;
       TString sampleHistName = nameHistoMap[name] + "_" + sysName;
       TH1D * hist = ProcessSample(name,sysName,0,true);
-      nameTH1DMap[sampleHistName] = hist;
       std::cout << "hist : " << sampleHistName << "   entries = " << hist->GetEntries() << "   sumOfW = " << hist->GetSumOfWeights() << std::endl;
+      if (sysName.Contains("QCDscale")) {
+	double normWeightSys = hist->GetSumOfWeights();
+	if (normWeightSys>0) {
+	  double SF_QCDscale = normCentral[name]/normWeightSys;
+	  std::cout << "Rescaling " << sysName << " by " << SF_QCDscale << std::endl;
+	  hist->Scale(SF_QCDscale);
+	}
+      }
+
+      nameTH1DMap[sampleHistName] = hist;
     }
     if (runWithShapeSystematics) {
       for (auto shapeSys : shapeSystematicsMap) {
@@ -1124,9 +1250,9 @@ void Cards::PrintSamples() {
     vector<TString> sampleNames = nameSampleMap["Data"];
     std::cout << "Data -> " << nameHistoMap["Data"] << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << std::endl;
     for (auto sampleName : sampleNames) {
-      std::cout << "      cut(SR/OS) : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
-      std::cout << "      cut(SB/SS) : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
-      if(channel=="tt")std::cout << "      cut(SF) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;
+      std::cout << "      cut(SR/OS)  : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
+      std::cout << "      cut(SB/SS)  : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
+      std::cout << "      cut(SF/SSL) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;
       
     }
   }
@@ -1135,9 +1261,9 @@ void Cards::PrintSamples() {
     std::cout << name << " -> " << nameHistoMap[name] << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " << std::endl;
     vector<TString> sampleNames = nameSampleMap[name];
     for (auto sampleName : sampleNames) {
-      std::cout << "      cut(SR/OS) : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
-      std::cout << "      cut(SB/SS) : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
-      if(channel=="tt")std::cout << "      cut(SF) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;
+      std::cout << "      cut(SR/OS)  : " << sampleSpecificCutMap[sampleName].at(0) << std::endl;
+      std::cout << "      cut(SB/SS)  : " << sampleSpecificCutMap[sampleName].at(1) << std::endl;
+      std::cout << "      cut(SF/SSL) : " << sampleSpecificCutMap[sampleName].at(2) << std::endl;
       
     }
     std::cout << std::endl;
@@ -1152,14 +1278,14 @@ void Cards::PrintSamples() {
   std::cout << "Global weight = " << globalWeight << std::endl;
   std::cout << std::endl;
   std::cout << "Region cuts : " << std::endl;
-  std::cout << "       SR/OS = " << regionCut[0] << std::endl;
-  std::cout << "       SB/SS = " << regionCut[1] << std::endl;
-  if(channel=="tt")std::cout << "       SF = " << regionCut[2] << std::endl;
+  std::cout << "       SR/OS  = " << regionCut[0] << std::endl;
+  std::cout << "       SB/SS  = " << regionCut[1] << std::endl;
+  std::cout << "       SF/SSL = " << regionCut[2] << std::endl;
   std::cout << std::endl;
   std::cout << "Region weights : " << std::endl;
-  std::cout << "       SR/OS = " << regionWeight[0] << std::endl;
-  std::cout << "       SB/SS = " << regionWeight[1] << std::endl;
-  if(channel=="tt")std::cout << "       SF = " << regionWeight[2] << std::endl;
+  std::cout << "       SR/OS =  " << regionWeight[0] << std::endl;
+  std::cout << "       SB/SS  = " << regionWeight[1] << std::endl;
+  std::cout << "       SB/SSL = " << regionWeight[2] << std::endl;
   std::cout << std::endl;
 
 }
@@ -1179,7 +1305,13 @@ bool Cards::Run() {
   for (auto histogram : nameTH1DMap) {
     TString histoName = histogram.first;
     TH1D * histo = histogram.second;
-    histo->Write(histoName);
+    if (rebin) { 
+      TH1D * rebinned_histo = (TH1D*)TH1DtoTH1D(histo,nBins_rebinned,Bins_rebinned,true,"_rebinned");
+      rebinned_histo->Write(histoName);
+    }
+    else {
+      histo->Write(histoName);
+    }
   }
   return status;
 };
@@ -1197,21 +1329,69 @@ bool Cards::CloseFile() {
   return result;
 
 }
+void Cards::smooth(TH1D * hist) {
+  TH1D * tempHist = (TH1D*)hist->Clone("tempHist");
+  double xn = 2*double(range_smooth)+1.0;
+  for (int ib=min_smooth; ib<=max_smooth; ++ib) {
+    double sum = 0.;
+    double sumE2 = 0.;
+    int ibMin = ib-range_smooth;
+    int ibMax = ib+range_smooth;
+    for (int ix=ibMin; ix<=ibMax; ++ix) {
+      double x = tempHist->GetBinContent(ix);
+      double e = tempHist->GetBinError(ix);
+      double e2 = e*e;
+      sum += x;
+      sumE2 += e2;
+    }
+    sum = sum/xn;
+    double sumE = TMath::Sqrt(sumE2);
+    sumE = sumE/xn;
+    hist->SetBinContent(ib,sum);
+    hist->SetBinError(ib,sumE);
+  }
+  delete tempHist;
+}
+
 void Cards::zeroBins(TH1D * hist) {
 
   int nbins = hist->GetNbinsX();
   for (int iB=1; iB<=nbins; ++iB) {
     double x = hist->GetBinContent(iB);
+    double ex = hist->GetBinError(iB);
+    // fill bin with half of the stat. error if content < 0
     if (x<0.0) {
-      hist->SetBinContent(iB,0.);
-      hist->SetBinError(iB,0.);
+      hist->SetBinContent(iB,0.5*ex);
     }
   }
+}
+
+void Cards::SetSmoothing(int min, int max, int range) {
+
+  min_smooth = min;
+  max_smooth = max;
+  range_smooth = range;
+
+}
+
+void Cards::SetLooseShape(bool shape) {
+
+  useLooseShape = shape;
+
+}
+
+void Cards::Rebin(bool rebinHisto, vector<double> bins) {
+
+  rebin = rebinHisto;
+  nBins_rebinned = bins.size()-1;
+  for (int i=0; i<=nBins_rebinned; ++i)
+    Bins_rebinned[i] = bins[i];
 
 }
 
 Cards::~Cards() {
 
 }
+
 
 #endif

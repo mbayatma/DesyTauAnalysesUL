@@ -208,8 +208,7 @@ int main(int argc, char * argv[]){
     reader_Light = BTagCalibrationReader(BTagEntry::OP_MEDIUM, "central",{"up","down"});
     reader_B.load(calib, BTagEntry::FLAV_B, "comb");
     reader_C.load(calib, BTagEntry::FLAV_C, "comb");
-    //    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
-    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "comb");
+    reader_Light.load(calib, BTagEntry::FLAV_UDSG, "incl");
   }
 
   TString pathToTaggingEfficiencies = (TString) cmsswBase + "/src/" + cfg.get<string>("BtagMCeffFile");
@@ -263,7 +262,10 @@ int main(int argc, char * argv[]){
   const bool isMG = infiles.find("madgraph") != string::npos;
   const bool isMSSMsignal =  (infiles.find("SUSYGluGluToHToTauTau")!= string::npos) || (infiles.find("SUSYGluGluToBBHToTauTau")!= string::npos);
   const bool isTauSpinner = infiles.find("Uncorr") != string::npos;
-  const bool isTTbar = infiles.find("TT") != string::npos;
+  const bool isTTbar = infiles.find("TTTo") != string::npos;
+  const bool isYBYT  = infiles.find("_ybyt_M125") != string::npos;
+  const bool isYB2   = infiles.find("_yb2_M125") != string::npos;
+  const bool nonStandardQCDscale = isYBYT || isYB2;
 
   bool applyTauSpinnerWeights = false;
   if(isTauSpinner) applyTauSpinnerWeights = true;
@@ -556,6 +558,14 @@ int main(int argc, char * argv[]){
   TH1D *inputEventsH = new TH1D("inputEventsH", "", 1, -0.5, 0.5);
   TH1D *nWeightedEventsH = new TH1D("nWeightedEvents", "", 1, -0.5, 0.5);
   
+  TH1D *nWeightedEventsScaleCentralH = new TH1D("nWeightedEventsScaleCentral", "", 1, -0.5, 0.5);
+  TH1D *nWeightedEventsScaleUpH      = new TH1D("nWeightedEventsScaleUp", "", 1, -0.5, 0.5);
+  TH1D *nWeightedEventsScaleDownH    = new TH1D("nWeightedEventsScaleDown", "", 1, -0.5, 0.5);
+
+  TH1D *SumScaleCentralH = new TH1D("SumScaleCentral", "", 1, -0.5, 0.5);
+  TH1D *SumScaleUpH      = new TH1D("SumScaleUp", "", 1, -0.5, 0.5);
+  TH1D *SumScaleDownH    = new TH1D("SumScaleDown", "", 1, -0.5, 0.5);
+
   TTree *tree = new TTree("TauCheck", "TauCheck");
   TTree *gtree = new TTree("GenTauCheck", "GenTauCheck");
   SynchTree *otree = new SynchTree(tree,ch,false);
@@ -812,6 +822,26 @@ int main(int argc, char * argv[]){
     for (Long64_t iEntry = 0; iEntry < numberOfEntries; iEntry++) {
       analysisTree.GetEntry(iEntry);
       nEvents++;
+
+      float qcdScaleUp = analysisTree.weightScale4;
+      if (nonStandardQCDscale)
+	qcdScaleUp = analysisTree.weightScale2;
+
+      float qcdScaleDown = 1.0/qcdScaleUp;
+      if (qcdScaleDown>5.) qcdScaleDown = 5.0;
+      if (qcdScaleDown<0.01) qcdScaleDown = 0.01;
+
+      double wghtUp      = qcdScaleUp * analysisTree.genweight;
+      double wghtCentral = analysisTree.genweight;
+      double wghtDown    = qcdScaleDown * analysisTree.genweight;
+
+      nWeightedEventsScaleCentralH->Fill(0.,wghtCentral);
+      nWeightedEventsScaleUpH->Fill(0.,wghtUp);
+      nWeightedEventsScaleDownH->Fill(0.,wghtDown);
+
+      SumScaleCentralH->Fill(0.,1.);
+      SumScaleUpH->Fill(0.,qcdScaleUp);
+      SumScaleDownH->Fill(0.,qcdScaleDown);
 
       // counting b-jets
       int nbjets = 0;
@@ -1411,26 +1441,40 @@ int main(int argc, char * argv[]){
       otree->effweight = otree->idisoweight_1 * otree->idisoweight_2 * otree->trigweight;
       otree->weight *= otree->effweight;
       
-      //Theory uncertainties 
+      // btag SF ->
+      otree->weight *= otree->btagSF;
+
+      //Theory uncertainties       
+      otree->weight_CMS_scale_gg_13TeVUp   = qcdScaleUp;
+      otree->weight_CMS_scale_gg_13TeVDown = qcdScaleDown;
+
+      otree->weight_CMS_QCDScale[0] = analysisTree.weightScale0;
+      otree->weight_CMS_QCDScale[1] = analysisTree.weightScale1;
+      otree->weight_CMS_QCDScale[2] = analysisTree.weightScale2;
+      otree->weight_CMS_QCDScale[3] = analysisTree.weightScale3;
+      otree->weight_CMS_QCDScale[4] = analysisTree.weightScale4;
+      otree->weight_CMS_QCDScale[5] = analysisTree.weightScale5;
+      otree->weight_CMS_QCDScale[6] = analysisTree.weightScale6;
+      otree->weight_CMS_QCDScale[7] = analysisTree.weightScale7;
+      otree->weight_CMS_QCDScale[8] = analysisTree.weightScale8;
+
+      otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[4]/analysisTree.gen_pythiaweights[0];
+      otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[5]/analysisTree.gen_pythiaweights[0];
+
+      otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[26]/analysisTree.gen_pythiaweights[0];
+      otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[27]/analysisTree.gen_pythiaweights[0];
+
+      /*
+      std::cout << "PS_ISR = " << otree->weight_CMS_PS_ISR_ggH_13TeVDown 
+		<< " : " << otree->weight_CMS_PS_ISR_ggH_13TeVUp << std::endl;
+
+      std::cout << "PS_FSR = " << otree->weight_CMS_PS_FSR_ggH_13TeVDown 
+		<< " : " << otree->weight_CMS_PS_FSR_ggH_13TeVUp << std::endl;
       
-      otree->weight_CMS_scale_gg_13TeVUp   = 1.;
-      otree->weight_CMS_scale_gg_13TeVDown = 1.;
-
-      otree->weight_CMS_PS_ISR_ggH_13TeVUp   = 1.;
-      otree->weight_CMS_PS_ISR_ggH_13TeVDown = 1.;
-      otree->weight_CMS_PS_FSR_ggH_13TeVUp   = 1.;
-      otree->weight_CMS_PS_FSR_ggH_13TeVDown = 1.;
-
-      if(isHiggs){
-
-	otree->weight_CMS_scale_gg_13TeVUp   = analysisTree.weightScale4;
-	otree->weight_CMS_scale_gg_13TeVDown = analysisTree.weightScale8;
-
-	otree->weight_CMS_PS_ISR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[6];
-	otree->weight_CMS_PS_ISR_ggH_13TeVDown = analysisTree.gen_pythiaweights[8];
-	otree->weight_CMS_PS_FSR_ggH_13TeVUp   = analysisTree.gen_pythiaweights[7];
-	otree->weight_CMS_PS_FSR_ggH_13TeVDown = analysisTree.gen_pythiaweights[9];
-      }
+      std::cout << "QCDscale = " << otree->weight_CMS_scale_gg_13TeVDown << " : "
+		<< otree->weight_CMS_scale_gg_13TeVUp << std::endl;
+      std::cout << std::endl;
+      */
 
       //Prefiring weights
       otree->prefiringweight = 1.0;

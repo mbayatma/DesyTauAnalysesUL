@@ -267,6 +267,7 @@ namespace jets{
    vector<unsigned int> bjets; bjets.clear();
    vector<unsigned int> bjetsRaw; bjetsRaw.clear();
 
+   int nJetspt20_central = 0;
    //   TLorentzVector leadingJetLV; leadingJetLV.SetXYZT(0.,0.,0.,0.);
    //   TLorentzVector trailingJetLV; trailingJetLV.SetXYZT(0.,0.,0.,0.);
 
@@ -303,7 +304,6 @@ namespace jets{
    if(era_int == 2017) 
      is2017 = true;
    
-   const bool applyJetPUID = cfg->get<bool>("ApplyJetPUID");
    
    const float JetEtaCut = cfg->get<float>("JetEtaCut");
    const float JetPtLowCut = cfg->get<float>("JetPtLowCut");
@@ -312,6 +312,7 @@ namespace jets{
    const float bJetEtaCut = cfg->get<float>("bJetEtaCut");
    const float btagCut = cfg->get<float>("btagCut");
    const string BTagAlgorithm = cfg->get<string>("BTagAlgorithm");
+   bool applyJetPUID = cfg->get<bool>("ApplyJetPUID");
    
    TString BTagDiscriminator1 = (TString) cfg->get<string>("BTagDiscriminator1");
    TString BTagDiscriminator2 = (TString) "None BTagDiscriminator2";
@@ -320,6 +321,7 @@ namespace jets{
      BTagDiscriminator2 = (TString) cfg->get<string>("BTagDiscriminator2");
    if(BTagAlgorithm == "DeepFlavour")
      BTagDiscriminator3 = (TString) cfg->get<string>("BTagDiscriminator3");
+
       
    int nBTagDiscriminant1 = -1;
    int nBTagDiscriminant2 = -1;
@@ -339,9 +341,12 @@ namespace jets{
    
    TLorentzVector uncorrectedJets; uncorrectedJets.SetXYZT(0,0,0,0);
    TLorentzVector correctedJets; correctedJets.SetXYZT(0,0,0,0);
+   applyJetPUID = false;
 
    double bweight_event = 1.0;
    double bweight_event_sys[10];
+   double Pdata_event = 1.0;
+   double Pmc_event = 1.0;
    for (unsigned int i=0; i<otree->btag_unc.size(); ++i)
      bweight_event_sys[i] = 1.0;
 
@@ -415,6 +420,7 @@ namespace jets{
      
      if (absJetEta < bJetEtaCut) { // jet within b-tagging acceptance
        jetspt20_central.push_back(jet);
+       nJetspt20_central++;
        
        //       std::cout << "Discriminant1 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant1] << std::endl;
        //       std::cout << "Discriminant2 : " << analysisTree->pfjet_btag[jet][nBTagDiscriminant2] << std::endl;
@@ -530,6 +536,31 @@ namespace jets{
 	     tagged = true;
 	   }
 	 }
+	 double dataEff = 1.;
+	 double mcEff = 1.;
+
+	 if (taggedRaw) {
+	   Pdata_event = Pdata_event * jet_scalefactor * tageff;
+	   Pmc_event = Pmc_event * tageff;
+	   dataEff = jet_scalefactor * tageff;
+	   mcEff = tageff;
+	 }
+	 else {
+	   Pdata_event = Pdata_event * (1-jet_scalefactor*tageff);
+	   Pmc_event = Pmc_event * (1 - tageff);
+	   dataEff = 1-jet_scalefactor*tageff;
+	   mcEff = 1 - tageff;
+	 }
+	 /*
+	 std::cout << nJetspt20_central 
+		   << "   flavor = " << flavor 
+		   << "   tagged = " << taggedRaw
+		   << "   eta = " << jetEta
+		   << "   pT = " << JetPtForBTag
+		   << "   SF = " << jet_scalefactor
+		   << "   data(eff) = " << dataEff
+		   << "   MC(eff) = " << mcEff << std::endl;
+	 */
        }
        
        if (taggedRaw) 
@@ -574,11 +605,15 @@ namespace jets{
    otree->njets = jets.size();
    otree->njetspt20 = jetspt20.size();
    otree->njetspt20_central = jetspt20_central.size();
-   otree->nbtag = bjets.size();
-   otree->nbtag_raw = bjetsRaw.size();
+   // Crucial change -> applying btag SF!
+   otree->nbtag = bjetsRaw.size();
+   otree->nbtag_raw = bjets.size();
    otree->btagweight = bweight_event;
-   //   std::cout << std::endl;
-   //   std::cout << "n(central) = " << jetspt20_central.size() << "  bweight_event : " << bweight_event << std::endl;   
+   otree->btagSF = Pdata_event/Pmc_event;
+   //   std::cout << "number of taggable jets = " << otree->njetspt20_central << std::endl;
+   //   std::cout << "BTagSF = " << otree->btagSF << std::endl;
+   //   std::cout << "BTagWeight (reshaping) = " << otree->btagweight << std::endl;
+   if (std::isnan(otree->btagSF)) otree->btagSF = 1.0;
    for (unsigned int i=0; i<otree->btag_unc.size(); ++i) {
      otree->btagweight_sys[i] = 1.0;
      if (bweight_event>1e-1) { 
@@ -586,9 +621,10 @@ namespace jets{
        //       std::cout << otree->btag_unc[i] << " = " << otree->btagweight_sys[i] << std::endl;
      }
    }
+   //   std::cout << std::endl;
    if (!otree->apply_recoil) {
 
-     //     std::cout << "changing met " << std::endl;
+     // std::cout << "changing met " << std::endl;
      
      float metx = otree->met * cos(otree->metphi);
      float mety = otree->met * sin(otree->metphi);

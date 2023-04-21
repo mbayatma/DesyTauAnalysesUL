@@ -27,6 +27,18 @@ public :
   const std::vector<std::string> btag_unc = 
     {"jes","lf","hf","hfstats1","hfstats2","lfstats1","lfstats2","cferr1","cferr2"};
 
+  std::map<unsigned int, TString> index_scale = {
+    {0,"0"},
+    {1,"1"},
+    {2,"2"},
+    {3,"3"},
+    {4,"4"},
+    {5,"5"},
+    {6,"6"},
+    {7,"7"},
+    {8,"8"},
+    {9,"9"},
+  };
  
   std::map<std::string, unsigned int> btag_unc_map = {
     {"jes",0},
@@ -469,6 +481,7 @@ public :
   Float_t         prefiringweightUp;
   Float_t         prefiringweightDown;
   Float_t         btagweight;
+  Float_t         btagSF;
 
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   Float_t weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
@@ -574,6 +587,9 @@ public :
 
   Float_t weight_CMS_scale_gg_13TeVUp;
   Float_t weight_CMS_scale_gg_13TeVDown;
+
+  Float_t weight_CMS_QCDScale[9];
+
   Float_t weight_CMS_PS_ISR_ggH_13TeVUp;
   Float_t weight_CMS_PS_ISR_ggH_13TeVDown;
   Float_t weight_CMS_PS_FSR_ggH_13TeVUp;
@@ -1277,6 +1293,7 @@ public :
   TBranch	 *b_prefiringweightUp;
   TBranch	 *b_prefiringweightDown;
   TBranch        *b_btagweight;
+  TBranch        *b_btagSF;
 
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM0_13TeVUp;
   TBranch        *b_weight_CMS_eff_Xtrigger_mt_MVADM1_13TeVUp;
@@ -1320,6 +1337,8 @@ public :
   TBranch        *b_weight_CMS_eff_t_pThigh_MVADM10_13TeVDown;
   TBranch        *b_weight_CMS_eff_t_pThigh_MVADM11_13TeVDown;
   
+  TBranch        *b_weight_CMS_QCDScale[9];
+
   TBranch        *b_weight_CMS_scale_gg_13TeVUp;
   TBranch        *b_weight_CMS_scale_gg_13TeVDown;
   TBranch        *b_weight_CMS_PS_ISR_ggH_13TeVUp;

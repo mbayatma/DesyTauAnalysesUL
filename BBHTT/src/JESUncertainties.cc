@@ -3,19 +3,22 @@
 
 JESUncertainties::JESUncertainties(std::string uncFileName) {
   
-  std::string cmsswBase( getenv ("CMSSW_BASE") );
-  uncertFile = cmsswBase + "/src/" + uncFileName;
+  //  std::string cmsswBase( getenv ("CMSSW_BASE") );
+  uncertFile = uncFileName;
 
   TString UncertFile(uncertFile);
-  if (UncertFile.Contains("Regrouped_Autumn18"))
+  if (UncertFile.Contains("RegroupedV2_Summer19UL18"))
     uncertNames = uncertNames_2018;
-  else if (UncertFile.Contains("Regrouped_Fall17"))
+  else if (UncertFile.Contains("RegroupedV2_Summer19UL17"))
     uncertNames = uncertNames_2017;
   else 
     uncertNames = uncertNames_2016;
 
+  std::cout << std::endl;
+  std::cout << uncertFile << std::endl;
   for (auto const& name : uncertNames) {
 
+    std::cout << name << std::endl;
     JetCorrectorParameters const * JetCorPar = new JetCorrectorParameters(uncertFile, name);
     JetCorParMap[name] = JetCorPar;
 

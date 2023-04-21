@@ -226,8 +226,8 @@ The source codes for synchtuple production are
 
 Template configuration files to create synchtuples are
 
-* []()
-* []()
+* [analysisMacroSynch_em_template.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/analysisMacroSynch_em_template.conf)
+* [analysisMacroSynch_tt_template.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/analysisMacroSynch_tt_template.conf)
 
 
 ## DNN tuple production
@@ -257,7 +257,7 @@ The code loads configuration files depending on the channel specified:
 * [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
 * [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
 
-In config files you have to specify:
+In configuration files you have to specify
 * the name of the directory where synchtuples are located (parameter ```InputDir```), 
 * the name of the directory were the BDT predictions (friend trees) are located (parameter ```FriendDir```),
 * and the name of the directory where DNN tuples will be stored (parameter ```OutputDir```)
@@ -267,8 +267,33 @@ Make sure that the directory where DNN tuples will be stored, exists (you should
 The script [dnn_producer.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer.bash) submits one single job to the condor system for specified sample, channel and era. With this script all trees (central and systematic variations) will be filled and output into RooT file. 
 The script [dnn_producer_Syst.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_Syst.bash) submits one single job to the condor system for specified sample, channel, era and tree name (central tree or systematic variation).
 
-To submit jobs to condor system for multiple eras and samples, you should use scripts
+To submit jobs to condor system for multiple eras and samples use scripts
+
 * [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
 * [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
   
+Change to the directory
+```
+cd $CMSSW_BASE/src/DesyTauAnalyses/test/dnn_production
+```
 
+Before running DNN tuple production modify scripts 
+* [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash) 
+* [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash).
+
+You have to specify directory where log files of jobs submitted to condor, will be stored 
+(parameter ```dir```) as well list of eras and samples you would like to run on. 
+By default, scripts will submit jobs for all eras and samples. Aforementioned scripts will submit one job per sample and per era, and the DNN tuples will be saved in the folder specified by parameter ```OutputDir``` of configuration files 
+* [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
+* [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
+
+For the TTbar sample of em channel, which is extremely large, jobs are split by era and systematic tree. This is done in order to accelerate production of DNN tuples for this extremely large sample.
+
+Once all jobs submitted to condor have finished you have, to merge RooT files of TTbar sample (for em channel) with central and different systematic trees. You have to merge also DNN tuples of eras 2016_pre and 2016_post. This is done with scripts 
+
+* [dnn_merge_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_productiondnn_merge_em.bash) 
+* [dnn_merge_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_productiondnn_merge_tt.bash)
+  
+
+
+  

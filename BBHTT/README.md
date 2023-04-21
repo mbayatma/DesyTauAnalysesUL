@@ -40,16 +40,14 @@ cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/D
 cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/dnn_production'
 ```
 
-
-Set up configuration files to run synchtuple for a given era
+Set up grid-control to run synchtuple for a given era
 ```
 ./gridcontrol_setup_Run2.sh $era $channel
 ```
 where $era={16_pre,16_post,17,18} and $channel={em,tt}. 
 IMPORTANT! Eras should be specified as 16_pre, 16_post, 17 or 18 without preceeding "20".
 
-Don't forget to edit gc_synch.conf file, in particular these parameters 
-need to be adapted accordingly
+Don't forget to edit gc_synch.conf file. In particular these parameters need to be adapted accordingly
 ```
 [storage]
 ; please modify according to your working directory ->
@@ -69,7 +67,11 @@ It is suggested to run grid-control in screen session.
 ```
 screen
 cd $CMSSW_BASE/src
+source /cvmfs/cms.cern.ch/cmsset_default.csh
+setenv SCRAM_ARCH slc7_amd64_gcc700
 cmsenv
+setenv X509_USER_PROXY /afs/desy.de/user/r/rasp/public/k5-ca-proxy.pem
+voms-proxy-init -voms cms:/cms/dcms -valid 96:00
 cd /nfs/dust/cms/user/$username/$working_dir/$era
 $grid_control_folder/go.py gc_synch.conf -iGc
 ```

@@ -10,8 +10,7 @@ source setup.sh
 
 ## Running synchtuples
 
-Before running synch tuples update the code from git repository 
-and replace the folder with correction workspaces (!) 
+Before running synch tuples update the code from git repository. 
 ```
 cd $CMSSW_BASE/src/DesyTauAnalyses
 git pull
@@ -40,7 +39,7 @@ cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/D
 cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/dnn_production'
 ```
 
-Set up grid-control to run synchtuple for a given era
+Set up grid-control to run synchtuple production for a given era
 ```
 ./gridcontrol_setup_Run2.sh $era $channel
 ```
@@ -225,6 +224,11 @@ The source codes for synchtuple production are
 * [SynchNTupleProducer_em_UL.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/SynchNTupleProducer_em_UL.cpp)
 * [SynchNTupleProducer_tt_UL.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/SynchNTupleProducer_tt_UL.cpp)
 
+Template configuration files to create synchtuples are
+
+* []()
+* []()
+
 
 ## DNN tuple production
 
@@ -236,11 +240,13 @@ The code requires three or four input parameters:
 ```
 > create_dnn $sample $era $channel [$systematic]
 ```     
-where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}. The fifth parameter ($systematic) is optional and stands for the name of systematic uncertainty. When this parameter is specified the code will produce DNN tree only for the systematic uncertainty specified. Otherwise the code will create DNN trees for central tree and all systematic variations. Available options for parameter $systematic are
+where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}. The fourth parameter ($systematic) is optional and stands for the name of systematic uncertainty (or central tree). When this parameter is specified the code will produce DNN tree only for the systematic uncertainty specified or for central tree. Otherwise the code will create DNN trees for central tree and all systematic variations. Available options for parameter $systematic are
+
 * Central : nominal tree TauCheck
 * JES{Up,Down} : TauCheck_CMS_scale_j_13TeV{Up,Down}
 * JER{Up,Down} : TauCheck_CMS_res_j_13TeV{Up}
 * UnclEn{Up,Down} : TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+
 More options will be added for the extended uncertainty model which implements splitting .
 
 The names of the samples to be processed are listed in bash scripts, submitting jobs to the condor system: 
@@ -251,10 +257,11 @@ The code loads configuration files depending on the channel specified:
 * [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
 * [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
 
-In config files you have specify:
-* the name of the directory where synchtuples are located (parameter ``````), 
-* the name of the directory were the BDT predictions are located (parameter ``````),
-* and the name of the directory where DNN tuples will be stored ()
+In config files you have to specify:
+* the name of the directory where synchtuples are located (parameter ```InputDir```), 
+* the name of the directory were the BDT predictions (friend trees) are located (parameter ```FriendDir```),
+* and the name of the directory where DNN tuples will be stored (parameter ```OutputDir```)
+
 Make sure that the directory where DNN tuples will be stored, exists (you should create it) and contains subfolders for each era: 2016_pre, 2016_post, 2017 and 2018. You should also create one more subfolder, 2016, where merged DNN tuples of eras 2016_pre and 2016_post will be stored. How to merge tuples of eras 2016_pre and 2016_post will be explained later.  
 
 The script [dnn_producer.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer.bash) submits one single job to the condor system for specified sample, channel and era. With this script all trees (central and systematic variations) will be filled and output into RooT file. 

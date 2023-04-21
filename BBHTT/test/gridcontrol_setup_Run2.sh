@@ -34,7 +34,7 @@ cp ./add_samples.sh $OUTDIR/.
 
 cd ./$OUTDIR
 rm parameters.txt
-./make_parameter_file.sh $CHANNEL $YEAR
+./make_parameter_file.sh $CHANNEL $1
 cd -
 
 echo "-----------------------------------------"

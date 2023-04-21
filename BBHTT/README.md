@@ -34,6 +34,12 @@ mkdir /nfs/dust/cms/user/$username/$working_dir
 cd /nfs/dust/cms/user/$username/$working_dir
 cp $CMSSW_BASE/src/DesyTauAnalyses/BBHTT/test/* ./
 ```
+Ignore warning messages
+```
+cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/datacards'
+cp: omitting directory '/nfs/dust/cms/user/rasp/CMSSW/Update/CMSSW_10_6_26/src/DesyTauAnalyses/BBHTT/test/dnn_production'
+```
+
 
 Set up configuration files to run synchtuple for a given era
 ```

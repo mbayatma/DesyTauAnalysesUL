@@ -2,12 +2,9 @@
 
 CHANNEL=$1
 
-dirMC2=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2016/mc_2
 dirMC=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2016/mc
 dirMC_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2016_preVFP/mc
-dirSignal_UL=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2016_preVFP/mc
 dirData=/pnfs/desy.de/cms/tier2/store/user/acardini/ntuples/Oktoberfest21/2016_preVFP/data
-dirEmbedded=/pnfs/desy.de/cms/tier2/store/user/rasp/ntuples_Dec2020/2016/emb
 
 OUTDIR=./2016_pre
 
@@ -19,16 +16,9 @@ fi
 
 if [[ $CHANNEL == "mm" ]]; then
 
-#    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
     ls $dirMC_UL/WJetsToLNu_amcatnlo/*root > $OUTDIR/WJetsToLNu_amcatnlo
 
 else
-
-#    ls $dirMC_UL/WJetsToLNu/*root > $OUTDIR/WJetsToLNu
-#    ls $dirMC_UL/W1JetsToLNu/*root > $OUTDIR/W1JetsToLNu
-#    ls $dirMC_UL/W2JetsToLNu/*root > $OUTDIR/W2JetsToLNu
-#    ls $dirMC_UL/W3JetsToLNu/*root > $OUTDIR/W3JetsToLNu
-#    ls $dirMC_UL/W4JetsToLNu/*root > $OUTDIR/W4JetsToLNu
 
     ls $dirMC_UL/WJetsToLNu_amcatnlo/*root > $OUTDIR/WJetsToLNu_amcatnlo
     ls $dirMC_UL/WJetsToLNu_0J_amcatnlo/*root > $OUTDIR/WJetsToLNu_0J_amcatnlo
@@ -42,9 +32,9 @@ else
     ls $dirMC_UL/ZHToTauTau_M125_CP5_13TeV-powheg-pythia8_ext1/*root > $OUTDIR/ZHToTauTau_M125
     ls $dirMC_UL/ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8/*root > $OUTDIR/ttHToTauTau_M125
 
-    ls $dirSignal_UL/bbHToTauTau_yb2_M125_UL16MiniAODAPVv2/*.root > $OUTDIR/bbHToTauTau_yb2_M125
-    ls $dirSignal_UL/bbHToTauTau_yt2_M125_UL16MiniAODAPVv2/*.root > $OUTDIR/bbHToTauTau_yt2_M125
-    ls $dirSignal_UL/bbHToTauTau_M125_ybyt_UL16MiniAODAPVv2/*.root > $OUTDIR/bbHToTauTau_ybyt_M125
+    ls $dirMC_UL/bbHToTauTau_yb2_M125_MiniAODv2/*root > $OUTDIR/bbHToTauTau_yb2_M125
+    ls $dirMC_UL/bbHToTauTau_yt2_M125_MiniAODv2/*root > $OUTDIR/bbHToTauTau_yt2_M125
+    ls $dirMC_UL/bbHToTauTau_ybyt_M125_MiniAODv2/*root > $OUTDIR/bbHToTauTau_ybyt_M125
 
 fi
 
@@ -85,21 +75,20 @@ if [[ $CHANNEL == "em" ]]; then
     ls $dirMC/HWminusJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/WminusHToWWTo2L2Nu_M125
     ls $dirMC/HWplusJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/WplusHToWWTo2L2Nu_M125
     ls $dirMC/HZJ_HToWW_M125_13TeV_powheg_pythia8/*root > $OUTDIR/ZHToWWTo2L2Nu_M125
+    ls $dirMC_UL/ttHJetToNonbb_M125/*root > $OUTDIR/ttHJetToNonbb_M125
+    ls $dirMC_UL/TTWJetsToLNu/*root > $OUTDIR/ttWJets
+    ls $dirMC_UL/ttZJets_TuneCP5_13TeV_madgraphMLM_pythia8/*root > $OUTDIR/ttZJets
+    ls $dirMC_UL/WGToLNuG/*root > $OUTDIR/WGToLNuG
 
-    ls $dirMC2/bbHToWWTo2L2Nu_M-125_yb2/*.root > $OUTDIR/bbHToWWTo2L2Nu_yb2_M125
-    ls $dirMC2/bbHToWWTo2L2Nu_M-125_ybyt/*.root > $OUTDIR/bbHToWWTo2L2Nu_ybyt_M125
+    ls $dirMC_UL/bbHWWTo2L2Nu_M-125_4FS_yt2/*root > $OUTDIR/bbHToWWTo2L2Nu_yt2_M125
+    ls $dirMC_UL/bbHWWTo2L2Nu_M-125_4FS_yb2/*root > $OUTDIR/bbHToWWTo2L2Nu_yb2_M125
+    ls $dirMC_UL/bbHWWTo2L2Nu_M-125_4FS_ybyt/*root > $OUTDIR/bbHToWWTo2L2Nu_ybyt_M125
 
     ls $dirData/MuonEG_Run2016B-ver2/*.root > $OUTDIR/MuonEG_Run2016B
     ls $dirData/MuonEG_Run2016C/*.root > $OUTDIR/MuonEG_Run2016C
     ls $dirData/MuonEG_Run2016D/*.root > $OUTDIR/MuonEG_Run2016D
     ls $dirData/MuonEG_Run2016E/*.root > $OUTDIR/MuonEG_Run2016E
     ls $dirData/MuonEG_Run2016F/*.root > $OUTDIR/MuonEG_Run2016F
-
-#    ls $dirEmbedded/EmbeddingRun2016B_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016B
-#    ls $dirEmbedded/EmbeddingRun2016C_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016C
-#    ls $dirEmbedded/EmbeddingRun2016D_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016D
-#    ls $dirEmbedded/EmbeddingRun2016E_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016E
-#    ls $dirEmbedded/EmbeddingRun2016F_ElMu/*root > $OUTDIR/EmbeddedElMu_Run2016F
 
 elif [[ $CHANNEL == "tt" ]]; then
 
@@ -108,12 +97,6 @@ elif [[ $CHANNEL == "tt" ]]; then
     ls $dirData/Tau_Run2016D/*.root > $OUTDIR/Tau_Run2016D
     ls $dirData/Tau_Run2016E/*.root > $OUTDIR/Tau_Run2016E
     ls $dirData/Tau_Run2016F/*.root > $OUTDIR/Tau_Run2016F
-
-#    ls $dirEmbedded/EmbeddingRun2016B_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2016B
-#    ls $dirEmbedded/EmbeddingRun2016C_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2016C
-#    ls $dirEmbedded/EmbeddingRun2016D_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2016D
-#    ls $dirEmbedded/EmbeddingRun2016E_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2016E
-#    ls $dirEmbedded/EmbeddingRun2016F_TauTau/*root > $OUTDIR/EmbeddedTauTau_Run2016F
 
 elif [[ $CHANNEL == "mm" ]]; then
 

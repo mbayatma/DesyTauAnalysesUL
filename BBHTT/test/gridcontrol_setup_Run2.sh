@@ -23,19 +23,18 @@ if [ ! -d "$OUTDIR" ]; then
 fi
 cp ./run_${CHANNEL}_synchntuples.sh $OUTDIR/run_synchntuples.sh
 cp ./split_filelist.sh $OUTDIR/.
-cp ./gc_synch.conf $OUTDIR/. 
-cp ./make_parameter_file_$YEAR.sh $OUTDIR/.
+cp ./gc_synch_${CHANNEL}.conf $OUTDIR/gc_synch.conf 
+cp ./make_parameter_file.sh $OUTDIR/.
 cp ./add_samples.sh $OUTDIR/.
 
 
 ./make_config_Run2.sh $1 MC $CHANNEL
 ./make_config_Run2.sh $1 data $CHANNEL
-./make_config_Run2.sh $1 embedded $CHANNEL 
 ./make_lists_${YEAR}.sh $CHANNEL
 
 cd ./$OUTDIR
 rm parameters.txt
-./make_parameter_file_${YEAR}.sh $CHANNEL
+./make_parameter_file.sh $CHANNEL $YEAR
 cd -
 
 echo "-----------------------------------------"

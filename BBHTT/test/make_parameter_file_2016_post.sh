@@ -4,35 +4,35 @@ CHANNEL=$1
 echo "CONFIGFILE,FILELIST" > parameters.txt
 
 
-if [[ $CHANNEL == "em" ]]; then
+#if [[ $CHANNEL == "em" ]]; then
     # data
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf MuonEG_Run2016F 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_dataGH.conf MuonEG_Run2016G 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_dataGH.conf MuonEG_Run2016H 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf MuonEG_Run2016F 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_dataGH.conf MuonEG_Run2016G 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_dataGH.conf MuonEG_Run2016H 10
     
     # Embedded
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016F 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016G 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedElMu_Run2016H 4
-elif [[ $CHANNEL == "tt" ]]; then
+#elif [[ $CHANNEL == "tt" ]]; then
     # data
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016F 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016G 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016H 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016F 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016G 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf Tau_Run2016H 10
     
     # Embedded
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016F 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016G 4
 #    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_embedded.conf EmbeddedTauTau_Run2016H 4
 
-elif [[ $CHANNEL == "mm" ]]; then
+#elif [[ $CHANNEL == "mm" ]]; then
 
     # data
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016F 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016G 10
-    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016H 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016F 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016G 10
+#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_data.conf SingleMuon_Run2016H 10
 
-fi
+#fi
 
 
 if [[ $CHANNEL == "mm" ]]; then
@@ -49,11 +49,11 @@ else
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf DYJetsToLL_2J_amcatnlo 10
 
     # W+jets
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WJetsToLNu 20
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W1JetsToLNu 20
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W2JetsToLNu 20
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W3JetsToLNu 20
-#    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W4JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WJetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W1JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W2JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W3JetsToLNu 20
+    ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf W4JetsToLNu 20
 
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WJetsToLNu_amcatnlo 20
     ./split_filelist.sh analysisMacroSynch_${CHANNEL}_16_post_MC.conf WJetsToLNu_0J_amcatnlo 20

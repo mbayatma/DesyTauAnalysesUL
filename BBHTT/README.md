@@ -40,6 +40,7 @@ Set up configuration files to run synchtuple for a given era
 ./gridcontrol_setup_Run2.sh $era $channel
 ```
 where $era={16_pre,16_post,17,18} and $channel={em,tt}. 
+IMPORTANT! Eras should be specified as 16_pre, 16_post, 17 or 18 without preceeding "20".
 
 Don't forget to edit gc_synch.conf file, in particular these parameters 
 need to be adapted accordingly
@@ -223,19 +224,36 @@ Production of DNN tuples follows the BDT training in tt and em channels. The cod
 
 * [create_dnn_ntuples.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/bin/create_dnn_ntuples.cpp)
 
-The code requires three input parameters
+The code requires three or four input parameters:
 ```
-> create_dnn $sample $era $channel
+> create_dnn $sample $era $channel [$systematic]
 ```     
-where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}.
-The names of the samples to be processed are listed in bash scripts, submitting jobs to condor system: 
+where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}. The fifth parameter ($systematic) is optional and stands for the name of systematic uncertainty. When this parameter is specified the code will produce DNN tree only for the systematic uncertainty specified. Otherwise the code will create DNN trees for central tree and all systematic variations. Available options for parameter $systematic are
+* Central : nominal tree TauCheck
+* JES{Up,Down} : TauCheck_CMS_scale_j_13TeV{Up,Down}
+* JER{Up,Down} : TauCheck_CMS_res_j_13TeV{Up}
+* UnclEn{Up,Down} : TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+More options will be added for the extended uncertainty model which implements splitting .
+
+The names of the samples to be processed are listed in bash scripts, submitting jobs to the condor system: 
 * [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
 * [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
 
 The code loads configuration files depending on the channel specified: 
-* []()
-* []()
+* [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
+* [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
 
+In config files you have specify:
+* the name of the directory where synchtuples are located (parameter ``````), 
+* the name of the directory were the BDT predictions are located (parameter ``````),
+* and the name of the directory where DNN tuples will be stored ()
+Make sure that the directory where DNN tuples will be stored, exists (you should create it) and contains subfolders for each era: 2016_pre, 2016_post, 2017 and 2018. You should also create one more subfolder, 2016, where merged DNN tuples of eras 2016_pre and 2016_post will be stored. How to merge tuples of eras 2016_pre and 2016_post will be explained later.  
 
+The script [dnn_producer.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer.bash) submits one single job to the condor system for specified sample, channel and era. With this script all trees (central and systematic variations) will be filled and output into RooT file. 
+The script [dnn_producer_Syst.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_Syst.bash) submits one single job to the condor system for specified sample, channel, era and tree name (central tree or systematic variation).
 
-### Datacard producer
+To submit jobs to condor system for multiple eras and samples, you should use scripts
+* [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
+* [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
+  
+

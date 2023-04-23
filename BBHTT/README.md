@@ -287,13 +287,11 @@ By default, scripts will submit jobs for all eras and samples. Aforementioned sc
 * [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
 * [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
 
-For the TTbar sample of em channel, which is extremely large, jobs are split by era and systematic tree. This is done in order to accelerate production of DNN tuples for this extremely large sample.
+For the extremely large TTbar sample of em channel, jobs are split by sample, era and systematic tree. This is done in order to accelerate production of DNN tuples for this extremely large sample. Once all jobs submitted to condor have finished you have to merge RooT files of TTbar sample in em channel (central tree and different systematic trees). You have to merge also DNN tuples of eras 2016_pre and 2016_post. This is done with the following scripts: 
 
-Once all jobs submitted to condor have finished you have, to merge RooT files of TTbar sample (for em channel) with central and different systematic trees. You have to merge also DNN tuples of eras 2016_pre and 2016_post. This is done with scripts 
-
-* [dnn_merge_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_productiondnn_merge_em.bash) 
-* [dnn_merge_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_productiondnn_merge_tt.bash)
+* [dnn_merge_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_merge_em.bash) 
+* [dnn_merge_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_merge_tt.bash)
   
-
+In these bash scripts you have to specify properly the name of the directory where DNN tuples are stored (parameter ```dir```). 
 
   

@@ -613,17 +613,53 @@ std::vector<TString> systematics_tt = {
   "CMS_scale_t_1prong_13TeV",
   "CMS_scale_t_1prong1pizero_13TeV",
   "CMS_scale_t_3prong_13TeV",
-  "CMS_scale_t_3prong1pizero_13TeV",
-  "CMS_scale_j_JES_13TeV",
+  "CMS_scale_t_3prong1pizero_13TeV"
+};
+
+std::vector<TString> systematicsJES_2016 = {
+  "CMS_scale_j_Absolute_2016_13TeV",
+  "CMS_scale_j_HF_2016_13TeV",
+  "CMS_scale_j_EC2_2016_13TeV",
+  "CMS_scale_j_RelativeSample_2016_13TeV",
+  "CMS_scale_j_BBEC1_2016_13TeV"
+};
+
+std::vector<TString> systematicsJES_2017 = {
+  "CMS_scale_j_Absolute_2017_13TeV",
+  "CMS_scale_j_HF_2017_13TeV",
+  "CMS_scale_j_EC2_2017_13TeV",
+  "CMS_scale_j_RelativeSample_2017_13TeV",
+  "CMS_scale_j_BBEC1_2017_13TeV"
+};
+
+std::vector<TString> systematicsJES_2018 = {
+  "CMS_scale_j_Absolute_2018_13TeV",
+  "CMS_scale_j_HF_2018_13TeV",
+  "CMS_scale_j_EC2_2018_13TeV",
+  "CMS_scale_j_RelativeSample_2018_13TeV",
+  "CMS_scale_j_BBEC1_2018_13TeV"
+};
+
+std::vector<TString> systematicsTotalJES = {
+  "CMS_scale_j_JES_13TeV"
+};
+
+std::vector<TString> systematicsJES = {
+  "CMS_scale_j_FlavorQCD_13TeV",
+  "CMS_scale_j_RelativeBal_13TeV",
+  "CMS_scale_j_HF_13TeV",
+  "CMS_scale_j_BBEC1_13TeV",
+  "CMS_scale_j_EC2_13TeV",
+  "CMS_scale_j_Absolute_13TeV"  
+};
+
+std::vector<TString> systematics = {
   "CMS_res_j_13TeV",
   "CMS_scale_met_unclustered_13TeV"
 };
 
 std::vector<TString> systematics_em = {
-  //  "CMS_scale_e_13TeV",
-  "CMS_scale_j_JES_13TeV",
-  "CMS_res_j_13TeV",
-  "CMS_scale_met_unclustered_13TeV"
+  "CMS_scale_e_13TeV"
 };
 
 const map<TString , TString> process_map_2018 = {

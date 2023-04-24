@@ -130,36 +130,63 @@ int main(int argc, char * argv[]) {
   TString era(argv[2]);
   TString channel(argv[3]);
   TString SysName("Central");
-  if (argc==5) { 
-    SysName = TString(argv[4]);
-    if (SysName!="Central"&&
-	SysName!="JESUp"&&
-	SysName!="JESDown"&&
-	SysName!="JERUp"&&
-	SysName!="JERDown"&&
-	SysName!="UnclEnUp"&&
-	SysName!="UnclEnDown") {
-      std::cout << "Unknown systematics specified : " << SysName << std::endl;
-      std::cout << "Available options : Central, JESUp, JESDown, JERUp, JERDown, UnclEnUp, UnclEnDown" << std::endl;
-      exit(EXIT_FAILURE);
-    }
-  }
-
-  std::map<TString,TString> systematicsMap = {
-    {"Central",""},
-    {"JESUp","_CMS_scale_j_JES_13TeVUp"},
-    {"JESDown","_CMS_scale_j_JES_13TeVDown"},
-    {"JERUp","_CMS_res_j_13TeVUp"},
-    {"JERDown","_CMS_res_j_13TeVDown"},
-    {"UnclEnUp","_CMS_scale_met_unclustered_13TeVUp"},
-    {"UnclEnDown","_CMS_scale_met_unclustered_13TeVDown"}
-  };
-
 
   TString Era("2018");
   if (era=="2017") Era="2017";
   if (era=="2016_pre") Era="2016";
   if (era=="2016_post") Era="2016";
+
+  std::map<TString,TString> systematicsNameMap = {
+    {"JES","_CMS_scale_j_JES_13TeV"},
+    {"JER","_CMS_res_j_13TeV"},
+    {"EScale","_CMS_scale_e_13TeV"},
+    {"Uncl","_CMS_scale_met_unclustered_13TeV"},
+    {"FlavorQCD","_CMS_scale_j_FlavorQCD_13TeV"},
+    {"RelativeBal","_CMS_scale_j_RelativeBal_13TeV"},
+    {"HF","_CMS_scale_j_HF_13TeV"},
+    {"BBEC1","_CMS_scale_j_BBEC1_13TeV"},
+    {"EC2","_CMS_scale_j_EC2_13TeV"},
+    {"Absolute","_CMS_scale_j_Absolute_13TeV"},
+    {"Absolute_Era","_CMS_scale_j_Absolute_"+Era+"_13TeV"},
+    {"HF_Era","_CMS_scale_j_HF_"+Era+"_13TeV"},
+    {"EC2_Era","_CMS_scale_j_EC2_"+Era+"_13TeV"},
+    {"RelativeSample_Era","_CMS_scale_j_RelativeSample_"+Era+"_13TeV"},
+    {"BBEC1_Era","_CMS_scale_j_BBEC1_"+Era+"_13TeV"}
+  };
+
+  if (argc==5) { 
+    SysName = TString(argv[4]);
+    bool isSysExist = false;
+
+    if (SysName=="Central") isSysExist = true;
+    if (!isSysExist) {
+      for (auto sysmap : systematicsNameMap) {
+	TString sysLabelUp = sysmap.first + "Up";
+	TString sysLabelDown = sysmap.first + "Down";
+	if (SysName==sysLabelUp||SysName==sysLabelDown) {
+	  isSysExist = true;
+	  break;
+	}
+      }
+    }
+    if (!isSysExist) {
+      std::cout << "Unknown systematics specified : " << SysName << std::endl;
+      std::cout << "Available options ->" << std::endl;
+      std::cout << "  Central" << std::endl;
+      for (auto sysmap : systematicsNameMap) 
+	std::cout << "  " << sysmap.first << "{Up,Down}" << std::endl;
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  std::map<TString,TString> systematicsMap;
+  systematicsMap["Central"] = "";
+  for (auto sysmap : systematicsNameMap) {
+    TString label = sysmap.first;
+    TString sysname = sysmap.second;
+    systematicsMap[label+"Up"] = sysname + "Up";
+    systematicsMap[label+"Down"] = sysname + "Down";
+  }
   
   TString Sample = process + "_" + era ;
 
@@ -212,6 +239,7 @@ int main(int argc, char * argv[]) {
   bool useFriend = cfg.get<bool>("UseFriend");
   bool applyPreselection = cfg.get<bool>("ApplyPreselection");
   bool recomputeTauID = cfg.get<bool>("RecomputeTauID");
+  bool splitJES = cfg.get<bool>("SplitJES");
   TString input_dir  = TString(cfg.get<string>("InputDir"))+"/"+era; 
   TString friend_dir = TString(cfg.get<string>("FriendDir"))+"/"+era;
   TString output_dir = TString(cfg.get<string>("OutputDir"))+"/"+ era;
@@ -265,6 +293,10 @@ int main(int argc, char * argv[]) {
     std::cout << "scaling fakes by " << scaleFake << " (incl) and " << scaleFake_btag << " (btag)" << std::endl;
   }
 
+  std::vector<TString> systematicsJES_era = systematicsJES_2018;
+  if (Era=="2017") systematicsJES_era = systematicsJES_2017;
+  if (Era=="2016") systematicsJES_era = systematicsJES_2016;
+
   std::vector<TString> sysTreeNames;
   if (argc==4) {
     sysTreeNames.push_back("");
@@ -272,6 +304,34 @@ int main(int argc, char * argv[]) {
     bool isData = process=="Tau"||process=="MuonEG";
 
     if (!isData) {
+      for (auto sysname : systematics) {
+	TString NameSys = "_" + sysname + "Up";
+	sysTreeNames.push_back(NameSys);
+	NameSys = "_" + sysname +"Down";
+	sysTreeNames.push_back(NameSys);
+      }
+      if (splitJES) {
+	for (auto sysname : systematicsJES) {
+	  TString NameSys = "_" + sysname + "Up";
+	  sysTreeNames.push_back(NameSys);
+	  NameSys = "_" + sysname +"Down";
+	  sysTreeNames.push_back(NameSys);
+	}
+	for (auto sysname : systematicsJES_era) {
+	  TString NameSys = "_" + sysname + "Up";
+	  sysTreeNames.push_back(NameSys);
+	  NameSys = "_" + sysname +"Down";
+	  sysTreeNames.push_back(NameSys);
+	}
+      }
+      else {
+	for (auto sysname : systematicsTotalJES) {
+	  TString NameSys = "_" + sysname + "Up";
+	  sysTreeNames.push_back(NameSys);
+	  NameSys = "_" + sysname +"Down";
+	  sysTreeNames.push_back(NameSys);
+	}
+      }
       if (channel == "tt") {
 	for (auto sysname : systematics_tt) {
 	  TString NameSys = "_" + sysname + "Up";

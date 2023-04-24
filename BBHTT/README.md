@@ -240,16 +240,17 @@ The code requires three or four input parameters:
 ```
 > create_dnn $sample $era $channel [$systematic]
 ```     
-where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}. The fourth parameter ($systematic) is optional and stands for the name of systematic uncertainty (or central tree). When this parameter is specified the code will produce DNN tree only for the systematic uncertainty specified or for central tree. Otherwise the code will create DNN trees for central tree and all systematic variations. Available options for parameter $systematic are
+where $sample is the name of the sample to be processed, $era={2016_pre,2016_post,2017,2018}, $channel={em,tt}. The fourth parameter ($systematic) is optional and stands for the name of systematic uncertainty (or central tree). When this parameter is specified the code will produce DNN tree only for the systematic uncertainty specified or for central tree. Otherwise the code will create DNN trees for central tree and all systematic variations. Available options for parameter $systematic are:
 
 * Central : nominal tree TauCheck
 * JES{Up,Down} : TauCheck_CMS_scale_j_13TeV{Up,Down}
 * JER{Up,Down} : TauCheck_CMS_res_j_13TeV{Up}
-* UnclEn{Up,Down} : TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+* Uncl{Up,Down} : TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down}
+* EScale{Up,Down} : TauCheck_
 
 More options will be added for the extended uncertainty model which implements splitting .
 
-The names of the samples to be processed are listed in bash scripts, submitting jobs to the condor system: 
+The names of the samples to be processed are listed in bash scripts that submit jobs to the condor system: 
 * [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
 * [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
 
@@ -262,22 +263,22 @@ In configuration files you have to specify
 * the name of the directory were the BDT predictions (friend trees) are located (parameter ```FriendDir```),
 * and the name of the directory where DNN tuples will be stored (parameter ```OutputDir```)
 
-Make sure that the directory where DNN tuples will be stored, exists (you should create it) and contains subfolders for each era: 2016_pre, 2016_post, 2017 and 2018. You should also create one more subfolder, 2016, where merged DNN tuples of eras 2016_pre and 2016_post will be stored. How to merge tuples of eras 2016_pre and 2016_post will be explained later.  
+Make sure that the directory where DNN tuples will be stored, exists (you should create it) and contains subfolders for each era: ```2016_pre```, ```2016_post```, ```2017``` and ```2018```. You should also create one more subfolder ```2016``` where merged DNN tuples of eras ```2016_pre``` and ```2016_post``` will be stored. How to merge tuples of eras ```2016_pre``` and ```2016_post``` is explained later in this instruction.  
 
-The script [dnn_producer.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer.bash) submits one single job to the condor system for specified sample, channel and era. With this script all trees (central and systematic variations) will be filled and output into RooT file. 
-The script [dnn_producer_Syst.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_Syst.bash) submits one single job to the condor system for specified sample, channel, era and tree name (central tree or systematic variation).
+The script [dnn_producer.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer.bash) submits one single job to the condor system for specified sample, channel and era. With this script all trees (central and systematic variations) will be filled and output into single RooT file. 
 
-To submit jobs to condor system for multiple eras and samples use scripts
+The script [dnn_producer_Syst.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_Syst.bash) submits one single job to the condor system for specified sample, channel, era and tree (central tree or systematic variation).
 
+To submit jobs to condor system for multiple eras and samples use the following scripts:
 * [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
 * [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash)
   
-Change to the directory
+Change to the directory:
 ```
 cd $CMSSW_BASE/src/DesyTauAnalyses/test/dnn_production
 ```
 
-Before running DNN tuple production modify scripts 
+Before running DNN tuple production modify the following scripts: 
 * [dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash) 
 * [dnn_producer_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_tt.bash).
 
@@ -287,7 +288,7 @@ By default, scripts will submit jobs for all eras and samples. Aforementioned sc
 * [dnn_production_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_em.conf)
 * [dnn_production_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_production_tt.conf)
 
-For the extremely large TTbar sample of em channel, jobs are split by sample, era and systematic tree. This is done in order to accelerate production of DNN tuples for this extremely large sample. Once all jobs submitted to condor have finished you have to merge RooT files of TTbar sample in em channel (central tree and different systematic trees). You have to merge also DNN tuples of eras 2016_pre and 2016_post. This is done with the following scripts: 
+For extremely large TTbar sample of em channel, jobs are split by sample, era and systematic tree. This is done in order to accelerate production of DNN tuples for this extremely large sample. Once all jobs submitted to condor have finished you have to merge RooT files of TTbar sample in em channel (central tree and different systematic trees). You have to merge also DNN tuples of eras 2016_pre and 2016_post. This is done with the following scripts: 
 
 * [dnn_merge_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_merge_em.bash) 
 * [dnn_merge_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_merge_tt.bash)

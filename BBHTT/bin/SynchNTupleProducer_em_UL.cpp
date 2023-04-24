@@ -1114,7 +1114,7 @@ int main(int argc, char * argv[]){
 
 
       // Preselection cuts ->
-      bool isSRevent = otree->iso_1<0.4&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired&&((otree->nbtag>0||otree->nbtag<3)||(otree->nbtag_raw>0||otree->nbtag_raw<3));
+      bool isSRevent = otree->iso_1<0.4&&otree->iso_2<0.4&&otree->extramuon_veto<0.5&&otree->extraelec_veto<0.5&&trigger_fired&&((otree->nbtag>0&&otree->nbtag<3)||(otree->nbtag_raw>0&&otree->nbtag_raw<3));
 
       if (!isSRevent) continue;
 

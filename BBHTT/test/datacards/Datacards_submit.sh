@@ -7,7 +7,7 @@
 # $3 - era (2016, 2017, 2018)
 # $4 - channel (em, tt)
 # $5 - configuration file
-outdir=/nfs/dust/cms/user/rasp/Run/log
+outdir=/nfs/dust/cms/user/rasp/Run/log/datacards
 
 jobname=Datacards_${1}_${2}_${3}_${4}_${5}
 cat > ${outdir}/${jobname}.bash <<EOF1

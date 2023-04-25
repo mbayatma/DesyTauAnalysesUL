@@ -355,25 +355,31 @@ The following parameters have been introduced to implement smoothing of template
 * ```UseLooseShape = false```
 * ```Rebin = false```
  
-IMPORTANT! Before running datacards production specify properly parameter ```OutputDir``` which points to the folder where datacards (RooT files with shapes) will be stored. You should first create the directory and subfolders inside this directory for each era : 2016, 2017, 2018. For a given $era datacards will be saved in folder ```$OutputDir/$era```. 
+IMPORTANT! Before running datacards production specify properly parameter ```OutputDir``` which points to the directory where datacards (RooT files with templates) will be stored. Make sure that the directory exists (you have to create it). Inside this directory subfolders have to be created for each era : 2016, 2017, 2018. For a given $era datacards will be saved in the directory ```$OutputDir/$era```. 
 
-The input directories with DNN tuples are:
-* ```/nfs/dust/cms/user/rasp/Run/tautau_dnn_newTauID_UL``` : tt channel, training with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar);
-* ```/nfs/dust/cms/user/rasp/Run/emu_dnn_sys_UL``` : em channel, "nominal training" with 4 categories (TTbar, DY, HTT, HWW) using inclusive sample (no mass cuts, nbtag<3)
+Presently the following DNN tuples are available:
+* ```/nfs/dust/cms/user/rasp/Run/tautau_dnn_newTauID_UL``` : tt channel, "nominal" training with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar);
+* ```/nfs/dust/cms/user/rasp/Run/emu_dnn_sys_UL``` : em channel, "nominal training" with 4 categories (TTbar, DY, HTT, HWW) using inclusive sample for training (no mass cuts, nbtag<3)
 * ```/nfs/dust/cms/user/rasp/Run/emu_dnn_ST_UL``` : em channel, training with 5 categories (TTbar, DY, HTT, HWW, ST4f), cuts applied for training : 10<m_vis<100&&mt_tot<200&&nbtag>0&&nbtag<3; 
 
-The script [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) submit one job to condor system for specified sample name, era and event category and channel. It takes five input parameters:
+The script 
+* [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) 
+
+ssubmit one job to condor system for specified sample name, era and event category and channel. 
+It takes five input parameters:
 ```
 > Datacards_submit.sh $sample $category $era $channel $config
 ```
 
-IMPORTANT! Before running datacard production modify in the script [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) parameter ```outdir``` which points to the folder where outputs of condor jobs (log and error files) will be saved.
+IMPORTANT! Before running datacard production modify in the script [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) parameter ```outdir``` which points to the folder where outputs of condor jobs (log, output and error files) will be saved.
 
-Datacard production for all samples, eras and categories is run with the following scripts:
+Datacard production on multiple samples, eras and categories is run with the following scripts:
 * [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_em.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_em.sh) - to submit jobs for em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_tt.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_tt.sh) - to submit jobs for tt channel.
 
-These scripts configuration files with category dependent non-equidistant binnings: 
+In the current version scripts produce datacards for all eras, samples and categories. However, you can edit these scripts to specify for which eras and categories you would like datacards to be created. 
+
+These scripts make use of configuration files with category dependent non-equidistant binnings: 
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat0.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat0.conf) : to produce datacards for category cat0_NbtagGe1 (TTbar category) of em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat1.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat1.conf) : to produce datacards for category cat1_NbtagGe1 (DY category) of em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat2.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat2.conf) : to produce datacards for category cat2_NbtagGe1 (HTT category) of em channel;
@@ -384,10 +390,15 @@ These scripts configuration files with category dependent non-equidistant binnin
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt_DY.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt_DY.conf) : to produce datacards for category cat3_NbtagGe1 (DY) of tt channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt_bbH.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt_bbH.conf) : to produce datacards for category cat0_NbtagGe1 (bbH signal) of tt channel;
 
-You can edit these configuration files and define binning of your choice.
+You can edit these configuration files and define binning of your choice. You can also create your own configuration files and use them in bash scripts: 
+* [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_em.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_em.sh);
+* [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_tt.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_tt.sh).
+
 
 Once all jobs have finished, you have to merge datacards RooT files with the script 
-[DesyTauAnalyses/BBHTT/test/datacards/Merge_datacards.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Merge_datacards.bash). The script expects two input parameters:
+* [DesyTauAnalyses/BBHTT/test/datacards/Merge_datacards.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Merge_datacards.bash). 
+
+The script expects two input parameters:
 ```
 > Merge_datacards.bash $channel $datacards_folder
 ```
@@ -397,7 +408,46 @@ This script merges datacard RooT files for each era and saves merged RooT files 
 
 ## Plotting datacards
 
-Plotting of datacards is done with macro [DesyTauAnalyses/Plotter/bin/PlotDatacards.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/bin/PlotDatacards.cpp) which expects 4 input parameters:
+Plotting of datacards is done with macro 
+* [DesyTauAnalyses/Plotter/bin/PlotDatacards.cpp](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/bin/PlotDatacards.cpp) 
+
+It is run with 4 input parameters:
 ```
 > PlotDatacards $era $category $channel $config
 ```
+
+The example configuration files to create datacards are:
+* [DesyTauAnalyses/Plotter/datacards/plot_cards_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/plot_cards_tt.conf) : to plot unblinded distributions in tt channel (recommended for background categories)
+* [DesyTauAnalysis/Plotter/datacards/plot_cards_tt_blind.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/plot_cards_tt_blind.conf) : to plot blinded distributions in tt channel (recommended for signal category before unblinding data)
+* [DesyTauAnalyses/Plotter/datacards/plot_cards_em.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/plot_cards_em.conf) : to plot unblinded distributions in em channel (recommended for background categories)
+* [DesyTauAnalysis/Plotter/datacards/plot_cards_em_blind.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/plot_cards_em_blind.conf) : to plot blinded distributions in em channel (recommended for signal categories before unblinding data)
+
+Parameters specified in config files are: 
+* ```InputDir``` - directory with datacards (code assumes that this directory contains datacard RooT files named ```bbH_$channel_$era.root```);
+* ```BlindData``` - if true, the plotted distribution is blinded, otherwise unblinded distribution is plotted;
+* ```XminBlind``` - lower boundary of the blinded region (parameter is ignored if ```BlindData = false```);
+* ```XmaxBlind``` - upper boundary of the blinded region (parameter is ignored if ```BlindData = false```);
+* ```ApplySystematics``` - if true systematic error band is shown for normalization uncertainties;
+* ```Xtitle``` - title of x-axis;
+* ```YMin``` - lower edge of y-axis (if y-axis is set to log scale);
+* ```YMax``` - logarithmic factor for y-axis (recommended value 100);
+* ```YRatioMin``` - lower edge of the y-axis in the ratio plot;
+* ```YRatioMax``` - upper edge of the y-axis in the ratio plot;
+* ```PlotDir``` - directory where plots (png files) will be saved;
+* ```logY``` - if true, y-axis is set to log scale;
+* ```PlotLegend``` - if true, legend is put on the plot;
+* ```LegendRight``` - if true, legend is drawn in the upper-right corner of the plot (in the upper-left corner otherwise).
+
+
+Bash scripts: 
+
+* [DesyTauAnalyses/Plotter/datacards/Plot_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/Plot_em.bash)
+* [DesyTauAnalyses/Plotter/datacards/Plot_tt.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/Plotter/datacards/Plot_tt.bash)
+
+plot datacards sequentially for all eras and categories in em and tt channels, respectively.
+Output of these scripts is saved in files ```em_cards.log``` and ```tt_cards.log```
+
+Available datacards:
+* ```/nfs/dust/cms/user/rasp/Run/tautau_datacards_newTauID_UL/BDT_coarse``` : tt datacards, "nominal" with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar). Higgs background category is excluded from statistical inference;
+* ```/nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_coarse``` : em datacards, "nominal" training with 4 categories (TTbar, DY, HTT, HWW), no mass cuts, nbtag<3, DY category is excluded from statistical inference;
+* ```/nfs/dust/cms/user/rasp/Run/emu_datacards_ST_UL/BDT_coarse``` : em datacards, training with 5 categories (TTbar, DY, HTT, HWW, ST); cuts applied: m_vis<100&&m_vis>10&&mt_tot>200&&nbtag>0&&nbtag<3.

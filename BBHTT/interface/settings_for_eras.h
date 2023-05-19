@@ -663,16 +663,16 @@ std::vector<TString> systematics_em = {
 };
 
 const map<TString , TString> process_map_2018 = {
-  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
-  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
-  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
-  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
 
-  { "WJets"   , "WJetsToLNu"},
-  { "W1Jets"  , "W1JetsToLNu"},
-  { "W2Jets"  , "W2JetsToLNu"},
-  { "W3Jets"  , "W3JetsToLNu"},
-  { "W4Jets"  , "W4JetsToLNu"},
+  //  { "WJets"   , "WJetsToLNu"},
+  //  { "W1Jets"  , "W1JetsToLNu"},
+  //  { "W2Jets"  , "W2JetsToLNu"},
+  //  { "W3Jets"  , "W3JetsToLNu"},
+  //  { "W4Jets"  , "W4JetsToLNu"},
 
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
@@ -681,16 +681,16 @@ const map<TString , TString> process_map_2018 = {
 };
 
 const map<TString , TString> process_map_2017 = {
-  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
-  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
-  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
-  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
 
-  { "WJets"   , "WJetsToLNu"},
-  { "W1Jets"  , "W1JetsToLNu"},
-  { "W2Jets"  , "W2JetsToLNu"},
-  { "W3Jets"  , "W3JetsToLNu"},
-  { "W4Jets"  , "W4JetsToLNu"},
+  //  { "WJets"   , "WJetsToLNu"},
+  //  { "W1Jets"  , "W1JetsToLNu"},
+  //  { "W2Jets"  , "W2JetsToLNu"},
+  //  { "W3Jets"  , "W3JetsToLNu"},
+  //  { "W4Jets"  , "W4JetsToLNu"},
 
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},
@@ -699,16 +699,16 @@ const map<TString , TString> process_map_2017 = {
 };
 
 const map<TString , TString> process_map_2016 = {
-  //  { "WJets"   , "WJetsToLNu_amcatnlo"},
-  //  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
-  //  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
-  //  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
+  { "WJets"   , "WJetsToLNu_amcatnlo"},
+  { "W0Jets"  , "WJetsToLNu_0J_amcatnlo"},
+  { "W1Jets"  , "WJetsToLNu_1J_amcatnlo"},
+  { "W2Jets"  , "WJetsToLNu_2J_amcatnlo"},
 
-  { "WJets"   , "WJetsToLNu"},
-  { "W1Jets"  , "W1JetsToLNu"},
-  { "W2Jets"  , "W2JetsToLNu"},
-  { "W3Jets"  , "W3JetsToLNu"},
-  { "W4Jets"  , "W4JetsToLNu"},
+  //  { "WJets"   , "WJetsToLNu"},
+  //  { "W1Jets"  , "W1JetsToLNu"},
+  //  { "W2Jets"  , "W2JetsToLNu"},
+  //  { "W3Jets"  , "W3JetsToLNu"},
+  //  { "W4Jets"  , "W4JetsToLNu"},
 
   { "DYJets"  , "DYJetsToLL_M-50_amcatnlo"},
   { "DY0Jets" , "DYJetsToLL_0J_amcatnlo"},

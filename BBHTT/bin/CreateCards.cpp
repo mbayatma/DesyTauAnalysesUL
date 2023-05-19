@@ -38,13 +38,10 @@ int main(int argc, char * argv[]) {
   double xmin = cfg.get<double>("Xmin");
   double xmax = cfg.get<double>("Xmax");
   vector<double> xbins = cfg.get<vector<double> >("Bins");
-  int minSmooth = cfg.get<int>("MinSmooth");
-  int maxSmooth = cfg.get<int>("MaxSmooth");
-  int rangeSmooth = cfg.get<int>("RangeSmooth");
   bool runWithSystematics = cfg.get<bool>("Systematics");
-  bool useLooseShape = cfg.get<bool>("UseLooseShape");
-  bool rebin = cfg.get<bool>("Rebin");
+  bool splitJES = cfg.get<bool>("SplitJES");
   bool testCards = cfg.get<bool>("TestCards");
+  int sym = cfg.get<int>("Symmetrize");
   bool runOnEmbedded = false;
 
   Cards * cards = new Cards(sample,
@@ -59,8 +56,9 @@ int main(int argc, char * argv[]) {
 			    xmin,
 			    xmax,
 			    runWithSystematics,
-			    runOnEmbedded
-			    );
+			    splitJES,
+			    runOnEmbedded,
+			    sym);
  
   cards->PrintSamples();
   cards->PrintShapeSystematics();
@@ -71,14 +69,14 @@ int main(int argc, char * argv[]) {
   else {
     nbins = xbins.size() - 1;
     cards->SetVariableToPlot(variable,nbins,xbins);
+    std::cout << std::endl;
+    std::cout << "Non-equdistant binning used -> " << std::endl;
     std::cout << "nbins = " << nbins << std::endl;
     for (int i=0; i<=nbins; ++i)
       std::cout << xbins[i] << std::endl;
     //    exit(-1);
+    std::cout << std::endl;
   }
-  cards->SetSmoothing(minSmooth,maxSmooth,rangeSmooth);
-  if (useLooseShape) cards->SetLooseShape(useLooseShape);
-  if (rebin) cards->Rebin(rebin,xbins);
   if (!testCards) cards->Run();
   cards->CloseFile();
   cout << endl;

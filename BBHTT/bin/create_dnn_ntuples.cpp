@@ -14,8 +14,282 @@
 #include "RooRealVar.h"
 #include "DesyTauAnalyses/Common/interface/Config.h"
 
-// Updated tau ID SF -> 
 
+float tt_extrap_unc(float dR, TString era, int nbtag) {
+
+  float x = dR;
+  if (x<0.5) x = 0.5;
+  if (x>5.0) x = 5.0;
+
+  float corr = 1.0;
+
+  if (era=="2016") {
+    if (nbtag==1) {
+      corr = -0.0217778*x*x + 0.0642223*x + 1.11333;
+    }
+    else if (nbtag>=2) {
+      corr = -0.042*x*x + 0.111*x + 1.255;
+    }
+  }
+  if (era=="2017") {
+    if (nbtag==1) {
+      corr = 0.000222206*x*x - 0.0767777*x + 1.32833;
+    }
+    else if (nbtag>=2) {
+      corr = -0.0597778*x*x + 0.273222*x + 0.968333;
+    }
+
+  }
+  if (era=="2018") {
+    if (nbtag==1) {
+      corr = 0.0104444*x*x + -0.108555*x + 1.32167;
+    }
+    else if (nbtag>=2) {
+      corr = -0.0611111*x*x + 0.213889*x + 1.14833;
+    }
+  }
+
+  return corr;
+
+}
+
+std::vector<TString> ff_extrapnames = {
+  "qcd_extrap_stat_nbtag1",
+  "qcd_extrap_stat_nbtag2",
+};
+
+std::map<TString, std::vector<float> > ff_extrap_unc_2016 = {
+  {"qcd_extrap_stat_nbtag1",{0.032,0.055}},
+  {"qcd_extrap_stat_nbtag2",{0.081,0.112}},
+};
+
+std::map<TString, std::vector<float> > ff_extrap_unc_2017 = {
+  {"qcd_extrap_stat_nbtag1",{0.030,0.049}},
+  {"qcd_extrap_stat_nbtag2",{0.079,0.109}},
+};
+
+std::map<TString, std::vector<float> > ff_extrap_unc_2018 = {
+  {"qcd_extrap_stat_nbtag1",{0.027,0.042}},
+  {"qcd_extrap_stat_nbtag2",{0.063,0.087}},
+};
+
+
+std::vector<TString> ff_statnames = {
+
+  "qcd_stat_njet0_dm0",
+  "qcd_stat_njet0_dm1",
+  "qcd_stat_njet0_dm10",
+  "qcd_stat_njet0_dm11",
+
+  "qcd_stat_njet1_dm0",
+  "qcd_stat_njet1_dm1",
+  "qcd_stat_njet1_dm10",
+  "qcd_stat_njet1_dm11",
+
+  "qcd_stat_njet2_dm0",
+  "qcd_stat_njet2_dm1",
+  "qcd_stat_njet2_dm10",
+  "qcd_stat_njet2_dm11",
+
+};
+
+std::map<TString, std::vector<float> > ff_stat_unc_2016 = {
+
+  {"qcd_stat_njet0_dm0",{1.012,1.040}},
+  {"qcd_stat_njet0_dm1",{1.007,1.047}},
+  {"qcd_stat_njet0_dm10",{1.015,1.066}},
+  {"qcd_stat_njet0_dm11",{1.021,1.094}},
+
+  {"qcd_stat_njet1_dm0",{1.015,1.061}},
+  {"qcd_stat_njet1_dm1",{1.012,1.055}},
+  {"qcd_stat_njet1_dm10",{1.022,1.090}},
+  {"qcd_stat_njet1_dm11",{1.038,1.172}},
+
+  {"qcd_stat_njet2_dm0",{1.029,1.084}},
+  {"qcd_stat_njet2_dm1",{1.020,1.061}},
+  {"qcd_stat_njet2_dm10",{1.033,1.137}},
+  {"qcd_stat_njet2_dm11",{1.057,1.260}},
+  
+};
+
+std::map<TString, std::vector<float> > ff_stat_unc_2017 = {
+
+  {"qcd_stat_njet0_dm0",{1.010,1.043}},
+  {"qcd_stat_njet0_dm1",{1.006,1.042}},
+  {"qcd_stat_njet0_dm10",{1.012,1.062}},
+  {"qcd_stat_njet0_dm11",{1.019,1.088}},
+
+  {"qcd_stat_njet1_dm0",{1.013,1.060}},
+  {"qcd_stat_njet1_dm1",{1.010,1.052}},
+  {"qcd_stat_njet1_dm10",{1.019,1.084}},
+  {"qcd_stat_njet1_dm11",{1.034,1.150}},
+
+  {"qcd_stat_njet2_dm0",{1.024,1.080}},
+  {"qcd_stat_njet2_dm1",{1.015,1.060}},
+  {"qcd_stat_njet2_dm10",{1.029,1.129}},
+  {"qcd_stat_njet2_dm11",{1.052,1.210}},
+  
+};
+
+std::map<TString, std::vector<float> > ff_stat_unc_2018 = {
+
+  {"qcd_stat_njet0_dm0",{1.007,1.040}},
+  {"qcd_stat_njet0_dm1",{1.005,1.036}},
+  {"qcd_stat_njet0_dm10",{1.010,1.059}},
+  {"qcd_stat_njet0_dm11",{1.017,1.082}},
+
+  {"qcd_stat_njet1_dm0",{1.013,1.049}},
+  {"qcd_stat_njet1_dm1",{1.010,1.042}},
+  {"qcd_stat_njet1_dm10",{1.019,1.075}},
+  {"qcd_stat_njet1_dm11",{1.034,1.110}},
+
+  {"qcd_stat_njet2_dm0",{1.024,1.077}},
+  {"qcd_stat_njet2_dm1",{1.015,1.059}},
+  {"qcd_stat_njet2_dm10",{1.029,1.119}},
+  {"qcd_stat_njet2_dm11",{1.052,1.187}},
+  
+};
+
+float computeUnc(float pt, float a, float b) {
+  float ptmax = TMath::Min(float(pt),float(120.));
+  float unc = a + (b-a)*(pt-40.)/80.;
+  return unc;
+}
+
+float computeExtrapUnc(float dR, float a, float b) {
+  float dRrange = dR;
+  if (dR<0.5) dRrange = 0.5;
+  if (dR>5.0) dRrange = 5.0;
+  float offset = TMath::Abs(dRrange - float(2.6));  
+  float unc = 1.0 + a + offset*b;
+  return unc;
+}
+
+// bjet -> e fake rate uncertainties 
+float btoe_fake(float pt, TString era) {
+  
+  if (pt>100) {
+    pt = 100;
+  }
+  float emin = 1.08;
+  float emax = 1.20;
+  if (era=="2016") {
+    emin = 1.11;
+    emax = 1.26;
+  }
+  if (era=="2017") {
+    emin = 1.10;
+    emax = 1.22;
+  }
+
+  float SF = emin + (pt-15.)*(emax-emin)/85.;
+  return SF;
+
+}
+
+// bjet -> mu fake rate uncertainties 
+float btomu_fake(float pt, TString era) {
+
+  if (pt>100) {
+    pt = 100;
+  }
+  float emin = 1.09;
+  float emax = 1.20;
+  if (era=="2016") {
+    emin = 1.12;
+    emax = 1.26;
+  }
+  if (era=="2017") {
+    emin = 1.11;
+    emax = 1.22;
+  }
+
+  float SF = emin + (pt-15.)*(emax-emin)/85.;
+  return SF;
+
+}
+
+// light jet -> mu fake rate uncertainties 
+float jtomu_fake(float pt, TString era) {
+
+  if (pt>100) {
+    pt = 100;
+  }
+  float emin = 1.07;
+  float emax = 1.22;
+  if (era=="2016") {
+    emin = 1.09;
+    emax = 1.27;
+  }
+  if (era=="2017") {
+    emin = 1.08;
+    emax = 1.25;
+  }
+
+  float SF = emin + (pt-15.)*(emax-emin)/85.;
+  return SF;
+
+}
+
+// light jet -> e fake rate uncertainties 
+float jtoe_fake(float pt, TString era) {
+
+  if (pt>100) {
+    pt = 100;
+  }
+  float emin = 1.12;
+  float emax = 1.32;
+  if (era=="2016") {
+    emin = 1.15;
+    emax = 1.39;
+  }
+  if (era=="2017") {
+    emin = 1.13;
+    emax = 1.35;
+  }
+
+  float SF = emin + (pt-15.)*(emax-emin)/85.;
+  return SF;
+
+}
+
+// additional corrections to be applied to subtracted MC samples
+// in the SS sideband region: correction for j->l fake rate
+float corr_SS_em_JFakes(float prob, int pred_class, TString era) {
+
+  float corr = 1.0;
+
+  // HWW  
+  if (pred_class==3) {
+    if (prob>0.0&&prob<1.0) {
+      if (era=="2018") 
+	corr = -0.204082*prob*prob - 0.634694*prob + 1.35878;
+      if (era=="2017")
+	corr = -0.816327*prob*prob + 0.0326529*prob + 1.07367;
+      if (era=="2016")
+	corr = 0.612245*prob*prob - 1.58163*prob + 1.66939;
+    }
+  }
+  // TTbar
+  if (pred_class==0) {
+    if (prob>0.0&&prob<1.0) {
+      if (era=="2018") {
+	corr = 1.012 + 0.054*prob;
+      }
+      if (era=="2017") {
+	corr = 0.997 - 0.0016*prob;
+      }
+      if (era=="2016") {
+	corr = 0.995 - 0.0019*prob;
+      }
+    }    
+  }
+  // no correction is needed for HTT category
+  return corr;
+
+}
+
+// Updated tau ID SF -> 
 double TauSFv1_UL(TString era,
 		  int tauDM,
 		  int genMatch,
@@ -135,6 +409,8 @@ int main(int argc, char * argv[]) {
   if (era=="2017") Era="2017";
   if (era=="2016_pre") Era="2016";
   if (era=="2016_post") Era="2016";
+
+  bool isData = (process=="Tau"||process=="MuonEG");
 
   std::map<TString,TString> systematicsNameMap = {
     {"JES","_CMS_scale_j_JES_13TeV"},
@@ -294,8 +570,18 @@ int main(int argc, char * argv[]) {
   }
 
   std::vector<TString> systematicsJES_era = systematicsJES_2018;
-  if (Era=="2017") systematicsJES_era = systematicsJES_2017;
-  if (Era=="2016") systematicsJES_era = systematicsJES_2016;
+  std::map<TString, std::vector<float> > ff_stat_unc = ff_stat_unc_2018;
+  std::map<TString, std::vector<float> > ff_extrap_unc = ff_extrap_unc_2018;
+  if (Era=="2017") {
+    systematicsJES_era = systematicsJES_2017;
+    ff_stat_unc = ff_stat_unc_2017;
+    ff_extrap_unc = ff_extrap_unc_2017;
+  }
+  if (Era=="2016") { 
+    systematicsJES_era = systematicsJES_2016;
+    ff_stat_unc = ff_stat_unc_2016;
+    ff_extrap_unc = ff_extrap_unc_2016;
+  }
 
   std::vector<TString> sysTreeNames;
   if (argc==4) {
@@ -400,8 +686,9 @@ int main(int argc, char * argv[]) {
   double neventsDY1Jets = 0;
   double neventsDY2Jets = 0;
 
+  /*
   if (Sample.Contains("WJets")){
-    /*
+
     neventsWIncl   = getNEventsProcessed(input_dir+"/"+process_map->at("WJets")+".root");
     neventsW0Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W0Jets")+".root");
     neventsW1Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W1Jets")+".root");
@@ -410,19 +697,9 @@ int main(int argc, char * argv[]) {
     xsecW0Jets     = xsec_map->at(process_map->at("W0Jets"));
     xsecW1Jets     = xsec_map->at(process_map->at("W1Jets"));
     xsecW2Jets     = xsec_map->at(process_map->at("W2Jets"));
-    */
 
-    neventsWIncl   = getNEventsProcessed(input_dir+"/"+process_map->at("WJets")+".root");
-    neventsW1Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W1Jets")+".root");
-    neventsW2Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W2Jets")+".root");
-    neventsW3Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W3Jets")+".root");
-    neventsW4Jets  = getNEventsProcessed(input_dir+"/"+process_map->at("W4Jets")+".root");
-    xsecWIncl      = xsec_map->at(process_map->at("WJets"));
-    xsecW1Jets     = xsec_map->at(process_map->at("W1Jets"));
-    xsecW2Jets     = xsec_map->at(process_map->at("W2Jets"));
-    xsecW3Jets     = xsec_map->at(process_map->at("W3Jets"));
-    xsecW4Jets     = xsec_map->at(process_map->at("W4Jets"));
   }
+  */
   if (Sample.Contains("DYJets")){
      neventsDYIncl  = getNEventsProcessed(input_dir+"/"+process_map->at("DYJets")+".root");
      neventsDY0Jets = getNEventsProcessed(input_dir+"/"+process_map->at("DY0Jets")+".root");
@@ -437,7 +714,7 @@ int main(int argc, char * argv[]) {
   // Loop over all samples
   //  cout <<"loop start " << endl;
   for (auto const& sample : samples_map){
-    //    cout <<"loop start " << endl;
+    cout <<"loop start " << endl;
     cout << sample.first << "  :  " << endl ;
     // creating file -->
     TFile *outFile = NULL; 
@@ -446,11 +723,13 @@ int main(int argc, char * argv[]) {
     // reading files -->
     std::map<TString,TFile*> files_sample; 
     std::map<TString,TFile*> files_friend;
+    std::map<TString,float> scaleQCDUp;
+    std::map<TString,float> scaleQCDDown;
     std::vector<TString> subsamples;
     subsamples.clear();
     for(TString const& subsample: sample.second) {
       bool FoundSampleInMap=false;
-      //      cout << "  - " << subsample << " -> ";
+      cout << "  - " << subsample << " -> ";
       TString subSample = subsample;
 
       subsamples.push_back(subSample);
@@ -461,6 +740,24 @@ int main(int argc, char * argv[]) {
 	std::cout << "unable to open file " << input_dir << "/" << subsample << ".root" << std::endl;
 	exit(-1);
       }
+
+      float qcdNormUp = 1.0;
+      float qcdNormDown = 1.0;
+      
+      if (!isData) {
+	if (splitJES) {
+	  TH1D * histScaleCentral = (TH1D*)inFile->Get("nWeightedEventsScaleCentral");
+	  TH1D * histScaleUp = (TH1D*)inFile->Get("nWeightedEventsScaleUp");
+	  TH1D * histScaleDown = (TH1D*)inFile->Get("nWeightedEventsScaleDown");
+	  qcdNormUp   = histScaleCentral->GetSumOfWeights()/histScaleUp->GetSumOfWeights();
+	  qcdNormDown = histScaleCentral->GetSumOfWeights()/histScaleDown->GetSumOfWeights(); 
+	}
+      }
+
+      std::cout << std::endl;
+      std::cout << "QCD Scale up   -> overall normalization : " << qcdNormUp   << std::endl;
+      std::cout << "QCD scale down -> overall normalization : " << qcdNormDown <<  std::endl;
+      std::cout << std::endl;
 
       TFile *friendFile =NULL;      
       if(useFriend){
@@ -474,6 +771,8 @@ int main(int argc, char * argv[]) {
 	  exit(-1);
 	}
       }
+      scaleQCDUp[subSample]   = qcdNormUp;
+      scaleQCDDown[subSample] = qcdNormDown;
       files_sample[subSample] = inFile;
       files_friend[subSample] = friendFile;
     }
@@ -488,6 +787,8 @@ int main(int argc, char * argv[]) {
       for(auto subsample : subsamples) {
 	cout << "  - " << subsample << "   " << TreeName << " -> " << std::endl;
 	TFile * inFile = files_sample[subsample];
+	float qcdNormUp   = scaleQCDUp[subsample];
+	float qcdNormDown = scaleQCDDown[subsample];
 
 	TTree *inTree  = NULL;
 	inTree = (TTree*)inFile->Get(TreeName);
@@ -532,6 +833,7 @@ int main(int argc, char * argv[]) {
 	float trigweight;
 	float effweight;
 	float pzeta;
+	float btagSF;
 	//float mTdileptonMET;
 	bool passedAllMetFilters;
 	bool trg_muonelectron;
@@ -552,9 +854,14 @@ int main(int argc, char * argv[]) {
 	float qcdweight;
 	float dr_tt;
 	int os;
-	float mbb;
-	float dRbb;
+	//	float mbb;
+	//	float dRbb;
+	float bfakeE;
+	float jfakeE;
+	float bfakeMu;
+	float jfakeMu;
 	int nbtag;
+	int nbtag_raw;
 	int pred_class;
 	float prob_0,prob_1,prob_2,prob_3,prob_4;
 	double prob_tt_0, prob_tt_1, prob_tt_2, prob_tt_3, prob_tt_4;
@@ -571,6 +878,7 @@ int main(int argc, char * argv[]) {
 	float byVVVLooseDeepTau2017v2p1VSjet_1;
 	float byVVVLooseDeepTau2017v2p1VSjet_2;
 	float ff_nom;
+	float ff_qcd_stat[24];
 	// weights ->
 	float weight_CMS_QCDScale4;
 	float weight_CMS_QCDScale2;
@@ -586,7 +894,7 @@ int main(int argc, char * argv[]) {
 	inTree->SetBranchAddress("pt_2",&pt_2);
 	inTree->SetBranchAddress("pzeta",&pzeta);
 	//inTree->SetBranchAddress("mTdileptonMET",&mTdileptonMET);
-	inTree->SetBranchAddress("passedAllMetFilters",&passedAllMetFilters);
+	//	inTree->SetBranchAddress("passedAllMetFilters",&passedAllMetFilters);
 	inTree->SetBranchAddress("run",&run);
 	inTree->SetBranchAddress("njets",&njets);
 	inTree->SetBranchAddress("mjj",&mjj);
@@ -594,12 +902,12 @@ int main(int argc, char * argv[]) {
 	inTree->SetBranchAddress("pt_tt",&pt_tt);
 	inTree->SetBranchAddress("jpt_1",&jpt_1);
 	inTree->SetBranchAddress("jpt_2",&jpt_2);
-	inTree->SetBranchAddress("jeta_1",&jeta_1);
-	inTree->SetBranchAddress("jeta_2",&jeta_2);
+	//	inTree->SetBranchAddress("jeta_1",&jeta_1);
+	//	inTree->SetBranchAddress("jeta_2",&jeta_2);
 	inTree->SetBranchAddress("dr_tt",&dr_tt);
 	inTree->SetBranchAddress("os",&os);
-	inTree->SetBranchAddress("mbb", &mbb);
-	inTree->SetBranchAddress("dRbb",&dRbb);
+	//	inTree->SetBranchAddress("mbb", &mbb);
+	//	inTree->SetBranchAddress("dRbb",&dRbb);
 	inTree->SetBranchAddress("nbtag",&nbtag);
 	inTree->SetBranchAddress("trg_doubletau",&trg_doubletau);
 	inTree->SetBranchAddress("weight",&weight);
@@ -607,6 +915,8 @@ int main(int argc, char * argv[]) {
 	inTree->SetBranchAddress("weight_CMS_QCDScale2",&weight_CMS_QCDScale2);
 	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVUp",&weight_CMS_scale_gg_13TeVUp);
 	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVDown",&weight_CMS_scale_gg_13TeVDown);
+	inTree->SetBranchAddress("gen_match_1",&gen_match_1);
+	inTree->SetBranchAddress("gen_match_2",&gen_match_2);
 
 	// em specific variables
 	if (channel=="em") {
@@ -614,6 +924,8 @@ int main(int argc, char * argv[]) {
 	  inTree->SetBranchAddress("trg_ehigh_mulow", &trg_ehigh_mulow);
 	  inTree->SetBranchAddress("weightEMu",&weightEMu);
 	  inTree->SetBranchAddress("qcdweight",&qcdweight);
+	  inTree->SetBranchAddress("btagSF",&btagSF);
+	  inTree->SetBranchAddress("nbtag_raw",&nbtag_raw);
 	}
 	
 	// tt specific variables
@@ -630,8 +942,6 @@ int main(int argc, char * argv[]) {
 	  inTree->SetBranchAddress("ff_nom",&ff_nom);
 	  inTree->SetBranchAddress("tau_decay_mode_1",&tau_decay_mode_1);
 	  inTree->SetBranchAddress("tau_decay_mode_2",&tau_decay_mode_2);
-	  inTree->SetBranchAddress("gen_match_1",&gen_match_1);
-	  inTree->SetBranchAddress("gen_match_2",&gen_match_2);
 	  inTree->SetBranchAddress("trigweight",&trigweight);
 	  inTree->SetBranchAddress("effweight",&effweight);
 	}
@@ -666,18 +976,24 @@ int main(int argc, char * argv[]) {
 	float xsec_lumi_weight;
 	float ff_tt;
 	float ff_sys[20];
+	float ff_stat[12];
+	float ff_extrap_stat[2];
+	float qcd_syst_met_njet0_closure;
+	float qcd_syst_met_njet1_closure;
+	float qcd_syst_met_njet2_closure;
+	float qcd_syst_DR_nbtag1;
+	float qcd_syst_DR_nbtag2;
 	std::vector<std::string> ff_sysnames = {
-	  "qcd_stat_dR_unc1",
-	  "qcd_stat_dR_unc2",
 	  "qcd_stat_pt_unc1",
 	  "qcd_stat_pt_unc2",
-	  "qcd_syst",
-	  "qcd_syst_dr_closure",
-	  "qcd_syst_pt_2_closure",
-	  "qcd_syst_met_closure",
+	  "qcd_stat_dR_unc1",
+	  "qcd_stat_dR_unc2",
+	  "qcd_syst_dr_closure", 
+	  "qcd_syst_pt_2_closure", 
+	  "qcd_syst_met_closure", 
 	  "syst_alt_func"
 	};
-	
+
 	if(firstTree){
 	  outTree    = inTree->CloneTree(0);
 	  outTree->Branch("xsec_lumi_weight", &xsec_lumi_weight, "xsec_lumi_weight/F");
@@ -686,6 +1002,27 @@ int main(int argc, char * argv[]) {
 	    for (unsigned int i=0; i<ff_sysnames.size(); ++i) {
 	      outTree->Branch("ff_"+TString(ff_sysnames[i]),&ff_sys[i],"ff_"+TString(ff_sysnames[i])+"/F");
 	    }
+	    outTree->Branch("qcd_syst_met_njet0_closure",&qcd_syst_met_njet0_closure,"qcd_syst_met_njet0_closure/F");
+	    outTree->Branch("qcd_syst_met_njet1_closure",&qcd_syst_met_njet1_closure,"qcd_syst_met_njet1_closure/F");
+	    outTree->Branch("qcd_syst_met_njet2_closure",&qcd_syst_met_njet2_closure,"qcd_syst_met_njet2_closure/F");
+	    outTree->Branch("qcd_syst_DR_nbtag1",&qcd_syst_DR_nbtag1,"qcd_syst_DR_nbtag1/F");
+	    outTree->Branch("qcd_syst_DR_nbtag2",&qcd_syst_DR_nbtag2,"qcd_syst_DR_nbtag2/F");
+	    // ************************************
+	    // decorrelated stat. uncertainty ->
+	    // ************************************
+	    for (unsigned int i=0; i<ff_statnames.size(); ++i) {
+	      outTree->Branch("ff_"+ff_statnames[i],&ff_stat[i],"ff_"+ff_statnames[i]+"/F");
+	    }
+	    for (unsigned int i=0; i<ff_extrapnames.size(); ++i) {
+	      outTree->Branch("ff_"+ff_extrapnames[i],&ff_extrap_stat[i],"ff_"+ff_extrapnames[i]+"/F");
+	    }
+	    
+	  }
+	  if (channel=="em") {
+	    outTree->Branch("bfakeE",&bfakeE,"bfakeE/F");
+	    outTree->Branch("jfakeE",&jfakeE,"jfakeE/F");
+	    outTree->Branch("bfakeMu",&bfakeMu,"bfakeMu/F");
+	    outTree->Branch("jfakeMu",&jfakeMu,"jfakeMu/F");
 	  }
 	  if(useFriend){
 	    outTree->Branch("pred_class",&pred_class,"pred_class/I");
@@ -705,6 +1042,26 @@ int main(int argc, char * argv[]) {
 	  for (unsigned int i=0; i<ff_sysnames.size(); ++i) {
 	    currentTree->Branch("ff_"+TString(ff_sysnames[i]),&ff_sys[i],"ff_"+TString(ff_sysnames[i])+"/F");
 	  }
+	  currentTree->Branch("qcd_syst_met_njet0_closure",&qcd_syst_met_njet0_closure,"qcd_syst_met_njet0_closure/F");
+	  currentTree->Branch("qcd_syst_met_njet1_closure",&qcd_syst_met_njet1_closure,"qcd_syst_met_njet1_closure/F");
+	  currentTree->Branch("qcd_syst_met_njet2_closure",&qcd_syst_met_njet2_closure,"qcd_syst_met_njet2_closure/F");
+	  currentTree->Branch("qcd_syst_DR_nbtag1",&qcd_syst_DR_nbtag1,"qcd_syst_DR_nbtag1/F");
+	  currentTree->Branch("qcd_syst_DR_nbtag2",&qcd_syst_DR_nbtag2,"qcd_syst_DR_nbtag2/F");
+	  // ************************************
+	  // decorrelated stat. uncertainty ->
+	  // ************************************
+	  for (unsigned int i=0; i<ff_statnames.size(); ++i) {
+	    currentTree->Branch("ff_"+ff_statnames[i],&ff_stat[i],"ff_"+ff_statnames[i]+"/F");
+	  }
+	  for (unsigned int i=0; i<ff_extrapnames.size(); ++i) {
+	    currentTree->Branch("ff_"+ff_extrapnames[i],&ff_extrap_stat[i],"ff_"+ff_extrapnames[i]+"/F");
+	  }
+	}
+	if (channel=="em") {
+	  currentTree->Branch("bfakeE",&bfakeE,"bfakeE/F");
+	  currentTree->Branch("jfakeE",&jfakeE,"jfakeE/F");
+	  currentTree->Branch("bfakeMu",&bfakeMu,"bfakeMu/F");
+	  currentTree->Branch("jfakeMu",&jfakeMu,"jfakeMu/F");
 	}
 	if(useFriend){
 	  currentTree->Branch("pred_class",&pred_class,"pred_class/I");
@@ -721,13 +1078,26 @@ int main(int argc, char * argv[]) {
 	  inTree->GetEntry(i);
 	  trg_muonelectron = (trg_muhigh_elow && pt_2 > 24) || (trg_ehigh_mulow && pt_1 > 24);
 	  // Add here preselection if necessary
-	  weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale4));
-	  weight_CMS_scale_gg_13TeVDown = 1.0/weight_CMS_scale_gg_13TeVUp;
-	  // use different QCD scale
-	  if (process.Contains("_YB2")||process.Contains("_YBY2")) {
-	    weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale2));
+	  if (!splitJES) { // for old synch tuples ->
+	    weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale4));
 	    weight_CMS_scale_gg_13TeVDown = 1.0/weight_CMS_scale_gg_13TeVUp;
+	  
+	    // use different QCD scale
+	    if (process.Contains("_YB2")||process.Contains("_YBY2")) {
+	      weight_CMS_scale_gg_13TeVUp = TMath::Max(float(0.01),TMath::Min(float(5.0),weight_CMS_QCDScale2));
+	      weight_CMS_scale_gg_13TeVDown = 1.0/weight_CMS_scale_gg_13TeVUp;
+	    }
 	  }
+	  //	  std::cout << "weight_CMS_scale_gg_13TeVUp   (before) = " << weight_CMS_scale_gg_13TeVUp << std::endl;
+	  //	  std::cout << "weight_CMS_scale_gg_13TeVDown (before) = " << weight_CMS_scale_gg_13TeVDown << std::endl;
+	  if (splitJES) {
+	    weight_CMS_scale_gg_13TeVUp *= qcdNormUp;
+	    weight_CMS_scale_gg_13TeVDown *= qcdNormDown;
+	  }
+	  //	  std::cout << "weight_CMS_scale_gg_13TeVUp   (after)  = " << weight_CMS_scale_gg_13TeVUp << std::endl;
+	  //	  std::cout << "weight_CMS_scale_gg_13TeVDown (after)  = " << weight_CMS_scale_gg_13TeVDown << std::endl;
+	  //	  std::cout << std::endl;
+
 	  if(applyPreselection){
 	    if (channel=="em") {
 	      if( iso_1 > 0.5 )                continue;
@@ -783,6 +1153,22 @@ int main(int argc, char * argv[]) {
 	      */
 	    }
 	  }
+	  // j->l fake rate uncertainties for em channel
+	  bfakeE = 1.;
+	  jfakeE = 1.;
+	  bfakeMu = 1.;
+	  jfakeMu = 1.;
+	  if (channel=="em") {
+	    if (!isData) {
+	      if (gen_match_1==6) jfakeE = jtoe_fake(pt_1,Era);
+	      else if (gen_match_1>6) bfakeE = btoe_fake(pt_1,Era);
+	      if (gen_match_2==6) jfakeMu = jtomu_fake(pt_2,Era);
+	      else if (gen_match_2>6) bfakeMu = btomu_fake(pt_2,Era);
+	      // correction for fake rate in MC SS region (HWW category) ->
+	      float corr = corr_SS_em_JFakes(float(pred_proba),pred_class,Era);
+	      qcdweight *= corr;
+	    }
+	  }
 	  // Fake background tt channel
 	  if (channel=="tt") {
 	    w_fakefactors->var("pt")->setVal(pt_1);
@@ -815,8 +1201,71 @@ int main(int argc, char * argv[]) {
 	      //	      std::cout << ff_sysnames[isys] << " : " << ff_sys[isys] << std::endl;
 	    }
 	    //	    std::cout << std::endl;
-	  }
 
+	    for (unsigned i=0; i<ff_statnames.size(); ++i)
+	      ff_stat[i] = 1;
+	    for (unsigned i=0; i<ff_extrapnames.size(); ++i) 
+	      ff_extrap_stat[i] = 1;
+
+
+	    qcd_syst_met_njet0_closure = 1.0;
+	    qcd_syst_met_njet1_closure = 1.0;
+	    qcd_syst_met_njet2_closure = 1.0;
+
+	    qcd_syst_DR_nbtag1 = 1.0;
+	    qcd_syst_DR_nbtag2 = 1.0;
+
+	    // *********************************************
+	    // decorrelate between decay modes and njet bins
+	    // *********************************************
+	    int idm = 0;
+	    int injet =0;
+	    TString sdm = "dm0";
+	    TString snjet = "njet0";
+	    if (tau_decay_mode_1==0) {idm = 0; sdm = "dm0";}
+	    else if (tau_decay_mode_1>=1&&tau_decay_mode_1<=3) {idm = 1; sdm = "dm1";}
+	    else if (tau_decay_mode_1==10) {idm = 2; sdm = "dm10";}
+	    else if (tau_decay_mode_1==11) {idm = 3; sdm = "dm11";}
+	    if (njets==0) {injet = 0; snjet = "njet0"; qcd_syst_met_njet0_closure = ff_sys[6];}
+	    else if (njets==1) {injet = 1; snjet = "njet1"; qcd_syst_met_njet1_closure = ff_sys[6];}
+	    else {injet = 2; snjet = "njet2"; qcd_syst_met_njet2_closure = ff_sys[6];}
+	    TString sysName = "qcd_stat_" + snjet + "_" + sdm;
+	    float a = ff_stat_unc[sysName].at(0);
+	    float b = ff_stat_unc[sysName].at(1);
+	    int index = injet*4 + idm; 
+	    ff_stat[index] = computeUnc(pt_1,a,b);
+	    if (nbtag==1)  qcd_syst_DR_nbtag1 = tt_extrap_unc(dr_tt,Era,nbtag);
+	    else if (nbtag>=2) qcd_syst_DR_nbtag2 = tt_extrap_unc(dr_tt,Era,nbtag);
+	    if (nbtag==1) {
+	      TString sysNameExtrap = "qcd_extrap_stat_nbtag1";
+	      float a = ff_extrap_unc[sysNameExtrap].at(0);
+	      float b = ff_extrap_unc[sysNameExtrap].at(1);
+	      ff_extrap_stat[0] = computeExtrapUnc(dr_tt,a,b);
+	    }
+	    else if (nbtag>=2) {
+	      TString sysNameExtrap = "qcd_extrap_stat_nbtag2";
+	      float a = ff_extrap_unc[sysNameExtrap].at(0);
+	      float b = ff_extrap_unc[sysNameExtrap].at(1);
+	      ff_extrap_stat[1] = computeExtrapUnc(dr_tt,a,b);
+	    }
+	    /*
+	      if (nbtag>=2) {
+	      std::cout << "njets = " << njets << "   nbtag = " << nbtag << "   pt_1 =" << pt_1 << "   tau_decay_mode_1 = " 
+			<< tau_decay_mode_1 << "  dR(tautau) = " << dr_tt << std::endl;
+	      std::cout << sysName << " : index = " << index << "   -> " << ff_stat[index] << std::endl;
+	      std::cout << "qcd_syst_met_njet0_closure = " << qcd_syst_met_njet0_closure << std::endl;
+	      std::cout << "qcd_syst_met_njet1_closure = " << qcd_syst_met_njet1_closure << std::endl;
+	      std::cout << "qcd_syst_met_njet2_closure = " << qcd_syst_met_njet2_closure << std::endl;
+	      std::cout << "qcd_syst_DR_nbtag1 = " << qcd_syst_DR_nbtag1 << std::endl;
+	      std::cout << "qcd_syst_DR_nbtag2 = " << qcd_syst_DR_nbtag2 << std::endl;
+	      std::cout << ff_sysnames.at(6) << " = " << ff_sys[6] << std::endl;
+	      std::cout << "qcd_extrap_stat_nbtag1 = " << ff_extrap_stat[0] << std::endl;
+	      std::cout << "qcd_extrap_stat_nbtag2 = " << ff_extrap_stat[1] << std::endl;
+	      std::cout << std::endl;
+	      
+	      }
+	    */
+	  }	
 	  // Replace jet variables to have an effectie cut of jetpt > 30 GeV
 	  if(njets < 2){
 	    jdeta   = -10;
@@ -824,34 +1273,35 @@ int main(int argc, char * argv[]) {
 	    //dijetpt = -10;
 	    //pt_ttjj = -10;
 	    jpt_2   = -10;
-	    jeta_2  = -10;
+	    //	    jeta_2  = -10;
 	 
 	    if(njets < 1){
 	      jpt_1 = -10;
-	      jeta_1= -10;
+	      //	      jeta_1= -10;
 	    }
 	  }
-	  if(nbtag < 2){
-	    mbb     = -10;
-	    dRbb    = -10;
-	  }
+	  //	  if(nbtag < 2){
+	  //	    mbb     = -10;
+	  //	    dRbb    = -10;
+	  //	  }
 	  
 	  xsec_lumi_weight = xsec*luminosity/nevents;
-	  
-	  // Stitching only for wjets MC in n-jet binned samples in npartons
-	  //	  if( subsample.Contains("W") && subsample.Contains("JetsToLNu") ){
-	  //	    if(gen_noutgoing== 1)      xsec_lumi_weight = luminosity / ( neventsW1Jets/xsecW1Jets + neventsWIncl/xsecWIncl );
-	  //	    else if(gen_noutgoing== 2) xsec_lumi_weight = luminosity / ( neventsW2Jets/xsecW2Jets + neventsWIncl/xsecWIncl );
-	  //	    else if(gen_noutgoing== 3) xsec_lumi_weight = luminosity / ( neventsW3Jets/xsecW3Jets + neventsWIncl/xsecWIncl );
-	  //	    else if(gen_noutgoing== 4) xsec_lumi_weight = luminosity / ( neventsW4Jets/xsecW4Jets + neventsWIncl/xsecWIncl );
-	  //	    else                       xsec_lumi_weight = luminosity / ( neventsWIncl/xsecWIncl );
+	  //	  std::cout << "xsec = " << xsec << "  ;  lumi = " 
+	  //		    << luminosity << "  ;  nevents = " 
+	  //		    << nevents << "   -> " << xsec_lumi_weight << std::endl;
+
+	  // only few events from WJets_0J_amcatnlo sample pass selection
+	  // -> no need to include 0J bin
+	  //	  if (process.Contains("WJets_amcatnlo")&&Era=="2018"){
+	  //
 	  //	    if(gen_noutgoing==0)      xsec_lumi_weight = luminosity / ( neventsW0Jets/xsecW0Jets + neventsWIncl/xsecWIncl );
 	  //	    else if(gen_noutgoing==1) xsec_lumi_weight = luminosity / ( neventsW1Jets/xsecW1Jets + neventsWIncl/xsecWIncl );
 	  //	    else if(gen_noutgoing==2) xsec_lumi_weight = luminosity / ( neventsW2Jets/xsecW2Jets + neventsWIncl/xsecWIncl );
 	  //	    else                      xsec_lumi_weight = luminosity / ( neventsWIncl/xsecWIncl );
-	  //
-	  //	  } //changed the DYJETS for amcatnlo
-	  if( subsample.Contains("DY") && subsample.Contains("amcatnlo") ){
+	  //	    std::cout << gen_noutgoing << " : " << xsec_lumi_weight << std::endl;
+	  //	  }
+	  // Stitching DYJETS for amcatnlo
+	  if(process.Contains("DYJets_amcatnlo")){
 	    if(gen_noutgoing==0)      xsec_lumi_weight = luminosity / ( neventsDY0Jets/xsecDY0Jets + neventsDYIncl/xsecDYIncl );
 	    else if(gen_noutgoing==1) xsec_lumi_weight = luminosity / ( neventsDY1Jets/xsecDY1Jets + neventsDYIncl/xsecDYIncl );
 	    else if(gen_noutgoing==2) xsec_lumi_weight = luminosity / ( neventsDY2Jets/xsecDY2Jets + neventsDYIncl/xsecDYIncl );
@@ -864,8 +1314,10 @@ int main(int argc, char * argv[]) {
 	  
 	  //	std::cout << "xsec_lumi_weight = " << xsec_lumi_weight << std::endl;
 	  
-	  if (channel=="em")
-	    xsec_lumi_weight = xsec_lumi_weight * weightEMu;
+	  if (channel=="em") {
+	    if (splitJES) xsec_lumi_weight = xsec_lumi_weight * weight;
+	    else xsec_lumi_weight = xsec_lumi_weight * weightEMu;
+	  }
 	  else if (channel=="tt") {
 	    xsec_lumi_weight = xsec_lumi_weight * weight;
 	  
@@ -890,10 +1342,10 @@ int main(int argc, char * argv[]) {
 	  }
 	  
 	  currentTree->Fill();
-	}
+	  }
 	//	cout<< " Entries (current tree) = " << currentTree->GetEntries() << endl;
 	treeList->Add(currentTree);
-      }
+	}
       outTree = TTree::MergeTrees(treeList);
       cout << endl;
       cout << " Entries (all trees) = " << outTree->GetEntries() << endl;

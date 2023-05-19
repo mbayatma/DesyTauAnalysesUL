@@ -77,7 +77,9 @@ class Cards {
 	double xmin,
 	double xmax,
 	bool RunWithSystematics,
-	bool RunOnEmbedded); 
+	bool split,
+	bool RunOnEmbedded,
+	int sym); 
 
   void SetVariableToPlot(TString var, int nbins, double xmin, double xmax);
   void SetVariableToPlot(TString var, int nbins, double * bins);
@@ -91,6 +93,7 @@ class Cards {
   void PrintWeightSystematics();
   void SetSmoothing(int min, int max, int range);
   void SetLooseShape(bool shape);
+  void SetSplitJES(bool split);
   void Rebin(bool rebinHisto, vector<double> bins);
   ~Cards();
 
@@ -100,8 +103,12 @@ class Cards {
   int max_smooth;
   int range_smooth;
 
+  std::vector<TString> shapeList;
+
   bool useLooseShape;
   bool rebin;
+  bool splitJES;
+  int symmetrize;
 
   TString mcNotTauTau;
   TString mcTauTau;
@@ -143,70 +150,38 @@ class Cards {
     {"CMS_scale_t_3prong1pizero","CMS_scale_t_3prong1pizero_13TeV"}
   };
 
-  const map<TString,TString> ShapeSystematics_Common = {
-    {"CMS_scale_j_FlavorQCD","CMS_scale_j_FlavorQCD_13TeV"},
-    {"CMS_scale_j_RelativeBal","CMS_scale_j_RelativeBal_13TeV"},
-    {"CMS_scale_j_HF","CMS_scale_j_HF_13TeV"},
-    {"CMS_scale_j_BBEC1","CMS_scale_j_BBEC1_13TeV"},
-    {"CMS_scale_j_EC2","CMS_scale_j_EC2_13TeV"},
-    {"CMS_scale_j_Absolute","CMS_scale_j_Absolute_13TeV"},    
+  const map<TString,TString> ShapeSystematicsJESCommon = {
+    {"jesFlavorQCD","CMS_scale_j_FlavorQCD_13TeV"},
+    {"jesRelativeBal","CMS_scale_j_RelativeBal_13TeV"},
+    {"jesHF","CMS_scale_j_HF_13TeV"},
+    {"jesBBEC1","CMS_scale_j_BBEC1_13TeV"},
+    {"jesEC2","CMS_scale_j_EC2_13TeV"},
+    {"jesAbsolute","CMS_scale_j_Absolute_13TeV"},    
   };
 
-  /*
-  const map<TString,TString> ShapeSystematics_2016 = {
-    {"CMS_scale_t_1prong_2016","CMS_scale_t_1prong_13TeV"},
-    {"CMS_scale_t_1prong1pizero_2016","CMS_scale_t_1prong1pizero_13TeV"},
-    {"CMS_scale_t_3prong_2016","CMS_scale_t_3prong_13TeV"},
-    {"CMS_scale_t_3prong1pizero_2016","CMS_scale_t_3prong1pizero_13TeV"},
-    {"CMS_scale_met_unclustered_2016","CMS_scale_met_unclustered_13TeV"},
-    {"CMS_htt_boson_res_met_2016","CMS_htt_boson_reso_met_13TeV"},
-    {"CMS_htt_boson_scale_met_2016","CMS_htt_boson_scale_met_13TeV"},
-    {"CMS_htt_eff_b_2016","CMS_eff_b_13TeV"},
-    {"CMS_htt_mistag_b_2016","CMS_mistag_b_13TeV"},
-    {"CMS_scale_j_Absolute_2016","CMS_scale_j_Absolute_2016_13TeV"},
-    {"CMS_scale_j_HF_2016","CMS_scale_j_HF_2016_13TeV"},
-    {"CMS_scale_j_EC2_2016","CMS_scale_j_EC2_2016_13TeV"},
-    {"CMS_scale_j_RelativeSample_2016","CMS_scale_j_RelativeSample_2016_13TeV"},
-    {"CMS_scale_j_BBEC1_2016","CMS_scale_j_BBEC1_2016_13TeV"},
-    {"CMS_res_j_2016","CMS_res_j_13TeV"},
+  const map<TString,TString> ShapeSystematicsJES2016 = {
+    {"jesAbsolute_2016","CMS_scale_j_Absolute_2016_13TeV"},
+    {"jesHF_2016","CMS_scale_j_HF_2016_13TeV"},
+    {"jesEC2_2016","CMS_scale_j_EC2_2016_13TeV"},
+    {"jesRelativeSample_2016","CMS_scale_j_RelativeSample_2016_13TeV"},
+    {"jesBBEC1_2016","CMS_scale_j_BBEC1_2016_13TeV"}
   };  
 
-  const map<TString,TString> ShapeSystematics_2017 = {
-    {"CMS_scale_t_1prong_2017","CMS_scale_t_1prong_13TeV"},
-    {"CMS_scale_t_1prong1pizero_2017","CMS_scale_t_1prong1pizero_13TeV"},
-    {"CMS_scale_t_3prong_2017","CMS_scale_t_3prong_13TeV"},
-    {"CMS_scale_t_3prong1pizero_2017","CMS_scale_t_3prong1pizero_13TeV"},
-    {"CMS_scale_met_unclustered_2017","CMS_scale_met_unclustered_13TeV"},
-    {"CMS_htt_boson_res_met_2017","CMS_htt_boson_reso_met_13TeV"},
-    {"CMS_htt_boson_scale_met_2017","CMS_htt_boson_scale_met_13TeV"},
-    {"CMS_htt_eff_b_2017","CMS_eff_b_13TeV"},
-    {"CMS_htt_mistag_b_2017","CMS_mistag_b_13TeV"},
-    {"CMS_scale_j_Absolute_2017","CMS_scale_j_Absolute_2017_13TeV"},
-    {"CMS_scale_j_HF_2017","CMS_scale_j_HF_2017_13TeV"},
-    {"CMS_scale_j_EC2_2017","CMS_scale_j_EC2_2017_13TeV"},
-    {"CMS_scale_j_RelativeSample_2017","CMS_scale_j_RelativeSample_2017_13TeV"},
-    {"CMS_scale_j_BBEC1_2017","CMS_scale_j_BBEC1_2017_13TeV"},
-    {"CMS_res_j_2017","CMS_res_j_13TeV"},
+  const map<TString,TString> ShapeSystematicsJES2017 = {
+    {"jesAbsolute_2017","CMS_scale_j_Absolute_2017_13TeV"},
+    {"jesHF_2017","CMS_scale_j_HF_2017_13TeV"},
+    {"jesEC2_2017","CMS_scale_j_EC2_2017_13TeV"},
+    {"jesRelativeSample_2017","CMS_scale_j_RelativeSample_2017_13TeV"},
+    {"jesBBEC1_2017","CMS_scale_j_BBEC1_2017_13TeV"},
   };  
 
-  const map<TString,TString> ShapeSystematics_2018 = {
-    {"CMS_scale_t_1prong_2018","CMS_scale_t_1prong_13TeV"},
-    {"CMS_scale_t_1prong1pizero_2018","CMS_scale_t_1prong1pizero_13TeV"},
-    {"CMS_scale_t_3prong_2018","CMS_scale_t_3prong_13TeV"},
-    {"CMS_scale_t_3prong1pizero_2018","CMS_scale_t_3prong1pizero_13TeV"},
-    {"CMS_scale_met_unclustered_2018","CMS_scale_met_unclustered_13TeV"},
-    {"CMS_htt_boson_res_met_2018","CMS_htt_boson_reso_met_13TeV"},
-    {"CMS_htt_boson_scale_met_2018","CMS_htt_boson_scale_met_13TeV"},
-    {"CMS_htt_eff_b_2018","CMS_eff_b_13TeV"},
-    {"CMS_htt_mistag_b_2018","CMS_mistag_b_13TeV"},
-    {"CMS_scale_j_Absolute_2018","CMS_scale_j_Absolute_2018_13TeV"},
-    {"CMS_scale_j_HF_2018","CMS_scale_j_HF_2018_13TeV"},
-    {"CMS_scale_j_EC2_2018","CMS_scale_j_EC2_2018_13TeV"},
-    {"CMS_scale_j_RelativeSample_2018","CMS_scale_j_RelativeSample_2018_13TeV"},
-    {"CMS_scale_j_BBEC1_2018","CMS_scale_j_BBEC1_2018_13TeV"},
-    {"CMS_res_j_2018","CMS_res_j_13TeV"},
+  const map<TString,TString> ShapeSystematicsJES2018 = {
+    {"jesAbsolute_2018","CMS_scale_j_Absolute_2018_13TeV"},
+    {"jesHF_2018","CMS_scale_j_HF_2018_13TeV"},
+    {"jesEC2_2018","CMS_scale_j_EC2_2018_13TeV"},
+    {"jesRelativeSample_2018","CMS_scale_j_RelativeSample_2018_13TeV"},
+    {"jesBBEC1_2018","CMS_scale_j_BBEC1_2018_13TeV"},
   };  
-  */
 
   const map<TString,TString> ShapeSystematicsTT = {
     {"scale_t_1prong","CMS_scale_t_1prong_13TeV"},
@@ -215,13 +190,15 @@ class Cards {
     {"scale_t_3prong1pi","CMS_scale_t_3prong1pizero_13TeV"},
     {"met_unclustered","CMS_scale_met_unclustered_13TeV"},
     {"jer","CMS_res_j_13TeV"},
+  };
+
+  const map<TString,TString> ShapeSystematicsJESTotal = {
     {"jesTotal","CMS_scale_j_JES_13TeV"}
   };
 
   const map<TString,TString> ShapeSystematicsEM = {
     {"met_unclustered","CMS_scale_met_unclustered_13TeV"},
     {"jer","CMS_res_j_13TeV"},
-    {"jesTotal","CMS_scale_j_JES_13TeV"}
   };
 
   // ******************************
@@ -246,10 +223,10 @@ class Cards {
     {"CMS_eff_xtrigger_t_tt_dm1","weight_CMS_eff_tau_trig_DM1"},
     {"CMS_eff_xtrigger_t_tt_dm10","weight_CMS_eff_tau_trig_DM10"},
     {"CMS_eff_xtrigger_t_tt_dm11","weight_CMS_eff_tau_trig_DM11"},
-    {"CMS_eff_t_dm0","weight_CMS_eff_tauid_DM0"},
-    {"CMS_eff_t_dm1","weight_CMS_eff_tauid_DM1"},
-    {"CMS_eff_t_dm10","weight_CMS_eff_tauid_DM10"},
-    {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
+    {"CMS_eff_t_1prong","weight_CMS_eff_tauid_DM0"},
+    {"CMS_eff_t_1prong1pi","weight_CMS_eff_tauid_DM1"},
+    {"CMS_eff_t_3prong","weight_CMS_eff_tauid_DM10"},
+    //    {"CMS_eff_t_dm11","weight_CMS_eff_tauid_DM11"},
     {"fake_e_tt","weight_CMS_etaufake"},
     {"fake_m_tt","weight_CMS_mutaufake"}
   };
@@ -285,6 +262,12 @@ class Cards {
     {"cferr2","btagweight_cferr2"}
   };
 
+  const map<TString,TString> LeptonFakeSystematics = {
+    {"CMS_htt_em_JetToElecFakes","jfakeE"},
+    {"CMS_htt_em_JetToMuonFakes","jfakeMu"},
+    {"CMS_htt_em_BJetToElecFakes","bfakeE"},
+    {"CMS_htt_em_BJetToMuonFakes","bfakeMu"},
+  };
 
   const map<TString,TString> QCDSystematics = {
     {"CMS_htt_em_qcd_0jet_rate","qcdweight_deltaR_0jet_Par0"},
@@ -299,14 +282,33 @@ class Cards {
   };
 
   const map<TString,TString> FakeFactorSystematics = {
-    {"CMS_htt_tt_qcd_stat_dR_unc1","ff_qcd_stat_dR_unc1"},
-    {"CMS_htt_tt_qcd_stat_dR_unc2","ff_qcd_stat_dR_unc2"},    
-    {"CMS_htt_tt_qcd_stat_pt_unc1","ff_qcd_stat_pt_unc1"},
-    {"CMS_htt_tt_qcd_stat_pt_unc2","ff_qcd_stat_pt_unc2"},
-    {"CMS_htt_tt_qcd_syst","ff_qcd_syst"},
-    {"CMS_htt_tt_qcd_syst_dr_closure","ff_qcd_syst_dr_closure"},
+    {"CMS_htt_tt_qcd_syst_dR_nbtag1","qcd_syst_DR_nbtag1"},
+    {"CMS_htt_tt_qcd_syst_dR_nbtag2","qcd_syst_DR_nbtag2"},    
+
+    {"CMS_htt_tt_qcd_stat_dR_nbtag1","ff_qcd_extrap_stat_nbtag1"},
+    {"CMS_htt_tt_qcd_stat_dR_nbtag2","ff_qcd_extrap_stat_nbtag2"},    
+
     {"CMS_htt_tt_qcd_syst_pt_2_closure","ff_qcd_syst_pt_2_closure"},
-    {"CMS_htt_tt_qcd_syst_met_closure","ff_qcd_syst_met_closure"},
+
+    {"CMS_htt_tt_qcd_syst_met_njet0_closure","qcd_syst_met_njet0_closure"},
+    {"CMS_htt_tt_qcd_syst_met_njet1_closure","qcd_syst_met_njet1_closure"},
+    {"CMS_htt_tt_qcd_syst_met_njet2_closure","qcd_syst_met_njet2_closure"},
+
+    {"CMS_htt_tt_qcd_stat_njet0_dm0","ff_qcd_stat_njet0_dm0"},
+    {"CMS_htt_tt_qcd_stat_njet0_dm1","ff_qcd_stat_njet0_dm1"},
+    {"CMS_htt_tt_qcd_stat_njet0_dm10","ff_qcd_stat_njet0_dm10"},
+    {"CMS_htt_tt_qcd_stat_njet0_dm11","ff_qcd_stat_njet0_dm11"},
+
+    {"CMS_htt_tt_qcd_stat_njet1_dm0","ff_qcd_stat_njet1_dm0"},
+    {"CMS_htt_tt_qcd_stat_njet1_dm1","ff_qcd_stat_njet1_dm1"},
+    {"CMS_htt_tt_qcd_stat_njet1_dm10","ff_qcd_stat_njet1_dm10"},
+    {"CMS_htt_tt_qcd_stat_njet1_dm11","ff_qcd_stat_njet1_dm11"},
+
+    {"CMS_htt_tt_qcd_stat_njet2_dm0","ff_qcd_stat_njet2_dm0"},
+    {"CMS_htt_tt_qcd_stat_njet2_dm1","ff_qcd_stat_njet2_dm1"},
+    {"CMS_htt_tt_qcd_stat_njet2_dm10","ff_qcd_stat_njet2_dm10"},
+    {"CMS_htt_tt_qcd_stat_njet2_dm11","ff_qcd_stat_njet2_dm11"},
+
   };
 
   const map<TString,TString> QCDIsoSystematics = {
@@ -318,6 +320,12 @@ class Cards {
     {"QCDscale","weight_CMS_scale_gg_13TeV"},
     {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
     {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
+  };
+
+  const map<TString,TString> HiggsSystematics = {
+    {"QCDscale","weight_CMS_scale_gg_13TeV"},
+    //    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
+    //    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
   };
 
   // ******************************************************* 

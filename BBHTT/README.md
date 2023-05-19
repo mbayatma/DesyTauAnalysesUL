@@ -244,9 +244,20 @@ where $sample is the name of the sample to be processed, $era={2016_pre,2016_pos
 
 * Central : nominal tree TauCheck;
 * JES{Up,Down} : TauCheck_CMS_scale_j_13TeV{Up,Down} (total JES uncertainty);
-* JER{Up,Down} : TauCheck_CMS_res_j_13TeV{Up};
+* JER{Up,Down} : TauCheck_CMS_res_j_13TeV{Up,Down};
 * Uncl{Up,Down} : TauCheck_CMS_scale_met_unclustered_13TeV{Up,Down};
-* EScale{Up,Down} : TauCheck_CMS_scale_e_13TeV{Up,Down}.
+* EScale{Up,Down} : TauCheck_CMS_scale_e_13TeV{Up,Down};
+* FlavorQCD{Up,Down} : TauCheck_CMS_scale_j_FlavorQCD_13TeV{Up,Down};
+* RelativeBal{Up,Down} : TauCheck_CMS_scale_j_RelativeBal_13TeV{Up,Down};
+* HF{Up,Down} : TauCheck_CMS_scale_j_HF_13TeV{Up,Down};
+* BBEC1{Up,Down} : TauCheck_CMS_scale_j_BBEC1_13TeV{Up,Down};
+* EC2{Up,Down} : TauCheck_CMS_scale_j_EC2_13TeV{Up,Down};
+* Absolute{Up,Down} : TauCheck_CMS_scale_j_Absolute_13TeV{Up,Down};
+* Absolute_Era{Up,Down} : TauCheck_CMS_scale_j_Absolute_$ERA_13TeV{Up,Down};
+* HF_Era{Up,Down} : TauCheck_CMS_scale_j_HF_$ERA_13TeV{Up,Down};
+* EC2_Era{Up,Down} : TauCheck_CMS_scale_j_EC2_$ERA_13TeV{Up,Down};
+* RelativeSample_Era{Up,Down} : TauCheck_CMS_scale_j_RelativeSample_$ERA_13TeV{Up,Down};
+* BBEC1_Era{Up,Down} : TauCheck_CMS_scale_j_BBEC1_$ERA_13TeV{Up,Down}.
 
 The names of the samples to be processed are listed in bash scripts that submit jobs to the condor system: 
 * [DesyTauAnalyses/BBHTT/test/dnn_production/dnn_producer_em.bash](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/dnn_production/dnn_producer_em.bash)
@@ -327,12 +338,10 @@ Available options for parameter ```$sample```:
 * bbHWW_nobb : yt2, yb2, ybyt H->WW templates without generator b-jets with pT > 10 GeV;
 
 Available options for parameter ```$category```:
-* cat0_NbtagGe1 : TTbar (bbH signal) category in em (tt) channel;
-* cat1_NbtagGe1 : DY (Higgs bkg) category in em (tt) channel
-* cat2_NbtagGe1 : HTT (Fakes) category in em (tt) channel;
-* cat3_NbtagGe1 : HWW (DY) category in em (tt) channel;
-* cat4_NbtagGe1 : Single-top (TTbar) category in em (tt) channel;
-* cat5_NbtagGe1 : merged ST+TTbar (DY+Higgs bkg) category in em (tt) channel;  
+* cat0_NbtagGe1 : TTbar (bbH signal) category in em (tt) channel -> pred_class==0;
+* cat2_NbtagGe1 : HTT (Fakes) category in em (tt) channel -> pred_class==2;
+* cat3_NbtagGe1 : HWW (DY+Higgs bkg) category in em (tt) channel -> pred_class==3;
+* cat4_NbtagGe1 : TTbar category in tt channel -> pred_class==4;
 
 Example configuration files (files with extension conf) are found in folder
 [DesyTauAnalyses/BBHTT/test/datacards](https://github.com/DesyTau/DesyTauAnalysesUL/tree/bbHTT/BBHTT/test/datacards). Configuration parameters and their meaning are explained below:
@@ -347,31 +356,24 @@ Example configuration files (files with extension conf) are found in folder
 * ```Bins``` - vector of bin boundaries in case of non-equidistant binning (this parameter is ignored if equidistant binning is specified);
 * ```Systematics``` - if true templates with systematic variations are produced (always set to true)
 * ```TestCards``` - if true quick test run is performed with detailed output (cuts applied, systematic uncertainties activated, sample weights, etc) (set to false by default)
+* ```Symmetrize``` - integer variable, if set to 1 or 2 systematic templates are symmetrized to mitigate statistical fluctuations. Symmetrization schemes -> 1 : down = 2*central - up for every shape systematic uncertainty; 2 : up = central + 0.5*(up-down), down = central + 0.5*(down-up) (default option (recommended) - 0 : no symmetrization is performed) 
 
-The following parameters have been introduced to implement smoothing of templates with large statistical fluctuations. Currently, the smoothing procedure is disabled. Don't change settings of these parameters:
-* ```MinSmooth = 1```
-* ```MaxSmooth = -1```
-* ```RangeSmooth = 1```
-* ```UseLooseShape = false```
-* ```Rebin = false```
- 
 IMPORTANT! Before running datacards production specify properly parameter ```OutputDir``` which points to the directory where datacards (RooT files with templates) will be stored. Make sure that the directory exists (you have to create it). Inside this directory subfolders have to be created for each era : 2016, 2017, 2018. For a given $era datacards will be saved in the directory ```$OutputDir/$era```. 
 
 Presently the following DNN tuples are available:
-* ```/nfs/dust/cms/user/rasp/Run/tautau_dnn_newTauID_UL``` : tt channel, "nominal" training with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar);
-* ```/nfs/dust/cms/user/rasp/Run/emu_dnn_sys_UL``` : em channel, "nominal training" with 4 categories (TTbar, DY, HTT, HWW) using inclusive sample for training (no mass cuts, nbtag<3)
-* ```/nfs/dust/cms/user/rasp/Run/emu_dnn_ST_UL``` : em channel, training with 5 categories (TTbar, DY, HTT, HWW, ST4f), cuts applied for training : 10<m_vis<100&&mt_tot<200&&nbtag>0&&nbtag<3; 
+* ```/nfs/dust/cms/user/rasp/Run/tautau_dnn_sysJES_5Cat``` : tt channel, "nominal" training with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar), extended JES systematics model;
+* ```/nfs/dust/cms/user/rasp/Run/emu_dnn_sysJES_fixed``` : em channel, "nominal training" with 4 categories (TTbar, DY, HTT, HWW) using inclusive sample for training (no mass cuts, nbtag<3), extended JES systematic model
 
 The script 
 * [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) 
 
-ssubmit one job to condor system for specified sample name, era and event category and channel. 
-It takes five input parameters:
+submits one job to condor system for specified sample name, era and event category and channel. 
+It takes six input parameters:
 ```
-> Datacards_submit.sh $sample $category $era $channel $config
+> Datacards_submit.sh $sample $category $era $channel $config $outputdir
 ```
 
-IMPORTANT! Before running datacard production modify in the script [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit.sh) parameter ```outdir``` which points to the folder where outputs of condor jobs (log, output and error files) will be saved.
+IMPORTANT! Before running datacard production modify in the script [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_em.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_em.sh) and [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_tt.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_tt.sh) parameter ```outputdir``` which points to the folder where outputs of condor jobs (log, output and error files) will be saved.
 
 Datacard production on multiple samples, eras and categories is run with the following scripts:
 * [DesyTauAnalyses/BBHTT/test/datacards/Datacards_submit_em.sh](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/Datacards_submit_em.sh) - to submit jobs for em channel;
@@ -381,13 +383,10 @@ In the current version scripts produce datacards for all eras, samples and categ
 
 These scripts make use of configuration files with category dependent non-equidistant binnings: 
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat0.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat0.conf) : to produce datacards for category cat0_NbtagGe1 (TTbar category) of em channel;
-* [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat1.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat1.conf) : to produce datacards for category cat1_NbtagGe1 (DY category) of em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat2.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat2.conf) : to produce datacards for category cat2_NbtagGe1 (HTT category) of em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat3.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat3.conf) : to produce datacards for category cat3_NbtagGe1 (HWW category) of em channel;
-* [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat4.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat4.conf) : to produce datacards for category cat4_NbtagGe1 (Single-top category) of em channel;
-* [DesyTauAnalyses/BBHTT/test/datacards/datacards_em_cat5.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_em_cat4.conf) : to produce datacards for category cat5_NbtagGe1 (merged TTbar + single-top category) of em channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt.conf) : to produce datacards for categories cat2_NbtagGe1 (Fakes) and cat4_NbtagGe1 (TTbar) of tt channel;
-* [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt_DY.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt_DY.conf) : to produce datacards for category cat3_NbtagGe1 (DY) of tt channel;
+* [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt_DY.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt_DY.conf) : to produce datacards for category cat3_NbtagGe1 (DY+Higgs bkg) of tt channel;
 * [DesyTauAnalyses/BBHTT/test/datacards/datacards_tt_bbH.conf](https://github.com/DesyTau/DesyTauAnalysesUL/blob/bbHTT/BBHTT/test/datacards/datacards_tt_bbH.conf) : to produce datacards for category cat0_NbtagGe1 (bbH signal) of tt channel;
 
 You can edit these configuration files and define binning of your choice. You can also create your own configuration files and use them in bash scripts: 
@@ -405,6 +404,9 @@ The script expects two input parameters:
 
 where ```$channel``` is the channel and ```$datacards_folder``` is the name of the directory where datacards are saved. The latter is defined via parameter ```OutputDir``` of configuration files.
 This script merges datacard RooT files for each era and saves merged RooT files under names ```bbH_$channel_$era.root``` in the folder ```$datacards_folder```. 
+
+IMPORTANT! It has been found that script ```Merge_datacards.bash``` aborts when running under CMSSW_10_6_26 environment. The reason is unknown. Therefore it is recommended to run this script without setting CMSSW environment!!!! Open new window. DO NOT SET CMSSW ENVIROMENT. And execute script with two parameters: ```$channel``` and ```$datacards_folder```.
+
 
 ## Plotting datacards
 
@@ -447,7 +449,7 @@ Bash scripts:
 plot datacards sequentially for all eras and categories in em and tt channels, respectively.
 Output of these scripts is saved in files ```em_cards.log``` and ```tt_cards.log```
 
-Available datacards:
-* ```/nfs/dust/cms/user/rasp/Run/tautau_datacards_newTauID_UL/BDT_coarse``` : tt datacards, "nominal" with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar). Higgs background category is excluded from statistical inference;
-* ```/nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_coarse``` : em datacards, "nominal" training with 4 categories (TTbar, DY, HTT, HWW), no mass cuts, nbtag<3, DY category is excluded from statistical inference;
-* ```/nfs/dust/cms/user/rasp/Run/emu_datacards_ST_UL/BDT_coarse``` : em datacards, training with 5 categories (TTbar, DY, HTT, HWW, ST); cuts applied: m_vis<100&&m_vis>10&&mt_tot>200&&nbtag>0&&nbtag<3.
+Available datacards (latest datacards of 19/05/2023 with the extended JES uncertainty model):
+* ```/nfs/dust/cms/user/rasp/Run/tautau_datacards_sysJES_5Cat/BDT_coarse``` : tt datacards, "nominal" with 5 categories (bbH signal, Higgs background, Fakes, DY, TTbar). Higgs background category is excluded from statistical inference, extended JES uncertainty model;
+* ```/nfs/dust/cms/user/rasp/Run/emu_datacards_sysJES/BDT_coarse``` : em datacards, "nominal" training with 4 categories (TTbar, DY, HTT, HWW), no mass cuts, nbtag<3, DY category is excluded from statistical inference, extended JES uncertainty model;
+

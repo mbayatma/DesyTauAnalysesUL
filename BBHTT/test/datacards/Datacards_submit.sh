@@ -1,5 +1,5 @@
 #!/bin/sh 
-# $1 - sample : Data,DYToTT,DYToLL,ST,TT,EWK,HTT,bbHTT,bbHTT_nobb [HWW, bbHWW, bbHWW_nobb]
+# $1 - sample : Data,DYToTT,DYToLL,ST,TT,EWK,HTT,bbHTT,bbHTT_nobb [HWW, bbHWW, bbHWW_nobb,TTVJets]
 # $2 - category inclusive, Nbtag0, NbtagGe1, 
 #               cat0,          cat1,          cat2,          cat3
 #               cat0_Nbtag0,   cat1_Nbtag0  , cat2_Nbtag0  , cat3_Nbtag0
@@ -7,7 +7,8 @@
 # $3 - era (2016, 2017, 2018)
 # $4 - channel (em, tt)
 # $5 - configuration file
-outdir=/nfs/dust/cms/user/rasp/Run/log/datacards
+# $6 - outputdir
+outdir=$6
 
 jobname=Datacards_${1}_${2}_${3}_${4}_${5}
 cat > ${outdir}/${jobname}.bash <<EOF1

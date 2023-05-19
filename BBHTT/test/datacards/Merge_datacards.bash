@@ -1,11 +1,10 @@
 #!/bin/bash
 channel=$1
 folder=$2
-# em : /nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_coarse/nonneg_v2
-#    : /nfs/dust/cms/user/rasp/Run/emu_datacards_sys_UL/BDT_fine/nonneg_v2
-#    : /nfs/dust/cms/user/rasp/Run/emu_datacards_ST_UL/BDT_coarse
-#    : /nfs/dust/cms/user/rasp/Run/emu_datacards_ST_UL/BDT_fine
+# em : /nfs/dust/cms/user/rasp/Run/emu_datacards_sysv1_UL/BDT_coarse
+#    : /nfs/dust/cms/user/rasp/Run/emu_datacards_sysJES/BDT_coarse
 # tt : /nfs/dust/cms/user/rasp/Run/tautau_datacards_newTauID_UL/BDT_coarse
+#    : /nfs/dust/cms/user/rasp/Run/tautau_datacards_sysJES_5Cat/BDT_coarse
 cd $folder
 for era in 2016 2017 2018
 do

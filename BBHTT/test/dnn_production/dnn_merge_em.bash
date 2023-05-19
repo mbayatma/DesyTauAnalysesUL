@@ -1,6 +1,6 @@
 #!/bin/bash
 # modify properly the parameter below (location of DNN tuples)
-dir=/nfs/dust/cms/user/rasp/Run/emu_dnn_STv1_UL
+dir=/nfs/dust/cms/user/rasp/Run/emu_dnn_sysJES_fixed
 
 # merging TTbar tuples with central tree and different systematic trees ->
 for era in 2016_pre 2016_post 2017 2018

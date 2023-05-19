@@ -9,8 +9,8 @@ do
 	./dnn_producer.bash ${sample} ${era} em ${dir}
     done
     ./dnn_producer_Syst.bash TTbar ${era} em Central ${dir}
-    #    for sys in JER JES Uncl # <- uncomment for old tuples
-    for sys in EScale JER Uncl FlavorQCD RelativeBal HF BBEC1 EC2 Absolute Absolute_Era HF_Era EC2_Era RelativeSample_Era BBEC1_Era 
+    # for sys in JER JES Uncl # <- uncomment for old tuples with single JES uncertainty 
+    for sys in EScale JER Uncl FlavorQCD RelativeBal HF BBEC1 EC2 Absolute Absolute_Era HF_Era EC2_Era RelativeSample_Era BBEC1_Era # <- comment out for old tuples with single JES uncertainty
     do 
 	for variation in Up Down
 	do 

@@ -1100,6 +1100,7 @@ bool Cards::RunData() {
       QCD_sys->Add(QCD_sys,hist,1.,-1.);
       delete hist;
     }
+    zeroBins(QCD_sys);
     if (channel=="em") nameTH1DMap["QCD_"+sysName] = QCD_sys;
     else nameTH1DMap["jetFakes_"+sysName] = QCD_sys;
   }

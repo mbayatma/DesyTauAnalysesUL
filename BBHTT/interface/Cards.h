@@ -79,7 +79,8 @@ class Cards {
 	bool RunWithSystematics,
 	bool split,
 	bool RunOnEmbedded,
-	int sym); 
+	int sym,
+	bool MassCuts); 
 
   void SetVariableToPlot(TString var, int nbins, double xmin, double xmax);
   void SetVariableToPlot(TString var, int nbins, double * bins);
@@ -102,6 +103,7 @@ class Cards {
   int min_smooth;
   int max_smooth;
   int range_smooth;
+  bool massCuts;
 
   std::vector<TString> shapeList;
 

@@ -18,7 +18,8 @@ Cards::Cards(TString Sample,
 	     bool RunWithSystematics,
 	     bool split,
 	     bool RunOnEmbedded,
-	     int sym) {
+	     int sym,
+	     bool MassCuts) {
 
   era = Era;
   channel = Channel;
@@ -35,6 +36,7 @@ Cards::Cards(TString Sample,
   useLooseShape = false;
   splitJES = split;
   symmetrize = sym;
+  massCuts = MassCuts;
 
   _usefriend=true;
   if(PredDir==""||PredDir=="None"||PredDir=="NONE"||PredDir=="none") _usefriend=false;
@@ -164,11 +166,12 @@ Cards::Cards(TString Sample,
   outputFile->mkdir(category);
 
   // additional cuts for em channel
-  //  if (channel=="em") {
-  //    commonCuts += "&&m_vis>10.&&m_vis<100.&&mt_tot<200.";
+  if (channel=="em") {
+    if (massCuts)
+      commonCuts += "&&m_vis>10.&&m_vis<100.&&mt_tot<200.";
   //    if (category=="em_cat3_NbtagGe1"||category=="em_cat6_NbtagGe1")
   //      commonCuts += "&&puppimet>20.&&mt_tot>40.0";
-  //  }
+  }
 
   // joining DY and Higgs bkg categories in tt channel
   if (category=="tt_cat5_NbtagGe1") {
@@ -825,6 +828,14 @@ int Cards::CreateShapeSystematicsMap() {
       numberOfShapeSystematics += 2;
       shapeList.push_back(sysName);
     }    
+    for (auto mapIter : ShapeSystematicsJESTotal) {
+      TString sysName = mapIter.first;
+      TString treeName = mapIter.second;
+      shapeSystematicsMap[sysName+era+"Up"] = treeName+"Up";
+      shapeSystematicsMap[sysName+era+"Down"] = treeName+"Down";
+      numberOfShapeSystematics += 2;
+      shapeList.push_back(sysName+era);
+    }
     for (auto mapIter : ShapeSystematicsJES_Era) {
       TString sysName = mapIter.first;
       TString treeName = mapIter.second;

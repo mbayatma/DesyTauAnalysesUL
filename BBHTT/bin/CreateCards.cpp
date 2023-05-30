@@ -42,6 +42,7 @@ int main(int argc, char * argv[]) {
   bool splitJES = cfg.get<bool>("SplitJES");
   bool testCards = cfg.get<bool>("TestCards");
   int sym = cfg.get<int>("Symmetrize");
+  bool massCuts = cfg.get<bool>("MassCuts");
   bool runOnEmbedded = false;
 
   Cards * cards = new Cards(sample,
@@ -58,7 +59,8 @@ int main(int argc, char * argv[]) {
 			    runWithSystematics,
 			    splitJES,
 			    runOnEmbedded,
-			    sym);
+			    sym,
+			    massCuts);
  
   cards->PrintSamples();
   cards->PrintShapeSystematics();

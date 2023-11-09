@@ -185,6 +185,14 @@ class Cards {
     {"jesBBEC1_2018","CMS_scale_j_BBEC1_2018_13TeV"},
   };  
 
+  const map<TString,TString> ShapeSystematicsJES_TT2018 = {
+    {"jesAbsolute_2018","CMS_scale_j_BBEC1_2018_13TeV"},
+    {"jesHF_2018","CMS_scale_j_HF_2018_13TeV"},
+    {"jesEC2_2018","CMS_scale_j_EC2_2018_13TeV"},
+    {"jesRelativeSample_2018","CMS_scale_j_HF_2018_13TeV"},
+    {"jesBBEC1_2018","CMS_scale_j_Absolute_2018_13TeV"},
+  };
+
   const map<TString,TString> ShapeSystematicsTT = {
     {"scale_t_1prong","CMS_scale_t_1prong_13TeV"},
     {"scale_t_1prong1pi","CMS_scale_t_1prong1pizero_13TeV"},
@@ -214,6 +222,10 @@ class Cards {
 
   const map<TString,TString> DYShapeSystematics = {
     {"dyShape","zptweight"},
+    {"dyShape1b","zptweight_1btag"},
+    {"dyShape2b","zptweight_2btag"},
+    {"dyxsec1b","zptweight_tt_1btag"},
+    {"dyxsec2b","zptweight_tt_2btag"}
   };
 
   const map<TString,TString> TopShapeSystematics = {
@@ -253,7 +265,7 @@ class Cards {
   };
 
   const map<TString,TString> BTagSystematics = {
-    {"jes","btagweight_jes"},
+    //    {"jes","btagweight_jes"},
     {"lf","btagweight_lf"},
     {"hf","btagweight_hf"},
     {"hfstats1","btagweight_hfstats1"},
@@ -264,6 +276,18 @@ class Cards {
     {"cferr2","btagweight_cferr2"}
   };
 
+  const map<TString,TString> BTagSystematics2016 = {
+    {"2016_preVFP_hfstats1","btagweight_hfstats1_2016pre"},
+    {"2016_preVFP_hfstats2","btagweight_hfstats2_2016pre"},
+    {"2016_preVFP_lfstats1","btagweight_lfstats1_2016pre"},
+    {"2016_preVFP_lfstats2","btagweight_lfstats2_2016pre"},
+    {"2016_postVFP_hfstats1","btagweight_hfstats1_2016post"},
+    {"2016_postVFP_hfstats2","btagweight_hfstats2_2016post"},
+    {"2016_postVFP_lfstats1","btagweight_lfstats1_2016post"},
+    {"2016_postVFP_lfstats2","btagweight_lfstats2_2016post"}
+  };
+
+
   const map<TString,TString> LeptonFakeSystematics = {
     {"CMS_htt_em_JetToElecFakes","jfakeE"},
     {"CMS_htt_em_JetToMuonFakes","jfakeMu"},
@@ -273,13 +297,13 @@ class Cards {
 
   const map<TString,TString> QCDSystematics = {
     {"CMS_htt_em_qcd_0jet_rate","qcdweight_deltaR_0jet_Par0"},
-    {"CMS_htt_em_qcd_0jet_shape","qcdweight_deltaR_0jet_Par1"},
+    {"CMS_htt_em_qcd_0jet_shape1","qcdweight_deltaR_0jet_Par1"},
     {"CMS_htt_em_qcd_0jet_shape2","qcdweight_deltaR_0jet_Par2"},
     {"CMS_htt_em_qcd_1jet_rate","qcdweight_deltaR_1jet_Par0"},
-    {"CMS_htt_em_qcd_1jet_shape","qcdweight_deltaR_1jet_Par1"},
+    {"CMS_htt_em_qcd_1jet_shape1","qcdweight_deltaR_1jet_Par1"},
     {"CMS_htt_em_qcd_1jet_shape2","qcdweight_deltaR_1jet_Par2"},
     {"CMS_htt_em_qcd_2jet_rate","qcdweight_deltaR_2jet_Par0"},
-    {"CMS_htt_em_qcd_2jet_shape","qcdweight_deltaR_2jet_Par1"},
+    {"CMS_htt_em_qcd_2jet_shape1","qcdweight_deltaR_2jet_Par1"},
     {"CMS_htt_em_qcd_2jet_shape2","qcdweight_deltaR_0jet_Par2"},
   };
 
@@ -318,17 +342,27 @@ class Cards {
     {"CMS_htt_em_qcd_nonClosure","qcdweight_nonclosure"},
   };
 
-  const map<TString,TString> SignalSystematics = {
-    {"QCDscale","weight_CMS_scale_gg_13TeV"},
-    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
-    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
+  const map<TString,TString> SignalScaleSystematics = {
+    {"QCDscaleMURSig","weight_CMS_scale_muR_13TeV"},
+    {"QCDscaleMUFSig","weight_CMS_scale_muF_13TeV"},
+    {"PS_ISRSig","weight_CMS_PS_ISR_ggH_13TeV"},
+    {"PS_FSRSig","weight_CMS_PS_FSR_ggH_13TeV"},
   };
 
-  const map<TString,TString> HiggsSystematics = {
-    {"QCDscale","weight_CMS_scale_gg_13TeV"},
-    //    {"PS_ISR","weight_CMS_PS_ISR_ggH_13TeV"},
-    //    {"PS_FSR","weight_CMS_PS_FSR_ggH_13TeV"}
+  const map<TString,TString> TTscaleSystematics = {
+    {"QCDscaleMURTT","weight_CMS_scale_muR_13TeV"},
+    {"QCDscaleMUFTT","weight_CMS_scale_muF_13TeV"},
+    {"PS_ISRTT","weight_CMS_PS_ISR_ggH_13TeV"},
+    {"PS_FSRTT","weight_CMS_PS_FSR_ggH_13TeV"}
   };
+
+  const map<TString,TString> DYscaleSystematics = {
+    {"QCDscaleMURDY","weight_CMS_scale_muR_13TeV"},
+    {"QCDscaleMUFDY","weight_CMS_scale_muF_13TeV"},
+    {"PS_ISRDY","weight_CMS_PS_ISR_ggH_13TeV"},
+    {"PS_FSRDY","weight_CMS_PS_FSR_ggH_13TeV"}
+  };
+
 
   // ******************************************************* 
   // ************* CLASS VARIABLES *************************

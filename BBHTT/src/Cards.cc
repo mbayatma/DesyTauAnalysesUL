@@ -349,6 +349,7 @@ Cards::Cards(TString Sample,
   }
   InitializeSamples();
 
+  shapeList.clear();
   numberOfShapeSystematics = CreateShapeSystematicsMap();
   numberOfWeightSystematics = CreateWeightSystematicsMap();
   
@@ -565,6 +566,16 @@ TH1D * Cards::ProcessSample(TString name,
     }
     else {
       treeName = BaseTreeName + "_" + shapeSystematicsMap[sysName];
+      /*
+      if (sysName.Contains("jes")) {
+	if (sysName.Contains("Up")) {
+	  weight += "*btagweight_jes"; 
+	} 
+	else {
+	  weight += "*TMath::Max(0.1,2.0-btagweight_jes)";
+	}
+      }
+      */
     }
   }
 
@@ -633,8 +644,8 @@ TH1D * Cards::ProcessSample(TString name,
   }
   if (name.Contains("ybyt"))
     hist->Scale(-1.0);
-  else 
-    zeroBins(hist);
+
+  zeroBins(hist);
 
   return hist;
 
@@ -787,14 +798,16 @@ int Cards::CreateShapeSystematicsMap() {
 
   int numberOfShapeSystematics = 0;
 
-  shapeList.clear();
 
   if (sampleToProcess=="Data")
     return numberOfShapeSystematics;
 
   map<TString, TString> ShapeSystematicsJES_Era = ShapeSystematicsJES2016;
   if (era=="2017") ShapeSystematicsJES_Era = ShapeSystematicsJES2017;
-  if (era=="2018") ShapeSystematicsJES_Era = ShapeSystematicsJES2018;
+  if (era=="2018") { 
+    ShapeSystematicsJES_Era = ShapeSystematicsJES2018;
+    if (sampleToProcess=="TT") ShapeSystematicsJES_Era = ShapeSystematicsJES_TT2018;
+  }
 
 
   if (channel=="tt") {
@@ -941,6 +954,18 @@ int Cards::CreateWeightSystematicsMap() {
     weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
     numberOfWeightSystematics += 2;
   }
+
+  if (era.Contains("2016")) {
+    for (auto mapIter : BTagSystematics2016) {
+      TString sysName = "btag" + mapIter.first + "Up";
+      TString weightName = mapIter.second;
+      weightSystematicsMap[sysName] = weightName+"*";
+      
+      sysName = "btag" + mapIter.first + "Down";
+      weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
+      numberOfWeightSystematics += 2;
+    }
+  }
   
   // Prefiring weight;
   for (auto mapIter : PrefiringSystematics) {
@@ -950,6 +975,18 @@ int Cards::CreateWeightSystematicsMap() {
     numberOfWeightSystematics++;
   }
 
+  // Parton Shower systematics 
+  /*
+  for (auto mapIter : PartonShowerSystematics) {
+    TString sysName = mapIter.first + "Up";
+    TString weightName = mapIter.second;
+    weightSystematicsMap[sysName] = weightName+"Up*";
+
+    sysName = mapIter.first + "Down";
+    weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+"Up)*";
+    numberOfWeightSystematics += 2;  
+  }
+  */
   if (channel=="tt") {
     // tau id and trigger and l->tau fakes
     for (auto mapIter : WeightSystematicsTT) {
@@ -965,24 +1002,16 @@ int Cards::CreateWeightSystematicsMap() {
   if (sampleToProcess=="bbHTT"||
       sampleToProcess=="bbHTT_nobb"||
       sampleToProcess=="bbHWW"||
-      sampleToProcess=="bbHWW_nobb") {
-    for (auto mapIter : SignalSystematics) {
+      sampleToProcess=="bbHWW_nobb" ||
+      sampleToProcess=="HTT" ||
+      sampleToProcess=="HWW") {
+    for (auto mapIter : SignalScaleSystematics) {
       TString sysName = mapIter.first;
       TString weightName = mapIter.second;
       weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
       weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
       numberOfWeightSystematics += 2;
-    }
-  }
-
-  // Higgs samples ->
-  if (sampleToProcess=="HTT"||sampleToProcess=="HWW") {
-    for (auto mapIter : HiggsSystematics) {
-      TString sysName = mapIter.first;
-      TString weightName = mapIter.second;
-      weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
-      weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
-      numberOfWeightSystematics += 2;
+      shapeList.push_back(sysName);
     }
   }
 
@@ -997,7 +1026,15 @@ int Cards::CreateWeightSystematicsMap() {
       weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
       numberOfWeightSystematics += 2;
       
-   }      
+    }      
+    for (auto mapIter : TTscaleSystematics) {
+      TString sysName = mapIter.first;
+      TString weightName = mapIter.second;
+      weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
+      weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
+      shapeList.push_back(sysName);
+      numberOfWeightSystematics += 2;
+    }
   }
 
   // DYJets ---->
@@ -1009,6 +1046,14 @@ int Cards::CreateWeightSystematicsMap() {
 
       sysName = mapIter.first + "Down";
       weightSystematicsMap[sysName] = "TMath::Max(0.1,2.0-"+weightName+")*";
+      numberOfWeightSystematics += 2;
+    }
+    for (auto mapIter : DYscaleSystematics) {
+      TString sysName = mapIter.first;
+      TString weightName = mapIter.second;
+      weightSystematicsMap[sysName+"Up"] = weightName + "Up*";
+      weightSystematicsMap[sysName+"Down"] = weightName + "Down*";
+      shapeList.push_back(sysName);
       numberOfWeightSystematics += 2;
     }
   }
@@ -1023,27 +1068,48 @@ bool Cards::RunData() {
 
   TH1D * histData = ProcessSample("Data","",0,false);
   nameTH1DMap["data_obs"] = histData;
-  
   if (channel=="em") {
     TH1D * QCD = ProcessSample("Data","",1,false);
-    TH1D * QCD_Up = (TH1D*)QCD->Clone("QCDsubtrUp");
-    TH1D * QCD_Down = (TH1D*)QCD->Clone("QCDsubtrDown");
+    std::map<TString, TH1D*> jetToL_QCD; 
+    std::map<TString, TString> weightSystematicsMap_temp = weightSystematicsMap;
+    std::map<TString, TString> weightJetToLeptonMap;
+    for (auto mapIter : LeptonFakeSystematics) {
+      weightJetToLeptonMap[mapIter.first] = mapIter.second + "*";
+      jetToL_QCD[mapIter.first] = (TH1D*)QCD->Clone("QCD_"+mapIter.first);
+    }
+    weightSystematicsMap = weightJetToLeptonMap;
     for (auto name : samplesContainer) {
-
+      
       TH1D * hist = ProcessSample(name,"",1,false);
-
-      QCD->Add(QCD,hist,1.,-1.0);	
-      QCD_Up->Add(QCD_Up,hist,1.,-0.9);
-      QCD_Down->Add(QCD_Down,hist,1.,-1.1);
-
+      QCD->Add(QCD,hist,1.0,-1.0);	
       delete hist;
+      for (auto mapIter : jetToL_QCD) {
+	TH1D * histSys = ProcessSample(name,mapIter.first,1,true);
+	mapIter.second->Add(mapIter.second,histSys,1.0,-1.0);
+	delete histSys;
+      }
     }
     zeroBins(QCD); 
-    zeroBins(QCD_Up);
-    zeroBins(QCD_Down);
     nameTH1DMap["QCD"] = QCD;
-    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Up"] = QCD_Up;
-    nameTH1DMap["QCD_CMS_qcd_subtr_syst_em_"+era+"Down"] = QCD_Down;
+    for (auto mapIter : jetToL_QCD) {
+      TH1D * histSys = mapIter.second;
+      int nBins = QCD->GetNbinsX();
+      TH1D * histSysUp = (TH1D*)histSys->Clone("QCD_"+mapIter.first+"Up");
+      TH1D * histSysDown = (TH1D*)histSys->Clone("QCD_"+mapIter.first+"Down");
+      for (int iB=1; iB<=nBins; ++iB) {
+	double diff = 1.0*(histSys->GetBinContent(iB) - QCD->GetBinContent(iB));
+	double xup = QCD->GetBinContent(iB) + diff;
+	double xdown = QCD->GetBinContent(iB) - diff;
+	histSysUp->SetBinContent(iB,xup);
+	histSysDown->SetBinContent(iB,xdown);
+      } 
+      zeroBins(histSysUp);
+      zeroBins(histSysDown);
+      nameTH1DMap["QCD_"+mapIter.first+"_"+era+"Up"] = histSysUp;
+      nameTH1DMap["QCD_"+mapIter.first+"_"+era+"Down"] = histSysDown;
+    }
+
+    weightSystematicsMap = weightSystematicsMap_temp;
   }
   else {
     TH1D * QCD = ProcessSample("Data","",1,false);
@@ -1068,23 +1134,33 @@ bool Cards::RunData() {
     nameTH1DMap["jetFakes_CMS_fakes_subtr_syst_tt_"+era+"Down"] = QCD_Down;
   }
 
-  bool first = true;
-  TH1D * histSingleFake;
+  bool firstW = true;
+  TH1D * histSingleWFake;
+  TH1D * histSingleTTbarFake;
   if(channel=="tt"){
     //    cout<<"Side band region for tt channel"<<endl;
     for (auto name : samplesContainer) {
       TH1D * hist = ProcessSample(name,"",2,false);
-      if (first) {
-	histSingleFake = hist;
-	first = false;
+      if (name=="TT") {
+	histSingleTTbarFake = hist;
       }
       else {
-	histSingleFake->Add(histSingleFake,hist,1.,1.);
-	delete hist;
+	if (firstW) {
+	  histSingleWFake = hist;
+	  firstW = false;
+	}
+	else {
+	  histSingleWFake->Add(histSingleWFake,hist,1.,1.);
+	  delete hist;
+	}
       }
     }
+    TH1D * histSingleFake = (TH1D*)histSingleWFake->Clone("mcFakes");
+    histSingleFake->Add(histSingleFake,histSingleTTbarFake,1.,1.);
     zeroBins(histSingleFake);
-    nameTH1DMap["wFakes"] = histSingleFake;
+    nameTH1DMap["wFakes"] = histSingleWFake;
+    nameTH1DMap["ttFakes"] = histSingleTTbarFake;
+    nameTH1DMap["mcFakes"] = histSingleFake;
   }
 
   if (!runWithSystematics) { 
@@ -1241,6 +1317,12 @@ void Cards::PrintSamples() {
   }
 
   std::cout << std::endl;
+  std::cout << "Systematic uncertainties to be symmetrized -> " << std::endl;
+  for (auto sysSym : shapeList) {
+    std::cout << sysSym << std::endl;
+  }
+
+  std::cout << std::endl;
   std::cout << "Variable to be plotted : " << variable << std::endl;
   std::cout << std::endl;
   std::cout << "Cuts to be applied for category " << category << std::endl;
@@ -1275,6 +1357,60 @@ bool Cards::Run() {
   outputFile->cd(category);
   std::cout << std::endl;
   std::cout << std::endl;
+
+  // corrections btag_{lf,hf}
+  if (sampleToProcess=="TT"||
+      sampleToProcess=="DYToTT"||
+      sampleToProcess=="DYToLL"||
+      sampleToProcess=="ST"||
+      sampleToProcess=="EWK") {
+    std::vector<TString> btagCorr; 
+    btagCorr.push_back("btag"+era+"_lfUp");
+    btagCorr.push_back("btag"+era+"_lfDown");
+    btagCorr.push_back("btag"+era+"_hfUp");
+    btagCorr.push_back("btag"+era+"_hfDown");
+    for (auto sampleName : samplesContainer) {
+      TString histName = nameHistoMap[sampleName];
+      TH1D * histCentral = nameTH1DMap[histName];
+      int nBins = histCentral->GetNbinsX();
+      for (auto uncert : btagCorr) {
+	TH1D * histSys = nameTH1DMap[histName+"_"+uncert];
+	for (int iB=1; iB<=nBins; ++iB) {
+	  double xCentral = histCentral->GetBinContent(iB);
+	  double xSys = histSys->GetBinContent(iB);
+	  double xCorr = xCentral + 0.4*(xSys-xCentral);
+	  histSys->SetBinContent(iB,xCorr);
+	}
+      }
+    }
+  }
+
+  // corrections JES
+  if (channel=="em"&&(sampleToProcess=="TT"||
+		      sampleToProcess=="ST")) {
+    std::vector<TString> jesCorr; 
+    jesCorr.push_back("jesFlavorQCDUp");
+    jesCorr.push_back("jesFlavorQCDDown");
+    jesCorr.push_back("jesAbsoluteUp");
+    jesCorr.push_back("jesAbsoluteDown");
+    jesCorr.push_back("jesRelativeBalUp");
+    jesCorr.push_back("jesRelativeBalDown");
+    for (auto sampleName : samplesContainer) {
+      TString histName = nameHistoMap[sampleName];
+      TH1D * histCentral = nameTH1DMap[histName];
+      int nBins = histCentral->GetNbinsX();
+      for (auto uncert : jesCorr) {
+	TH1D * histSys = nameTH1DMap[histName+"_"+uncert];
+	for (int iB=1; iB<=nBins; ++iB) {
+	  double xCentral = histCentral->GetBinContent(iB);
+	  double xSys = histSys->GetBinContent(iB);
+	  double xCorr = xCentral + 0.5*(xSys-xCentral);
+	  histSys->SetBinContent(iB,xCorr);
+	}
+      }
+    }
+  }
+
 
   if (sampleToProcess!="Data"&&symmetrize>0) {
     for (auto name : samplesContainer) {

@@ -262,6 +262,12 @@ public :
   Float_t         gen_ipphi_2;
   Float_t         gen_ipeta_2;
 
+  Float_t         jetTauPt;
+  Float_t         jetTauEta;
+  Float_t         jetTauPhi;
+  Bool_t          jetTauPassed;
+  Int_t           jetTauFlavor;
+
   Float_t         ip_covxx_2;
   Float_t         ip_covxy_2;
   Float_t         ip_covxz_2;
@@ -588,6 +594,12 @@ public :
   Float_t weight_CMS_scale_gg_13TeVUp;
   Float_t weight_CMS_scale_gg_13TeVDown;
 
+  Float_t weight_CMS_scale_muR_13TeVUp;
+  Float_t weight_CMS_scale_muR_13TeVDown;
+
+  Float_t weight_CMS_scale_muF_13TeVUp;
+  Float_t weight_CMS_scale_muF_13TeVDown;
+
   Float_t weight_CMS_QCDScale[9];
 
   Float_t weight_CMS_PS_ISR_ggH_13TeVUp;
@@ -620,8 +632,15 @@ public :
 
   Float_t         topptweight;
   Double_t 	  zptweight;
+
   Double_t        zptweight_0btag;
   Double_t        zptweight_1btag;
+  Double_t        zptweight_2btag;
+
+  Double_t        zptweight_tt_0btag;
+  Double_t        zptweight_tt_1btag;
+  Double_t        zptweight_tt_2btag;
+
   Double_t        zptembweight;
   Double_t        trkeffweight;
   Float_t         etaufakeweight;
@@ -1341,6 +1360,11 @@ public :
 
   TBranch        *b_weight_CMS_scale_gg_13TeVUp;
   TBranch        *b_weight_CMS_scale_gg_13TeVDown;
+  TBranch        *b_weight_CMS_scale_muR_13TeVUp;
+  TBranch        *b_weight_CMS_scale_muR_13TeVDown;
+  TBranch        *b_weight_CMS_scale_muF_13TeVUp;
+  TBranch        *b_weight_CMS_scale_muF_13TeVDown;
+
   TBranch        *b_weight_CMS_PS_ISR_ggH_13TeVUp;
   TBranch        *b_weight_CMS_PS_ISR_ggH_13TeVDown;
   TBranch        *b_weight_CMS_PS_FSR_ggH_13TeVUp;
@@ -1431,8 +1455,15 @@ public :
 
   TBranch	 *b_topptweight;
   TBranch	 *b_zptweight;
+
   TBranch        *b_zptweight_0btag;
   TBranch        *b_zptweight_1btag;
+  TBranch        *b_zptweight_2btag;
+
+  TBranch        *b_zptweight_tt_0btag;
+  TBranch        *b_zptweight_tt_1btag;
+  TBranch        *b_zptweight_tt_2btag;
+
   TBranch	 *b_zptembweight;
   TBranch	 *b_trkeffweight;
   TBranch	 *b_etaufakeweight;
@@ -1713,6 +1744,12 @@ public :
   TBranch        *b_y2_ZMF;
   TBranch        *b_y1_TMF;
   TBranch        *b_y2_TMF;
+
+  TBranch        *b_jetTauPt;
+  TBranch        *b_jetTauEta;
+  TBranch        *b_jetTauPhi;
+  TBranch        *b_jetTauPassed;
+  TBranch        *b_jetTauFlavor;
   
   bool isGGHWeights;
 

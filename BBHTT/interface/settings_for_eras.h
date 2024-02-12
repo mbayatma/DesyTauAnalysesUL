@@ -645,6 +645,7 @@ std::vector<TString> systematicsTotalJES = {
 };
 
 std::vector<TString> systematicsJES = {
+  "CMS_scale_j_JES_13TeV",
   "CMS_scale_j_FlavorQCD_13TeV",
   "CMS_scale_j_RelativeBal_13TeV",
   "CMS_scale_j_HF_13TeV",

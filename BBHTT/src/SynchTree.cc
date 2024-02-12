@@ -365,8 +365,12 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    //   fChain->SetBranchAddress("embweight", &embweight, &b_embweight);
    fChain->SetBranchAddress("topptweight", &topptweight, &b_topptweight);
    fChain->SetBranchAddress("zptweight", &zptweight, &b_zptweight);
-   fChain->SetBranchAddress("zptweight_0btag", &zptweight_0btag, &b_zptweight_0btag);
+   //   fChain->SetBranchAddress("zptweight_0btag", &zptweight_0btag, &b_zptweight_0btag);
    fChain->SetBranchAddress("zptweight_1btag", &zptweight_1btag, &b_zptweight_1btag);
+   fChain->SetBranchAddress("zptweight_2btag", &zptweight_2btag, &b_zptweight_2btag);
+   //   fChain->SetBranchAddress("zptweight_tt_0btag", &zptweight_tt_0btag, &b_zptweight_tt_0btag);
+   fChain->SetBranchAddress("zptweight_tt_1btag", &zptweight_tt_1btag, &b_zptweight_tt_1btag);
+   fChain->SetBranchAddress("zptweight_tt_2btag", &zptweight_tt_2btag, &b_zptweight_tt_2btag);
    //   fChain->SetBranchAddress("zptembweight", &zptembweight, &b_zptembweight);
    fChain->SetBranchAddress("effweight", &effweight, &b_effweight); 
    fChain->SetBranchAddress("prefiringweight", &prefiringweight, &b_prefiringweight);
@@ -480,8 +484,16 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
    
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, &b_weight_CMS_scale_gg_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, &b_weight_CMS_scale_gg_13TeVDown);
+
+   fChain->SetBranchAddress("weight_CMS_scale_muR_13TeVUp", &weight_CMS_scale_muR_13TeVUp, &b_weight_CMS_scale_muR_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_scale_muR_13TeVDown", &weight_CMS_scale_muR_13TeVDown, &b_weight_CMS_scale_muR_13TeVDown);
+
+   fChain->SetBranchAddress("weight_CMS_scale_muF_13TeVUp", &weight_CMS_scale_muF_13TeVUp, &b_weight_CMS_scale_muF_13TeVUp);
+   fChain->SetBranchAddress("weight_CMS_scale_muF_13TeVDown", &weight_CMS_scale_muF_13TeVDown, &b_weight_CMS_scale_muF_13TeVDown);
+
    fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, &b_weight_CMS_PS_ISR_ggH_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, &b_weight_CMS_PS_ISR_ggH_13TeVDown);
+
    fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, &b_weight_CMS_PS_FSR_ggH_13TeVUp);
    fChain->SetBranchAddress("weight_CMS_PS_FSR_ggH_13TeVDown", &weight_CMS_PS_FSR_ggH_13TeVDown, &b_weight_CMS_PS_FSR_ggH_13TeVDown);
    
@@ -537,6 +549,7 @@ void SynchTree::ReadInit(TTree *tree, TString ch)
      fChain->SetBranchAddress("trg_elow",  &trg_elow, &b_trg_elow);
      fChain->SetBranchAddress("trg_muhigh_elow",  &trg_muhigh_elow, &b_trg_muhigh_elow);
      fChain->SetBranchAddress("trg_ehigh_mulow",  &trg_ehigh_mulow, &b_trg_ehigh_mulow);
+
    }
    
    //MET
@@ -1216,6 +1229,14 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
 
   fChain->Branch("weight_CMS_scale_gg_13TeVUp", &weight_CMS_scale_gg_13TeVUp, "weight_CMS_scale_gg_13TeVUp/F");
   fChain->Branch("weight_CMS_scale_gg_13TeVDown", &weight_CMS_scale_gg_13TeVDown, "weight_CMS_scale_gg_13TeVDown/F");
+
+  fChain->Branch("weight_CMS_scale_muF_13TeVUp", &weight_CMS_scale_muF_13TeVUp, "weight_CMS_scale_muF_13TeVUp/F");
+  fChain->Branch("weight_CMS_scale_muF_13TeVDown", &weight_CMS_scale_muF_13TeVDown, "weight_CMS_scale_muF_13TeVDown/F");
+
+  fChain->Branch("weight_CMS_scale_muR_13TeVUp", &weight_CMS_scale_muR_13TeVUp, "weight_CMS_scale_muR_13TeVUp/F");
+  fChain->Branch("weight_CMS_scale_muR_13TeVDown", &weight_CMS_scale_muR_13TeVDown, "weight_CMS_scale_muR_13TeVDown/F");
+
+
   fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVUp", &weight_CMS_PS_ISR_ggH_13TeVUp, "weight_CMS_PS_ISR_ggH_13TeVUp/F");
   fChain->Branch("weight_CMS_PS_ISR_ggH_13TeVDown", &weight_CMS_PS_ISR_ggH_13TeVDown, "weight_CMS_PS_ISR_ggH_13TeVDown/F");
   fChain->Branch("weight_CMS_PS_FSR_ggH_13TeVUp", &weight_CMS_PS_FSR_ggH_13TeVUp, "weight_CMS_PS_FSR_ggH_13TeVUp/F");
@@ -1259,8 +1280,12 @@ void SynchTree::WriteInit(TTree *tree, TString ch) {
   fChain->Branch("prefiringweightDown", &prefiringweightDown, "prefiringweightDown/F");
   fChain->Branch("topptweight", &topptweight, "topptweight/F");
   fChain->Branch("zptweight", &zptweight, "zptweight/D");
-  fChain->Branch("zptweight_0btag", &zptweight_0btag, "zptweight_0btag/D");
+  //  fChain->Branch("zptweight_0btag", &zptweight_0btag, "zptweight_0btag/D");
   fChain->Branch("zptweight_1btag", &zptweight_1btag, "zptweight_1btag/D");
+  fChain->Branch("zptweight_2btag", &zptweight_2btag, "zptweight_2btag/D");
+  //  fChain->Branch("zptweight_tt_0btag", &zptweight_tt_0btag, "zptweight_tt_0btag/D");
+  fChain->Branch("zptweight_tt_1btag", &zptweight_tt_1btag, "zptweight_tt_1btag/D");
+  fChain->Branch("zptweight_tt_2btag", &zptweight_tt_2btag, "zptweight_tt_2btag/D");
   //  fChain->Branch("zptembweight", &zptembweight, "zptembweight/D");
   fChain->Branch("effweight", &effweight, "effweight/F"); 
   fChain->Branch("btagweight",&btagweight, "btagweight/F");

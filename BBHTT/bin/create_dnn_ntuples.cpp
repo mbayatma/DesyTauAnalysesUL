@@ -725,6 +725,10 @@ int main(int argc, char * argv[]) {
     std::map<TString,TFile*> files_friend;
     std::map<TString,float> scaleQCDUp;
     std::map<TString,float> scaleQCDDown;
+    std::map<TString,float> scaleQCDMuRUp;
+    std::map<TString,float> scaleQCDMuRDown;
+    std::map<TString,float> scaleQCDMuFUp;
+    std::map<TString,float> scaleQCDMuFDown;
     std::vector<TString> subsamples;
     subsamples.clear();
     for(TString const& subsample: sample.second) {
@@ -744,19 +748,35 @@ int main(int argc, char * argv[]) {
       float qcdNormUp = 1.0;
       float qcdNormDown = 1.0;
       
+      float qcdNormMuRUp = 1.0;
+      float qcdNormMuRDown = 1.0;
+      
+      float qcdNormMuFUp = 1.0;
+      float qcdNormMuFDown = 1.0;
+      
       if (!isData) {
 	if (splitJES) {
 	  TH1D * histScaleCentral = (TH1D*)inFile->Get("nWeightedEventsScaleCentral");
 	  TH1D * histScaleUp = (TH1D*)inFile->Get("nWeightedEventsScaleUp");
 	  TH1D * histScaleDown = (TH1D*)inFile->Get("nWeightedEventsScaleDown");
+	  TH1D * histScaleMuRUp = (TH1D*)inFile->Get("nWeightedEventsScaleMuRUp");
+	  TH1D * histScaleMuRDown = (TH1D*)inFile->Get("nWeightedEventsScaleMuRDown");
+	  TH1D * histScaleMuFUp = (TH1D*)inFile->Get("nWeightedEventsScaleMuFUp");
+	  TH1D * histScaleMuFDown = (TH1D*)inFile->Get("nWeightedEventsScaleMuFDown");
 	  qcdNormUp   = histScaleCentral->GetSumOfWeights()/histScaleUp->GetSumOfWeights();
 	  qcdNormDown = histScaleCentral->GetSumOfWeights()/histScaleDown->GetSumOfWeights(); 
+	  qcdNormMuRUp   = histScaleCentral->GetSumOfWeights()/histScaleMuRUp->GetSumOfWeights();
+	  qcdNormMuRDown = histScaleCentral->GetSumOfWeights()/histScaleMuRDown->GetSumOfWeights(); 
+	  qcdNormMuFUp   = histScaleCentral->GetSumOfWeights()/histScaleMuFUp->GetSumOfWeights();
+	  qcdNormMuFDown = histScaleCentral->GetSumOfWeights()/histScaleMuFDown->GetSumOfWeights(); 
 	}
       }
 
       std::cout << std::endl;
-      std::cout << "QCD Scale up   -> overall normalization : " << qcdNormUp   << std::endl;
-      std::cout << "QCD scale down -> overall normalization : " << qcdNormDown <<  std::endl;
+      std::cout << "mu(R) up   -> overall normalization : " << qcdNormMuRUp   << std::endl;
+      std::cout << "mu(R) down -> overall normalization : " << qcdNormMuRDown <<  std::endl;
+      std::cout << "mu(F) up   -> overall normalization : " << qcdNormMuFUp   << std::endl;
+      std::cout << "mu(F) down -> overall normalization : " << qcdNormMuFDown <<  std::endl;
       std::cout << std::endl;
 
       TFile *friendFile =NULL;      
@@ -773,6 +793,10 @@ int main(int argc, char * argv[]) {
       }
       scaleQCDUp[subSample]   = qcdNormUp;
       scaleQCDDown[subSample] = qcdNormDown;
+      scaleQCDMuRUp[subSample]   = qcdNormMuRUp;
+      scaleQCDMuRDown[subSample] = qcdNormMuRDown;
+      scaleQCDMuFUp[subSample]   = qcdNormMuFUp;
+      scaleQCDMuFDown[subSample] = qcdNormMuFDown;
       files_sample[subSample] = inFile;
       files_friend[subSample] = friendFile;
     }
@@ -789,6 +813,10 @@ int main(int argc, char * argv[]) {
 	TFile * inFile = files_sample[subsample];
 	float qcdNormUp   = scaleQCDUp[subsample];
 	float qcdNormDown = scaleQCDDown[subsample];
+	float qcdNormMuRUp   = scaleQCDMuRUp[subsample];
+	float qcdNormMuRDown = scaleQCDMuRDown[subsample];
+	float qcdNormMuFUp   = scaleQCDMuFUp[subsample];
+	float qcdNormMuFDown = scaleQCDMuFDown[subsample];
 
 	TTree *inTree  = NULL;
 	inTree = (TTree*)inFile->Get(TreeName);
@@ -819,6 +847,18 @@ int main(int argc, char * argv[]) {
 	  std::cout << "  xsec = " << xsec << " ; nevents = " << nevents << " ; lumi = " << luminosity << " -> norm = " << xsec*luminosity/nevents << std::endl;
 	
 	// SetBranchAddress for variables that need are needed for preselection or stitching
+	float btagweight_hfstats1;
+	float btagweight_hfstats1_2016pre;
+	float btagweight_hfstats1_2016post;
+	float btagweight_hfstats2;
+	float btagweight_hfstats2_2016pre;
+	float btagweight_hfstats2_2016post;
+	float btagweight_lfstats1;
+	float btagweight_lfstats1_2016pre;
+	float btagweight_lfstats1_2016post;
+	float btagweight_lfstats2;
+	float btagweight_lfstats2_2016pre;
+	float btagweight_lfstats2_2016post;
 	int gen_noutgoing;
 	float iso_1;
 	float iso_2;
@@ -884,6 +924,10 @@ int main(int argc, char * argv[]) {
 	float weight_CMS_QCDScale2;
 	float weight_CMS_scale_gg_13TeVUp;
 	float weight_CMS_scale_gg_13TeVDown;
+	float weight_CMS_scale_muR_13TeVUp;
+	float weight_CMS_scale_muR_13TeVDown;
+	float weight_CMS_scale_muF_13TeVUp;
+	float weight_CMS_scale_muF_13TeVDown;
 
 	inTree->SetBranchAddress("gen_noutgoing",&gen_noutgoing);
 	inTree->SetBranchAddress("iso_1",&iso_1);
@@ -908,13 +952,22 @@ int main(int argc, char * argv[]) {
 	inTree->SetBranchAddress("os",&os);
 	//	inTree->SetBranchAddress("mbb", &mbb);
 	//	inTree->SetBranchAddress("dRbb",&dRbb);
-	inTree->SetBranchAddress("nbtag",&nbtag);
+	//	inTree->SetBranchAddress("mbb", &mbb);
+	//	inTree->SetBranchAddress("dRbb",&dRbb);
+	inTree->SetBranchAddress("btagweight_hfstats1",&btagweight_hfstats1);
+	inTree->SetBranchAddress("btagweight_hfstats2",&btagweight_hfstats2);
+	inTree->SetBranchAddress("btagweight_lfstats1",&btagweight_lfstats1);
+	inTree->SetBranchAddress("btagweight_lfstats2",&btagweight_lfstats2);
 	inTree->SetBranchAddress("trg_doubletau",&trg_doubletau);
 	inTree->SetBranchAddress("weight",&weight);
 	inTree->SetBranchAddress("weight_CMS_QCDScale4",&weight_CMS_QCDScale4);
 	inTree->SetBranchAddress("weight_CMS_QCDScale2",&weight_CMS_QCDScale2);
 	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVUp",&weight_CMS_scale_gg_13TeVUp);
 	inTree->SetBranchAddress("weight_CMS_scale_gg_13TeVDown",&weight_CMS_scale_gg_13TeVDown);
+	inTree->SetBranchAddress("weight_CMS_scale_muR_13TeVUp",&weight_CMS_scale_muR_13TeVUp);
+	inTree->SetBranchAddress("weight_CMS_scale_muR_13TeVDown",&weight_CMS_scale_muR_13TeVDown);
+	inTree->SetBranchAddress("weight_CMS_scale_muF_13TeVUp",&weight_CMS_scale_muF_13TeVUp);
+	inTree->SetBranchAddress("weight_CMS_scale_muF_13TeVDown",&weight_CMS_scale_muF_13TeVDown);
 	inTree->SetBranchAddress("gen_match_1",&gen_match_1);
 	inTree->SetBranchAddress("gen_match_2",&gen_match_2);
 
@@ -1018,6 +1071,19 @@ int main(int argc, char * argv[]) {
 	    }
 	    
 	  }
+
+	  if (Era=="2016") {
+	    outTree->Branch("btagweight_hfstats1_2016pre",&btagweight_hfstats1_2016pre,"btagweight_hfstats1_2016pre/F");
+	    outTree->Branch("btagweight_hfstats1_2016post",&btagweight_hfstats1_2016post,"btagweight_hfstats1_2016post/F");
+	    outTree->Branch("btagweight_hfstats2_2016pre",&btagweight_hfstats2_2016pre,"btagweight_hfstats2_2016pre/F");
+	    outTree->Branch("btagweight_hfstats2_2016post",&btagweight_hfstats2_2016post,"btagweight_hfstats2_2016post/F");
+
+	    outTree->Branch("btagweight_lfstats1_2016pre",&btagweight_lfstats1_2016pre,"btagweight_lfstats1_2016pre/F");
+	    outTree->Branch("btagweight_lfstats1_2016post",&btagweight_lfstats1_2016post,"btagweight_lfstats1_2016post/F");
+	    outTree->Branch("btagweight_lfstats2_2016pre",&btagweight_lfstats2_2016pre,"btagweight_lfstats2_2016pre/F");
+	    outTree->Branch("btagweight_lfstats2_2016post",&btagweight_lfstats2_2016post,"btagweight_lfstats2_2016post/F");
+	  }
+
 	  if (channel=="em") {
 	    outTree->Branch("bfakeE",&bfakeE,"bfakeE/F");
 	    outTree->Branch("jfakeE",&jfakeE,"jfakeE/F");
@@ -1072,7 +1138,17 @@ int main(int argc, char * argv[]) {
 	  currentTree->Branch("pred_class_3_proba",&prob_3,"pred_class_3_proba/F");
 	  currentTree->Branch("pred_class_4_proba",&prob_4,"pred_class_4_proba/F");
 	}
-	// lumi-xsec-weight added
+	if (Era=="2016") {
+	  currentTree->Branch("btagweight_hfstats1_2016pre",&btagweight_hfstats1_2016pre,"btagweight_hfstats1_2016pre/F");
+	  currentTree->Branch("btagweight_hfstats1_2016post",&btagweight_hfstats1_2016post,"btagweight_hfstats1_2016post/F");
+	  currentTree->Branch("btagweight_hfstats2_2016pre",&btagweight_hfstats2_2016pre,"btagweight_hfstats2_2016pre/F");
+	  currentTree->Branch("btagweight_hfstats2_2016post",&btagweight_hfstats2_2016post,"btagweight_hfstats2_2016post/F");
+	  
+	  currentTree->Branch("btagweight_lfstats1_2016pre",&btagweight_lfstats1_2016pre,"btagweight_lfstats1_2016pre/F");
+	  currentTree->Branch("btagweight_lfstats1_2016post",&btagweight_lfstats1_2016post,"btagweight_lfstats1_2016post/F");
+	  currentTree->Branch("btagweight_lfstats2_2016pre",&btagweight_lfstats2_2016pre,"btagweight_lfstats2_2016pre/F");
+	  currentTree->Branch("btagweight_lfstats2_2016post",&btagweight_lfstats2_2016post,"btagweight_lfstats2_2016post/F");
+	}
 
 	for (int i=0; i<inTree->GetEntries(); i++) {
 	  inTree->GetEntry(i);
@@ -1093,10 +1169,39 @@ int main(int argc, char * argv[]) {
 	  if (splitJES) {
 	    weight_CMS_scale_gg_13TeVUp *= qcdNormUp;
 	    weight_CMS_scale_gg_13TeVDown *= qcdNormDown;
+	    weight_CMS_scale_muR_13TeVUp *= qcdNormMuRUp;
+	    weight_CMS_scale_muR_13TeVDown *= qcdNormMuRDown;
+	    weight_CMS_scale_muF_13TeVUp *= qcdNormMuFUp;
+	    weight_CMS_scale_muF_13TeVDown *= qcdNormMuFDown;
 	  }
 	  //	  std::cout << "weight_CMS_scale_gg_13TeVUp   (after)  = " << weight_CMS_scale_gg_13TeVUp << std::endl;
 	  //	  std::cout << "weight_CMS_scale_gg_13TeVDown (after)  = " << weight_CMS_scale_gg_13TeVDown << std::endl;
 	  //	  std::cout << std::endl;
+
+	  btagweight_hfstats1_2016pre = 1.0;
+	  btagweight_hfstats1_2016post = 1.0;
+	  btagweight_hfstats2_2016pre = 1.0;
+	  btagweight_hfstats2_2016post = 1.0;
+	  
+	  btagweight_lfstats1_2016pre = 1.0;
+	  btagweight_lfstats1_2016post = 1.0;
+	  btagweight_lfstats2_2016pre = 1.0;
+	  btagweight_lfstats2_2016post = 1.0;
+
+	  if (era=="2016_pre") {
+	    btagweight_hfstats1_2016pre = btagweight_hfstats1;
+	    btagweight_hfstats2_2016pre = btagweight_hfstats2;
+	    btagweight_lfstats1_2016pre = btagweight_lfstats1;
+	    btagweight_lfstats2_2016pre = btagweight_lfstats2;
+	  }
+
+	  if (era=="2016_post") {
+	    btagweight_hfstats1_2016post = btagweight_hfstats1;
+	    btagweight_hfstats2_2016post = btagweight_hfstats2;
+	    btagweight_lfstats1_2016post = btagweight_lfstats1;
+	    btagweight_lfstats2_2016post = btagweight_lfstats2;
+	  }
+
 
 	  if(applyPreselection){
 	    if (channel=="em") {

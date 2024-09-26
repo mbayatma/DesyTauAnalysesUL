@@ -1,0 +1,59 @@
+<Flags CXXFLAGS="-Wno-unused-variable -Wno-error=unused-but-set-variable -Wno-error=maybe-uninitialized" />
+
+<bin name="PlotSystematics" file="PlotSystematics.cpp">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotMLFit" file="PlotMLFit.cpp">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+
+<bin name="PlotEMu" file="Plot_emu.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotDatacards" file="PlotDatacards.cpp">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotEMu_dnn" file="Plot_emu_stitched.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotTauTau_dnn" file="Plot_tautau_stitched.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
+<bin name="PlotTauTau" file="Plot_tautau.C">
+ <use name="rootgraphics"/>
+ <use name="root"/>
+ <use name="rootmath"/>
+ <use name="DesyTauAnalyses/Plotter"/>
+ <use name="DesyTauAnalyses/Common"/>
+</bin>
+
